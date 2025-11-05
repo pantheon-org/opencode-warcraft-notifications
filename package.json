@@ -1,21 +1,51 @@
 {
-  "name": "opencode-warcraft-notifications",
+  "name": "@pantheon-ai/opencode-warcraft-notifications",
   "version": "1.0.0",
   "description": "Warcraft II Alliance notifications plugin for OpenCode",
-  "main": "index.ts",
-  "module": "index.ts",
-  "author": "thoroc <thomas.a.roche@gmail.com>",
+  "keywords": [
+    "opencode",
+    "plugin",
+    "notification",
+    "typescript",
+    "warcraft",
+    "warcraft-ii",
+    "warcraft2",
+    "alliance",
+    "sounds"
+  ],
+  "homepage": "https://github.com/pantheon-org/opencode-warcraft-notifications#readme",
+  "bugs": {
+    "url": "https://github.com/pantheon-org/opencode-warcraft-notifications/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pantheon-org/opencode-warcraft-notifications.git"
   },
+  "license": "MIT",
+  "author": "thoroc <thomas.a.roche@gmail.com>",
+  "type": "module",
+  "main": "index.ts",
   "files": [
     "index.ts",
     "src",
     "README.md"
   ],
-  "license": "MIT",
-  "type": "module",
+  "scripts": {
+    "test": "bun test src",
+    "test:coverage": "bun test --coverage src/",
+    "test:watch": "bun test --watch src/",
+    "test:verbose": "bun test src/ --reporter tap",
+    "type-check": "bun tsc --noEmit --project tsconfig.test.json",
+    "lint": "eslint src/ --ext .ts",
+    "clean": "rm -rf dist/ .bun-cache/ coverage/",
+    "build": "bun tsc",
+    "dev": "bun tsc --watch"
+  },
+  "dependencies": {
+    "csstype": "^3.1.3",
+    "undici-types": "^7.16.0",
+    "zod": "^4.1.8"
+  },
   "devDependencies": {
     "@opencode-ai/plugin": "^1.0.29",
     "@types/node": "^20.0.0",
@@ -28,20 +58,5 @@
   "engines": {
     "node": ">=18.0.0",
     "bun": ">=1.0.0"
-  },
-  "keywords": [
-    "opencode",
-    "plugin",
-    "notification",
-    "typescript",
-    "warcraft",
-    "warcraft-ii",
-    "warcraft2",
-    "alliance",
-    "sounds"
-  ],
-  "bugs": {
-    "url": "https://github.com/pantheon-org/opencode-warcraft-notifications/issues"
-  },
-  "homepage": "https://github.com/pantheon-org/opencode-warcraft-notifications#readme"
+  }
 }
