@@ -1,0 +1,8 @@
+# dependencies (bun install)
+node_modules
+
+# Data files
+src/sounds/data/
+
+# GitHub Actions
+!.github/workflows/release.yml

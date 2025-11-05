@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    // Target modern environment since this is a Bun project
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "bundler",
+    
+    // Allow importing TypeScript files with .ts extensions (Bun supports this)
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    
+    // Essential type checking
+    "strict": true,
+    "skipLibCheck": true,
+    
+    // Allow JavaScript files (in case of mixed JS/TS)
+    "allowJs": true,
+    
+    // Module detection
+    "moduleDetection": "force",
+    
+    // Less strict for test files
+    "noImplicitAny": false,
+    
+    // Bun runtime globals (use @types/bun)
+    "types": ["bun"]
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
