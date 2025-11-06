@@ -1,6 +1,6 @@
 import { join } from "path";
 import { exists } from "fs/promises";
-import { getDataDirectory } from "./download.js";
+import { DEFAULT_DATA_DIR } from "./sound-data";
 
 /**
  * All available Warcraft II Alliance sound files
@@ -103,7 +103,7 @@ export const getRandomSoundFromCategory = (category: keyof typeof sounds): strin
  * @returns `true` when the file exists
  */
 export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
-  const effectiveDataDir = dataDir ?? getDataDirectory();
+  const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const filePath = join(effectiveDataDir, filename);
   return await exists(filePath);
 };
@@ -115,7 +115,7 @@ export const soundExists = async (filename: string, dataDir?: string): Promise<b
  * @returns Absolute path to the sound file
  */
 export const getSoundPath = (filename: string, dataDir?: string): string => {
-  const effectiveDataDir = dataDir ?? getDataDirectory();
+  const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   return join(effectiveDataDir, filename);
 };
 

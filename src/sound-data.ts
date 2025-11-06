@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 
 // Get the current directory (was sounds directory)
 const soundsDir = dirname(fileURLToPath(import.meta.url));
-export const DEFAULT_DATA_DIR = join(soundsDir, "..", "data");
+export const DEFAULT_DATA_DIR = process.env.SOUNDS_DATA_DIR ?? join(soundsDir, "..", "data");
 export const DEFAULT_BASE_URL = process.env.SOUNDS_BASE_URL ?? "https://www.thanatosrealms.com/war2/sounds/humans";
 
 export interface SoundFile {
@@ -101,3 +101,4 @@ export const buildSoundsToDownload = (baseUrl: string): SoundFile[] => {
 export const getSoundFileList = (): string[] => {
   return soundEntries.map(e => e.filename);
 }
+
