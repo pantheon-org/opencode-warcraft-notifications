@@ -58,7 +58,8 @@
     "eslint-plugin-jsdoc": "^39.0.0",
     "eslint-plugin-sonarjs": "^0.16.0",
     "eslint-plugin-import": "^2.28.0",
-    "eslint-import-resolver-typescript": "^3.5.2"
+    "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-plugin-tsdoc": "^11.0.0"
   },
   "engines": {
     "node": ">=18.0.0",

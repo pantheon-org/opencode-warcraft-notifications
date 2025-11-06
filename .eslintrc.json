@@ -15,7 +15,8 @@
         "prefer-arrow",
         "jsdoc",
         "sonarjs",
-        "import"
+        "import",
+        "tsdoc"
       ],
   "extends": [
     "eslint:recommended",
@@ -70,7 +71,9 @@
     "max-lines": ["warn", 300],
     "complexity": ["warn", 10],
     "import/max-dependencies": ["warn", { "max": 10 }],
-    "import/no-cycle": "error"
+    "import/no-cycle": "error",
+
+    "tsdoc/syntax": "warn"
   },
   "overrides": [
     {
