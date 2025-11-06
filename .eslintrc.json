@@ -73,7 +73,7 @@
     "import/max-dependencies": ["warn", { "max": 10 }],
     "import/no-cycle": "error",
 
-    "tsdoc/syntax": "warn"
+    "tsdoc/syntax": "error"
   },
   "overrides": [
     {
