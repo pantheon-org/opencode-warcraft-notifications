@@ -1,32 +1,48 @@
 import type { Plugin } from "@opencode-ai/plugin"
-import { getRandomSoundPath, soundExists } from "./sounds/index.js"
-import { downloadAllSounds } from "./sounds/download.js"
+import { getRandomSoundPath, soundExists } from "./sounds.js"
+import { ensureSoundAvailable } from "./download.js"
 
 /**
  * Notification idle plugin
  */
 export const NotificationPlugin: Plugin = async ({ project, client, $, directory, worktree }) => {
-  // Check if sounds exist on plugin initialization, download if needed
-  let soundsReady = false;
-  
-  const initializeSounds = async () => {
-    if (soundsReady) return;
-    
+  // We'll download sounds on demand. Keep a simple cache flag to avoid repeated checks.
+  const checkedSoundCache = new Map<string, boolean>();
+
+  async function ensureAndGetSoundPath() {
+    // Determine explicit data directory preference: plugin `directory` if available, otherwise env or default
+    const explicitDataDir = directory ? `${directory}/.opencode-sounds` : process.env.SOUNDS_DATA_DIR;
+
+    // Choose a random sound filename
+    const soundPath = getRandomSoundPath(explicitDataDir);
+    const filename = soundPath.split("/").pop() as string;
+
+    // If we've already confirmed availability, return the path
+    if (checkedSoundCache.get(filename) === true) return soundPath;
+
     try {
-      // Check if at least one sound file exists
-      const testSoundExists = await soundExists("human_selected1.wav");
-      
-      if (!testSoundExists) {
-        console.log("Warcraft II Alliance sounds not found. Downloading...");
-        await downloadAllSounds();
+      // If file exists locally, mark and return
+      const existsLocally = await soundExists(filename, explicitDataDir);
+      if (existsLocally) {
+        checkedSoundCache.set(filename, true);
+        return soundPath;
       }
-      
-      soundsReady = true;
+
+      // Otherwise attempt on-demand download via ensureSoundAvailable
+      const ok = await ensureSoundAvailable(filename, undefined, undefined, explicitDataDir);
+      if (ok) {
+        checkedSoundCache.set(filename, true);
+        return soundPath;
+      }
+
+      // If download failed, fall through to return original path (which may not exist)
+      return soundPath;
     } catch (error) {
-      console.error("Failed to initialize sounds:", error);
-      // Continue without sounds rather than failing completely
+      console.error("Error ensuring sound available:", error);
+      return soundPath;
     }
-  };
+  }
+
   let lastMessage: { messageID: string | null; text: string | null } = {
     messageID: null,
     text: null,
@@ -44,18 +60,20 @@ export const NotificationPlugin: Plugin = async ({ project, client, $, directory
 
       if (event.type === "session.idle") {
         const summary = getIdleSummary(lastMessage?.text) ?? "Idle";
+
         if (process.platform === "darwin") {
-          // Initialize sounds if needed
-          await initializeSounds();
-          
-          if (soundsReady) {
-            // Get a random Warcraft II Alliance sound from all available sounds
-            const soundPath = getRandomSoundPath();
+          // Ensure the randomly chosen sound is available (download on demand)
+          const soundPath = await ensureAndGetSoundPath();
+          const filename = soundPath.split("/").pop() as string;
+          const existsLocally = await soundExists(filename);
+
+          if (existsLocally) {
             await $`osascript -e 'do shell script "afplay ${soundPath}"'`;
           } else {
-            // Fallback to system sound if download failed
+            // Fallback to system sound if the file isn't available
             await $`osascript -e 'do shell script "afplay /System/Library/Sounds/Glass.aiff"'`;
           }
+
           await $`osascript -e 'display notification ${JSON.stringify(summary)} with title "opencode"'`;
         } else {
           await $`canberra-gtk-play --id=message`;

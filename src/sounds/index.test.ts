@@ -9,7 +9,7 @@ import {
   soundExists,
   getSoundPath,
   getRandomSoundPath,
-} from "./index.ts";
+} from "../sounds";
 
 describe("sounds data structure", () => {
   test("should have all expected categories", () => {
@@ -126,8 +126,7 @@ describe("getSoundPath()", () => {
   test("should use correct base directory", () => {
     const testFile = "human_selected1.wav" as const;
     const path = getSoundPath(testFile);
-    const soundsDir = dirname(fileURLToPath(import.meta.url));
-    const expectedPath = join(soundsDir, "data", testFile);
+    const expectedPath = join(process.cwd(), "data", testFile);
     
     expect(path).toBe(expectedPath);
   });

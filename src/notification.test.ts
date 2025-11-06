@@ -1,5 +1,5 @@
-import { soundExists, getRandomSoundPath, getAllSounds } from "./sounds/index.ts";
-import { downloadAllSounds } from "./sounds/download.ts";
+import { soundExists, getRandomSoundPath, getAllSounds } from "./sounds.ts";
+import { downloadAllSounds } from "./download.ts";
 
 async function testPlugin() {
   console.log("Testing Warcraft II Alliance sounds plugin...\n");
