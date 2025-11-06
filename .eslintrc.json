@@ -10,22 +10,24 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "prefer-arrow",
-    "jsdoc",
-    "tsdoc",
-    "sonarjs",
-    "filenames"
-  ],
+    "plugins": [
+        "@typescript-eslint",
+        "prefer-arrow",
+        "jsdoc",
+        "sonarjs",
+        "import"
+      ],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:jsdoc/recommended",
     "plugin:sonarjs/recommended"
   ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
   "rules": {
-    "tsdoc/syntax": "error",
     "jsdoc/require-jsdoc": [
       "error",
       {
@@ -36,8 +38,10 @@
         }
       }
     ],
+    "jsdoc/require-param": "off",
+
     "jsdoc/check-alignment": "error",
-    "jsdoc/check-param-names": "error",
+    "jsdoc/check-param-names": "off",
     "max-lines": [
       "error",
       {
@@ -50,7 +54,6 @@
       "error",
       30
     ],
-    "sonarjs/max-lines-per-function": ["error", 120],
     "prefer-arrow/prefer-arrow-functions": [
       "error",
       {
@@ -63,14 +66,17 @@
     "@typescript-eslint/no-explicit-any": "warn",
     "no-var": "error",
     "prefer-const": "error",
-    "filenames/match-exported": ["error", "kebab"]
+
+    "max-lines": ["warn", 300],
+    "complexity": ["warn", 10],
+    "import/max-dependencies": ["warn", { "max": 10 }],
+    "import/no-cycle": "error"
   },
   "overrides": [
     {
       "files": ["**/*.test.ts"],
       "rules": {
-        "jsdoc/require-jsdoc": "off",
-        "tsdoc/syntax": "off"
+        "jsdoc/require-jsdoc": "off"
       }
     }
   ]

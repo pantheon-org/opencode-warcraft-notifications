@@ -52,11 +52,9 @@ export const NotificationPlugin: Plugin = async ({ project: _project, client: _c
   return {
     event: async ({ event }) => {
       // Save message text for idle summary
-      if (event.type === "message.part.updated") {
-        if (event.properties.part.type === "text") {
-          const { messageID, text } = event.properties.part;
-          lastMessage = { messageID, text };
-        }
+      if (event.type === "message.part.updated" && event.properties.part.type === "text") {
+        const { messageID, text } = event.properties.part;
+        lastMessage = { messageID, text };
       }
 
       if (event.type === "session.idle") {
