@@ -5,11 +5,12 @@ import { ensureSoundAvailable } from "./download.js"
 /**
  * Notification idle plugin
  */
-export const NotificationPlugin: Plugin = async ({ project, client, $, directory, worktree }) => {
+export const NotificationPlugin: Plugin = async ({ project: _project, client: _client, $, directory, worktree: _worktree }) => {
   // We'll download sounds on demand. Keep a simple cache flag to avoid repeated checks.
   const checkedSoundCache = new Map<string, boolean>();
+  void _project; void _client; void _worktree;
 
-  async function ensureAndGetSoundPath() {
+  const ensureAndGetSoundPath = async () => {
     // Determine explicit data directory preference: plugin `directory` if available, otherwise env or default
     const explicitDataDir = directory ? `${directory}/.opencode-sounds` : process.env.SOUNDS_DATA_DIR;
 
@@ -41,7 +42,7 @@ export const NotificationPlugin: Plugin = async ({ project, client, $, directory
       console.error("Error ensuring sound available:", error);
       return soundPath;
     }
-  }
+  };
 
   let lastMessage: { messageID: string | null; text: string | null } = {
     messageID: null,
@@ -90,7 +91,7 @@ export const NotificationPlugin: Plugin = async ({ project, client, $, directory
 
 const getIdleSummary = (text: string | null) => {
   if (!text) return;
-  const idleMatch = text.match(/[_\*]Summary:[_\*]? (.*)[_\*]?$/m);
+  const idleMatch = text.match(/[_*]Summary:[_*]? (.*)[_*]?$/m);
   if (idleMatch && idleMatch[1]) {
     return idleMatch[1].trim();
   }

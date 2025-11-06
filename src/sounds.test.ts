@@ -1,6 +1,5 @@
-import { test, expect, describe, beforeEach, jest } from "bun:test";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import { test, expect, describe, jest } from "bun:test";
+import { join } from "path";
 import {
   sounds,
   getAllSounds,
@@ -9,13 +8,13 @@ import {
   soundExists,
   getSoundPath,
   getRandomSoundPath,
-} from "../sounds";
+} from "./sounds.ts";
 
 describe("sounds data structure", () => {
   test("should have all expected categories", () => {
     const expectedCategories = [
       "humanSelected",
-      "humanAcknowledge", 
+      "humanAcknowledge",
       "dwarfSelected",
       "dwarfAcknowledge",
       "elfSelected",
@@ -36,14 +35,16 @@ describe("sounds data structure", () => {
   });
 
   test("should have non-empty arrays for each category", () => {
-    Object.entries(sounds).forEach(([category, soundFiles]) => {
+    Object.entries(sounds).forEach(([_category, soundFiles]) => {
+      void _category;
       expect(Array.isArray(soundFiles)).toBe(true);
       expect(soundFiles.length).toBeGreaterThan(0);
     });
   });
 
   test("should have wav file extensions", () => {
-    Object.entries(sounds).forEach(([category, soundFiles]) => {
+    Object.entries(sounds).forEach(([_category, soundFiles]) => {
+      void _category;
       soundFiles.forEach((file) => {
         expect(file).toMatch(/\.wav$/);
       });
@@ -66,7 +67,7 @@ describe("getAllSounds()", () => {
     // Check that sounds from each category are included
     Object.values(sounds).forEach((categorySounds) => {
       categorySounds.forEach((sound) => {
-        expect(allSounds).toContain(sound as any);
+        expect(allSounds).toContain(sound);
       });
     });
   });
@@ -77,19 +78,17 @@ describe("getRandomSound()", () => {
     const randomSound = getRandomSound();
     const allSounds = getAllSounds();
     
-    expect(typeof randomSound).toBe("string");
-    expect(allSounds).toContain(randomSound as any);
-    expect(randomSound).toMatch(/\.wav$/);
-  });
+      expect(typeof randomSound).toBe("string");
+      expect(allSounds).toContain(randomSound);
+      expect(randomSound).toMatch(/\.wav$/);
+    });
 
   test("should return different sounds across multiple calls", () => {
-    // This is probabilistic - with 50+ sounds, getting the same one 10 times is very unlikely
     const results = new Set();
     for (let i = 0; i < 10; i++) {
       results.add(getRandomSound());
     }
     
-    // We should get at least 2 different sounds in 10 tries (very conservative)
     expect(results.size).toBeGreaterThanOrEqual(2);
   });
 });
@@ -98,18 +97,26 @@ describe("getRandomSoundFromCategory()", () => {
   test("should return sound from specified category", () => {
     const categories = Object.keys(sounds) as (keyof typeof sounds)[];
     
+    const getRandomSoundTyped = <C extends keyof typeof sounds>(category: C): (typeof sounds)[C][number] => {
+      return getRandomSoundFromCategory(category) as (typeof sounds)[C][number];
+    };
+    
     categories.forEach((category) => {
-      const randomSound = getRandomSoundFromCategory(category);
+      const randomSound = getRandomSoundTyped(category);
       const categorySounds = sounds[category];
       
       expect(typeof randomSound).toBe("string");
-      expect(categorySounds).toContain(randomSound as any);
+      expect(categorySounds).toContain(randomSound);
     });
   });
 
   test("should handle categories with multiple items", () => {
-    const sound = getRandomSoundFromCategory("humanSelected");
-    expect(sounds.humanSelected).toContain(sound as any);
+    const getRandomSoundTyped = <C extends keyof typeof sounds>(category: C): (typeof sounds)[C][number] => {
+      return getRandomSoundFromCategory(category) as (typeof sounds)[C][number];
+    };
+
+    const sound = getRandomSoundTyped("humanSelected");
+    expect(sounds.humanSelected).toContain(sound);
   });
 });
 
@@ -141,7 +148,6 @@ describe("getRandomSoundPath()", () => {
     expect(randomPath).toContain("data");
     expect(randomPath).toMatch(/\.wav$/);
     
-    // Extract filename and verify it's a valid sound
     const filename = randomPath.split("/").pop()!;
     expect(allSounds).toContain(filename);
   });
@@ -149,19 +155,18 @@ describe("getRandomSoundPath()", () => {
 
 describe("soundExists()", () => {
   test("should return boolean", async () => {
-    // Mock the exists function to avoid filesystem dependencies
     const mockExists = jest.fn(() => Promise.resolve(true));
     
-    // Mock the fs/promises module using spyOn
     const fsPromises = await import("fs/promises");
-    const spyExists = (jest.spyOn(fsPromises as any, "exists") as any).mockImplementation(mockExists);
+    type FsPromisesWithExists = { exists(path: string): Promise<boolean> };
+    const fsWithExists = fsPromises as unknown as FsPromisesWithExists;
+    const spyExists = jest.spyOn(fsWithExists, "exists").mockImplementation(mockExists);
 
     try {
       const result = await soundExists("test.wav");
       expect(typeof result).toBe("boolean");
       expect(mockExists).toHaveBeenCalledTimes(1);
     } finally {
-      // Restore original function
       spyExists.mockRestore();
     }
   });
@@ -169,9 +174,10 @@ describe("soundExists()", () => {
   test("should call exists with correct path", async () => {
     const mockExists = jest.fn(() => Promise.resolve(false));
     
-    // Mock the fs/promises module using spyOn
     const fsPromises = await import("fs/promises");
-    const spyExists = (jest.spyOn(fsPromises as any, "exists") as any).mockImplementation(mockExists);
+    type FsPromisesWithExists = { exists(path: string): Promise<boolean> };
+    const fsWithExists = fsPromises as unknown as FsPromisesWithExists;
+    const spyExists = jest.spyOn(fsWithExists, "exists").mockImplementation(mockExists);
 
     try {
       const testFile = "human_selected1.wav" as const;
@@ -181,7 +187,6 @@ describe("soundExists()", () => {
       expect(mockExists).toHaveBeenCalledTimes(1);
       expect(mockExists).toHaveBeenCalledWith(expectedPath);
     } finally {
-      // Restore original function
       spyExists.mockRestore();
     }
   });

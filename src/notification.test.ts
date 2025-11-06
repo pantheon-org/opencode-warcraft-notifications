@@ -1,7 +1,7 @@
 import { soundExists, getRandomSoundPath, getAllSounds } from "./sounds.ts";
 import { downloadAllSounds } from "./download.ts";
 
-async function testPlugin() {
+const testPlugin = async () => {
   console.log("Testing Warcraft II Alliance sounds plugin...\n");
   
   // Test 1: Check if sounds exist
@@ -44,7 +44,7 @@ async function testPlugin() {
   }
   
   console.log("\n✅ Plugin test completed!");
-}
+};
 
 // Run the test
 await testPlugin();

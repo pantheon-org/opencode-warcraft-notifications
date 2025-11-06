@@ -2,6 +2,8 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { mkdir, exists } from "fs/promises";
 
+export type FetchLike = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+
 // Get the current directory (was sounds directory)
 const soundsDir = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DATA_DIR = join(soundsDir, "..", "data");
@@ -87,14 +89,14 @@ const soundEntries: Array<{ filename: string; path: string; description: string 
   { filename: "jobs_done.wav", path: "peasant/work-complete.wav", description: "Jobs done" },
 ];
 
-function buildSoundsToDownload(baseUrl: string): SoundFile[] {
+const buildSoundsToDownload = (baseUrl: string): SoundFile[] => {
   return soundEntries.map(e => ({ filename: e.filename, url: `${baseUrl}/${e.path}`, description: e.description }));
 }
 
 /**
  * Download a single sound file
  */
-async function downloadSound(sound: SoundFile, fetchImpl: typeof fetch, dataDir?: string): Promise<boolean> {
+const downloadSound = async (sound: SoundFile, fetchImpl: FetchLike, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const filePath = join(effectiveDataDir, sound.filename);
   
@@ -133,7 +135,7 @@ async function downloadSound(sound: SoundFile, fetchImpl: typeof fetch, dataDir?
 /**
  * Check if a sound file exists locally
  */
-export async function soundExists(filename: string, dataDir?: string): Promise<boolean> {
+export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const filePath = join(effectiveDataDir, filename);
   return await exists(filePath);
@@ -146,8 +148,8 @@ const downloadInProgress = new Map<string, Promise<boolean>>();
  * Download a single sound by filename on demand.
  * Returns true if the file is available locally after the call (either already existed or downloaded successfully).
  */
-export async function downloadSoundByFilename(filename: string, fetchImpl?: typeof fetch, baseUrl?: string, dataDir?: string): Promise<boolean> {
-  const effectiveFetch = fetchImpl ?? (globalThis.fetch as typeof fetch);
+export const downloadSoundByFilename = async (filename: string, fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<boolean> => {
+  const effectiveFetch = fetchImpl ?? (globalThis.fetch as unknown as FetchLike);
   const effectiveBaseUrl = baseUrl ?? DEFAULT_BASE_URL;
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
 
@@ -215,7 +217,7 @@ export async function downloadSoundByFilename(filename: string, fetchImpl?: type
  * Ensure a sound is available locally (download on demand).
  * This is a convenience wrapper around `downloadSoundByFilename`.
  */
-export async function ensureSoundAvailable(filename: string, fetchImpl?: typeof fetch, baseUrl?: string, dataDir?: string): Promise<boolean> {
+export const ensureSoundAvailable = async (filename: string, fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<boolean> => {
   return await downloadSoundByFilename(filename, fetchImpl, baseUrl, dataDir);
 }
 
@@ -223,8 +225,8 @@ export async function ensureSoundAvailable(filename: string, fetchImpl?: typeof 
  * Download all Warcraft II Alliance sounds
  * Accepts optional fetch implementation and baseUrl for easier testing/config
  */
-export async function downloadAllSounds(fetchImpl?: typeof fetch, baseUrl?: string, dataDir?: string): Promise<void> {
-  const effectiveFetch = fetchImpl ?? (globalThis.fetch as typeof fetch);
+export const downloadAllSounds = async (fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<void> => {
+  const effectiveFetch = fetchImpl ?? (globalThis.fetch as unknown as FetchLike);
   const effectiveBaseUrl = baseUrl ?? DEFAULT_BASE_URL;
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
 
@@ -261,13 +263,13 @@ export async function downloadAllSounds(fetchImpl?: typeof fetch, baseUrl?: stri
 /**
  * Get the list of all sound files that should be downloaded
  */
-export function getSoundFileList(): string[] {
+export const getSoundFileList = (): string[] => {
   return soundEntries.map(e => e.filename);
 }
 
 /**
  * Get the data directory path
  */
-export function getDataDirectory(): string {
+export const getDataDirectory = (): string => {
   return process.env.SOUNDS_DATA_DIR ?? DEFAULT_DATA_DIR;
 }
