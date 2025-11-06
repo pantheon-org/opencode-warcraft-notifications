@@ -1,6 +1,7 @@
 import type { Plugin } from "@opencode-ai/plugin"
 import { getRandomSoundPath, soundExists } from "./sounds.js"
 import { ensureSoundAvailable } from "./download.js"
+/* eslint-disable jsdoc/require-param */
 
 /**
  * Notification idle plugin
@@ -10,7 +11,8 @@ import { ensureSoundAvailable } from "./download.js"
  *
  * The plugin downloads sounds on demand into `directory/.opencode-sounds` or `SOUNDS_DATA_DIR`.
  */
-export const NotificationPlugin: Plugin = async ({ project: _project, client: _client, $, directory, worktree: _worktree }) => {
+export const NotificationPlugin: Plugin = async (ctx) => {
+  const { project: _project, client: _client, $, directory, worktree: _worktree } = ctx;
   // We'll download sounds on demand. Keep a simple cache flag to avoid repeated checks.
   const checkedSoundCache = new Map<string, boolean>();
   void _project; void _client; void _worktree;

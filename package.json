@@ -36,7 +36,7 @@
     "test:watch": "bun test --watch src/",
     "test:verbose": "bun test src/ --reporter tap",
     "type-check": "bun tsc --noEmit --project tsconfig.test.json",
-    "lint": "eslint src/ --ext .ts",
+    "lint": "eslint src/",
     "clean": "rm -rf dist/ .bun-cache/ coverage/",
     "build": "bun tsc",
     "dev": "bun tsc --watch"

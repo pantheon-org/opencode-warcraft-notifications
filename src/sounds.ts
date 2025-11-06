@@ -71,29 +71,59 @@ export const sounds = {
   special: ["work_completed.wav", "jobs_done.wav"],
 } as const;
 
+/**
+ * Return a flat list of every known sound filename
+ * @returns Array of sound filenames
+ */
 export const getAllSounds = (): string[] => Object.values(sounds).flat();
 
+/**
+ * Pick a random sound filename from the full set
+ * @returns A sound filename
+ */
 export const getRandomSound = (): string => {
   const allSounds = getAllSounds();
   return allSounds[Math.floor(Math.random() * allSounds.length)];
 };
 
+/**
+ * Pick a random sound from a named category
+ * @param category - Key of the `sounds` map
+ * @returns A sound filename from the category
+ */
 export const getRandomSoundFromCategory = (category: keyof typeof sounds): string => {
   const categorySounds = sounds[category];
   return categorySounds[Math.floor(Math.random() * categorySounds.length)];
 };
 
+/**
+ * Check whether a sound file exists in the data directory
+ * @param filename - Name of the sound file
+ * @param dataDir - Optional override data directory
+ * @returns `true` when the file exists
+ */
 export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? getDataDirectory();
   const filePath = join(effectiveDataDir, filename);
   return await exists(filePath);
 };
 
+/**
+ * Resolve the absolute path for a sound filename in the data directory
+ * @param filename - Sound filename
+ * @param dataDir - Optional override data directory
+ * @returns Absolute path to the sound file
+ */
 export const getSoundPath = (filename: string, dataDir?: string): string => {
   const effectiveDataDir = dataDir ?? getDataDirectory();
   return join(effectiveDataDir, filename);
 };
 
+/**
+ * Pick a random sound filename and return its resolved path
+ * @param dataDir - Optional override data directory
+ * @returns Absolute path to a random sound file
+ */
 export const getRandomSoundPath = (dataDir?: string): string => {
   const randomSound = getRandomSound();
   return getSoundPath(randomSound, dataDir);
