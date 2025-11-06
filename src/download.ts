@@ -4,6 +4,12 @@ import { mkdir, exists } from "fs/promises";
 
 export type FetchLike = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 
+/**
+ * Build a list of sounds to download from the base URL.
+ * @param baseUrl - Base URL that hosts sound files
+ * @returns An array of SoundFile objects with filename, url and description
+ */
+
 // Get the current directory (was sounds directory)
 const soundsDir = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DATA_DIR = join(soundsDir, "..", "data");
@@ -89,12 +95,22 @@ const soundEntries: Array<{ filename: string; path: string; description: string 
   { filename: "jobs_done.wav", path: "peasant/work-complete.wav", description: "Jobs done" },
 ];
 
+/**
+ * Build a list of sounds to download from the base URL.
+ * @param baseUrl - Base URL that hosts sound files
+ * @returns An array of SoundFile objects with filename, url and description
+ */
 const buildSoundsToDownload = (baseUrl: string): SoundFile[] => {
   return soundEntries.map(e => ({ filename: e.filename, url: `${baseUrl}/${e.path}`, description: e.description }));
 }
 
 /**
  * Download a single sound file
+ *
+ * @param sound - SoundFile metadata describing the filename, url and description
+ * @param fetchImpl - A fetch-like implementation used to retrieve the resource
+ * @param dataDir - Optional local data directory to write the downloaded file
+ * @returns true when the file is present locally (already existed or downloaded successfully)
  */
 const downloadSound = async (sound: SoundFile, fetchImpl: FetchLike, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
@@ -134,6 +150,10 @@ const downloadSound = async (sound: SoundFile, fetchImpl: FetchLike, dataDir?: s
 
 /**
  * Check if a sound file exists locally
+ *
+ * @param filename - Name of the sound file (e.g. "human_selected1.wav")
+ * @param dataDir - Optional data directory override
+ * @returns true if the file exists on disk
  */
 export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
@@ -146,7 +166,15 @@ const downloadInProgress = new Map<string, Promise<boolean>>();
 
 /**
  * Download a single sound by filename on demand.
- * Returns true if the file is available locally after the call (either already existed or downloaded successfully).
+ *
+ * This function deduplicates concurrent requests for the same filename and
+ * ensures the file is present locally after completion.
+ *
+ * @param filename - The target sound filename to download (e.g. "human_selected1.wav")
+ * @param fetchImpl - Optional fetch-like implementation to use for retrieval
+ * @param baseUrl - Optional base URL to download sounds from
+ * @param dataDir - Optional local directory to store downloaded sounds
+ * @returns true when the file exists locally (either pre-existing or downloaded successfully)
  */
 export const downloadSoundByFilename = async (filename: string, fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<boolean> => {
   const effectiveFetch = fetchImpl ?? (globalThis.fetch as unknown as FetchLike);
@@ -215,7 +243,14 @@ export const downloadSoundByFilename = async (filename: string, fetchImpl?: Fetc
 
 /**
  * Ensure a sound is available locally (download on demand).
- * This is a convenience wrapper around `downloadSoundByFilename`.
+ *
+ * Convenience wrapper around `downloadSoundByFilename`.
+ *
+ * @param filename - Target sound filename
+ * @param fetchImpl - Optional fetch-like implementation
+ * @param baseUrl - Optional base URL for downloads
+ * @param dataDir - Optional local data directory
+ * @returns true when the file exists locally
  */
 export const ensureSoundAvailable = async (filename: string, fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<boolean> => {
   return await downloadSoundByFilename(filename, fetchImpl, baseUrl, dataDir);
@@ -223,7 +258,10 @@ export const ensureSoundAvailable = async (filename: string, fetchImpl?: FetchLi
 
 /**
  * Download all Warcraft II Alliance sounds
- * Accepts optional fetch implementation and baseUrl for easier testing/config
+ *
+ * @param fetchImpl - Optional fetch-like implementation used for downloads
+ * @param baseUrl - Optional base URL to download from
+ * @param dataDir - Optional local directory to store sounds
  */
 export const downloadAllSounds = async (fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<void> => {
   const effectiveFetch = fetchImpl ?? (globalThis.fetch as unknown as FetchLike);
@@ -262,6 +300,8 @@ export const downloadAllSounds = async (fetchImpl?: FetchLike, baseUrl?: string,
 
 /**
  * Get the list of all sound files that should be downloaded
+ *
+ * @returns list of filenames
  */
 export const getSoundFileList = (): string[] => {
   return soundEntries.map(e => e.filename);
@@ -269,6 +309,8 @@ export const getSoundFileList = (): string[] => {
 
 /**
  * Get the data directory path
+ *
+ * @returns Path to the sounds data directory
  */
 export const getDataDirectory = (): string => {
   return process.env.SOUNDS_DATA_DIR ?? DEFAULT_DATA_DIR;

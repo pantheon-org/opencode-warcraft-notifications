@@ -4,6 +4,11 @@ import { ensureSoundAvailable } from "./download.js"
 
 /**
  * Notification idle plugin
+ *
+ * This plugin plays a random Warcraft II Alliance sound when the session becomes idle
+ * and displays a notification with a short summary of the last message.
+ *
+ * The plugin downloads sounds on demand into `directory/.opencode-sounds` or `SOUNDS_DATA_DIR`.
  */
 export const NotificationPlugin: Plugin = async ({ project: _project, client: _client, $, directory, worktree: _worktree }) => {
   // We'll download sounds on demand. Keep a simple cache flag to avoid repeated checks.
@@ -87,6 +92,15 @@ export const NotificationPlugin: Plugin = async ({ project: _project, client: _c
  * Extract a last `*Summary:* ...` line at the end of the text
  */
 
+/**
+ * Extract a short idle summary from the end of a message text.
+ *
+ * If the text contains a line like `Summary: ...` it returns that; otherwise it
+ * truncates the text to 80 characters.
+ *
+ * @param text - Message text to extract the summary from
+ * @returns The extracted summary or `undefined` when no text is provided
+ */
 const getIdleSummary = (text: string | null) => {
   if (!text) return;
   const idleMatch = text.match(/[_*]Summary:[_*]? (.*)[_*]?$/m);
