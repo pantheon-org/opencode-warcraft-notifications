@@ -108,73 +108,51 @@ jobs:
             const tag = '${{ steps.version.outputs.tag }}';
             const branchName = '${{ steps.branch.outputs.branch_name }}';
             
+            const prTitle = 'chore: sync package.json version to ' + tagVersion;
+            const prBody = `## Version Sync
+
+            This PR automatically syncs the package.json version with the newly created Git tag.
+
+            - **Tag:** ${tag}
+            - **Version:** ${tagVersion}
+            - **Trigger:** Automated by tag creation workflow
+
+            ### Changes
+            - Updates package.json version from previous version to ${tagVersion}
+
+            ### Auto-Merge
+            This PR will auto-merge once all required checks pass, as it's a simple version synchronization.
+
+            ---
+            *This PR was automatically created by the Sync Package Version workflow.*`;
+            
             // Create the pull request
             const { data: pr } = await github.rest.pulls.create({
               owner,
               repo,
-              title: `chore: sync package.json version to ${tagVersion}`,
+              title: prTitle,
               head: branchName,
               base: 'main',
-              body: `## Version Sync
-
-              This PR automatically syncs the \`package.json\` version with the newly created Git tag.
-
-              - **Tag:** \`${tag}\`
-              - **Version:** \`${tagVersion}\`
-              - **Trigger:** Automated by tag creation workflow
-
-              ### Changes
-              - Updates \`package.json\` version from previous version to \`${tagVersion}\`
-
-              ### Auto-Merge
-              This PR will auto-merge once all required checks pass, as it's a simple version synchronization.
-
-              ---
-              *This PR was automatically created by the Sync Package Version workflow.*`,
+              body: prBody,
               draft: false
             });
 
-            console.log(\`Created PR #\${pr.number}: \${pr.html_url}\`);
+            console.log('Created PR #' + pr.number + ': ' + pr.html_url);
 
-            // Enable auto-merge if available
+            // Try to merge immediately
             try {
               await github.rest.pulls.merge({
                 owner,
                 repo,
                 pull_number: pr.number,
-                commit_title: \`chore: sync package.json version to \${tagVersion}\`,
-                commit_message: \`Sync package.json version with tag \${tag}\\n\\n[skip ci]\`,
+                commit_title: prTitle,
+                commit_message: 'Sync package.json version with tag ' + tag + '\n\n[skip ci]',
                 merge_method: 'squash'
               });
-              console.log(\`✅ Successfully auto-merged PR #\${pr.number}\`);
+              console.log('✅ Successfully auto-merged PR #' + pr.number);
             } catch (error) {
-              console.log(\`⚠️ Could not auto-merge PR #\${pr.number}: \${error.message}\`);
+              console.log('⚠️ Could not auto-merge PR #' + pr.number + ': ' + error.message);
               console.log('PR created and waiting for manual merge or status checks to complete.');
-              
-              // Try to enable auto-merge for when checks pass
-              try {
-                const mutation = \`
-                  mutation(\$pullRequestId: ID!, \$mergeMethod: PullRequestMergeMethod!) {
-                    enablePullRequestAutoMerge(input: {
-                      pullRequestId: \$pullRequestId,
-                      mergeMethod: \$mergeMethod
-                    }) {
-                      pullRequest {
-                        autoMergeRequest {
-                          enabledAt
-                        }
-                      }
-                    }
-                  }
-                \`;
-                await github.graphql(mutation, {
-                  pullRequestId: pr.node_id,
-                  mergeMethod: 'SQUASH'
-                });
-                console.log(\`✅ Enabled auto-merge for PR #\${pr.number}\`);
-              } catch (autoMergeError) {
-                console.log(\`⚠️ Could not enable auto-merge: \${autoMergeError.message}\`);
-              }
             }
 
       - name: Skip if no update needed
