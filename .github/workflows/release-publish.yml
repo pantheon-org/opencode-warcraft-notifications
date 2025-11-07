@@ -200,16 +200,24 @@ jobs:
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION="${{ steps.version.outputs.version }}"
           
-          # Wait a moment for npm to propagate
-          sleep 10
+          # Wait for npm to propagate with retry logic
+          echo "Waiting for npm registry to propagate package..."
+          for i in {1..6}; do
+            echo "Attempt $i/6: Checking if package is available..."
+            if npm view "$PACKAGE_NAME@$VERSION" version >/dev/null 2>&1; then
+              echo "✅ Successfully validated npm package: $PACKAGE_NAME@$VERSION"
+              exit 0
+            else
+              if [ $i -lt 6 ]; then
+                echo "Package not yet available, waiting 15 seconds..."
+                sleep 15
+              fi
+            fi
+          done
           
-          # Verify the package was published
-          if npm view "$PACKAGE_NAME@$VERSION" version; then
-            echo "✅ Successfully validated npm package: $PACKAGE_NAME@$VERSION"
-          else
-            echo "❌ Failed to validate npm package publication"
-            exit 1
-          fi
+          echo "❌ Failed to validate npm package publication after 90 seconds"
+          echo "Note: Package may still be published successfully, npm propagation can be slow"
+          exit 1
 
       - name: Notify on success
         if: success()
