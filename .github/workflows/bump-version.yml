@@ -125,7 +125,12 @@ jobs:
           fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + "\n");
           console.log('Version bumped to', newv);
           NODE
-          echo "new_version=$(node -e \"console.log(JSON.parse(require('fs').readFileSync('package.json','utf8')).version)\")" >> $GITHUB_OUTPUT
+          # Write the new version to a temp file then append to GITHUB_OUTPUT to avoid shell quoting issues
+          node -e "console.log(JSON.parse(require('fs').readFileSync('package.json','utf8')).version)" > /tmp/new_version.txt
+          # Use the documented append-to-GITHUB_OUTPUT method safely
+          echo "new_version=$(cat /tmp/new_version.txt)" >> $GITHUB_OUTPUT
+          rm /tmp/new_version.txt
+
 
       - name: Commit version bump
         run: |
