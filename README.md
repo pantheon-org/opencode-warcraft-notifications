@@ -7,10 +7,11 @@ Enhance your OpenCode experience with nostalgic Warcraft II Alliance unit sounds
 ## Features
 
 - 🎵 **56 Authentic Sounds**: Complete collection of Warcraft II Alliance unit voices
-- 🔄 **Auto-Download**: Automatically downloads sound files on first use
+- 🔄 **Auto-Download**: Automatically downloads sound files on first use with secure caching
 - 🎲 **Random Selection**: Plays a different sound each time for variety
 - 💻 **Cross-Platform**: Works on macOS and Linux
 - 📱 **Smart Notifications**: Shows session summary with the sound notification
+- 🚀 **Automated Releases**: Fully automated CI/CD pipeline with AI-powered version management
 - 🎮 **Unit Variety**: Includes voices from:
   - Human Units (peasants, knights, mages)
   - Elven Archers
