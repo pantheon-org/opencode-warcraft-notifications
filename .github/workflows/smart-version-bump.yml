@@ -190,8 +190,8 @@ jobs:
           
           echo "Version will be bumped from $CURRENT_VERSION to $NEW_VERSION (type: $VERSION_TYPE)"
 
-  bump-version:
-    name: Bump Version & Create Tag
+  create-tag:
+    name: Create Version Tag
     runs-on: ubuntu-latest
     needs: analyze-changes
     if: needs.analyze-changes.outputs.should_bump == 'true'
@@ -202,50 +202,38 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      - name: Update package.json version
-        run: |
-          NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
-          npm version $NEW_VERSION --no-git-tag-version
-          
-          echo "Updated package.json to version $NEW_VERSION"
-
-      - name: Commit version change
-        run: |
-          NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
-          git add package.json
-          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
-
       - name: Create and push tag
         run: |
           NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
-          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
-          git push origin main --tags
+          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ needs.analyze-changes.outputs.new_version }}
-          release_name: Release v${{ needs.analyze-changes.outputs.new_version }}
-          body: |
-            ## 🚀 Release v${{ needs.analyze-changes.outputs.new_version }}
-            
-            **Version Type:** ${{ needs.analyze-changes.outputs.version_type }}
-            
-            ${{ needs.analyze-changes.outputs.changelog }}
-            
-            ---
-            *This release was automatically generated based on commit analysis.*
-          draft: false
-          prerelease: false
+          Version Type: ${{ needs.analyze-changes.outputs.version_type }}
+          AI Analysis: ${{ steps.ai-analysis.outputs.ai_decision }}
+          
+          This tag will trigger:
+          1. Package version sync via sync-package-version.yml
+          2. NPM publishing via release-publish.yml"
+          
+          git push origin --tags
+          echo "✅ Created and pushed tag v$NEW_VERSION"
+
+      - name: Summary
+        run: |
+          echo "🎯 Smart Version Bump Complete!"
+          echo ""
+          echo "📊 Analysis Results:"
+          echo "  - Version Type: ${{ needs.analyze-changes.outputs.version_type }}"
+          echo "  - New Version: ${{ needs.analyze-changes.outputs.new_version }}"
+          echo "  - AI Decision: ${{ steps.ai-analysis.outputs.ai_decision }}"
+          echo ""
+          echo "🔄 Next Steps (Automated):"
+          echo "  1. ✅ Tag v${{ needs.analyze-changes.outputs.new_version }} created"
+          echo "  2. 🔄 sync-package-version.yml will sync package.json"
+          echo "  3. 🚀 release-publish.yml will publish to npm"
+          echo ""
+          echo "Monitor workflow progress in the Actions tab."
