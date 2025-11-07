@@ -157,20 +157,31 @@ jobs:
           if [ -z "$AI_DECISION" ] || [[ ! "$AI_DECISION" =~ ^(MAJOR|MINOR|PATCH|NONE)$ ]]; then
             echo "AI analysis failed, using conventional commit analysis"
             if [ -f commits.txt ] && [ -s commits.txt ]; then
+              # Prioritize semantic version levels (highest to lowest)
               if grep -qi "BREAKING CHANGE\|!:" commits.txt; then
                 AI_DECISION="MAJOR"
+                echo "📈 Found breaking changes - recommending MAJOR version bump"
               elif grep -qi "^feat\|^feature" commits.txt; then
-                AI_DECISION="MINOR"  
+                AI_DECISION="MINOR"
+                echo "✨ Found new features - recommending MINOR version bump"
               elif grep -qi "^fix\|^bugfix\|^patch" commits.txt; then
                 AI_DECISION="PATCH"
+                echo "🐛 Found bug fixes - recommending PATCH version bump"
               elif grep -qi "^docs\|^doc\|^chore\|^ci\|^build\|^style\|^refactor" commits.txt; then
                 AI_DECISION="PATCH"
+                echo "🔧 Found maintenance changes - recommending PATCH version bump"
               else
                 AI_DECISION="PATCH"
+                echo "❓ No conventional commit patterns found - defaulting to PATCH version bump"
               fi
+              
+              # Log what was found for debugging
+              echo "📝 Commits analyzed:"
+              cat commits.txt | head -10
             else
               # No commits or empty commits.txt - this should be NONE
               AI_DECISION="NONE"
+              echo "📭 No commits found - no version bump needed"
             fi
           fi
           
