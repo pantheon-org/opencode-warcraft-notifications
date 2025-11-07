@@ -524,16 +524,17 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
 export const buildSoundsToDownload = (baseUrl: string): SoundFile[] => {
   return soundEntries.map((e) => {
     // Determine if this is a Horde sound based on filename
-    const isHordeSound = e.filename.startsWith('orc_') || 
-                         e.filename.startsWith('death_knight_') || 
-                         e.filename.startsWith('dragon_') || 
-                         e.filename.startsWith('goblin_sapper_') || 
-                         e.filename.startsWith('ogre_') || 
-                         e.filename.startsWith('troll_') || 
-                         e.filename.startsWith('horde_ship_');
+    const isHordeSound =
+      e.filename.startsWith('orc_') ||
+      e.filename.startsWith('death_knight_') ||
+      e.filename.startsWith('dragon_') ||
+      e.filename.startsWith('goblin_sapper_') ||
+      e.filename.startsWith('ogre_') ||
+      e.filename.startsWith('troll_') ||
+      e.filename.startsWith('horde_ship_');
 
     // Use appropriate base URL for the faction
-    const effectiveUrl = isHordeSound 
+    const effectiveUrl = isHordeSound
       ? `https://www.thanatosrealms.com/war2/sounds/orcs/${e.path}`
       : `${baseUrl}/${e.path}`;
 

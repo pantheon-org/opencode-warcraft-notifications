@@ -25,14 +25,46 @@ describe('sound-data module', () => {
       expect(typeof r.filename).toBe('string');
       expect(typeof r.url).toBe('string');
       expect(typeof r.description).toBe('string');
-      expect(r.url.startsWith(base)).toBe(true);
       expect(r.url).toMatch(/\.wav$/);
+
+      // Check URL starts with expected base for Alliance sounds or Horde base for Horde sounds
+      const isHordeSound =
+        r.filename.startsWith('orc_') ||
+        r.filename.startsWith('death_knight_') ||
+        r.filename.startsWith('dragon_') ||
+        r.filename.startsWith('goblin_sapper_') ||
+        r.filename.startsWith('ogre_') ||
+        r.filename.startsWith('troll_') ||
+        r.filename.startsWith('horde_ship_');
+
+      if (isHordeSound) {
+        expect(r.url.startsWith('https://www.thanatosrealms.com/war2/sounds/orcs/')).toBe(true);
+      } else {
+        expect(r.url.startsWith(base)).toBe(true);
+      }
     });
   });
 
   it('buildSoundsToDownload works with DEFAULT_BASE_URL', () => {
     const results = buildSoundsToDownload(DEFAULT_BASE_URL);
     expect(results.length).toBeGreaterThan(0);
-    results.forEach((r) => expect(r.url.startsWith(DEFAULT_BASE_URL)).toBe(true));
+
+    results.forEach((r) => {
+      // Check URL starts with expected base for Alliance sounds or Horde base for Horde sounds
+      const isHordeSound =
+        r.filename.startsWith('orc_') ||
+        r.filename.startsWith('death_knight_') ||
+        r.filename.startsWith('dragon_') ||
+        r.filename.startsWith('goblin_sapper_') ||
+        r.filename.startsWith('ogre_') ||
+        r.filename.startsWith('troll_') ||
+        r.filename.startsWith('horde_ship_');
+
+      if (isHordeSound) {
+        expect(r.url.startsWith('https://www.thanatosrealms.com/war2/sounds/orcs/')).toBe(true);
+      } else {
+        expect(r.url.startsWith(DEFAULT_BASE_URL)).toBe(true);
+      }
+    });
   });
 });

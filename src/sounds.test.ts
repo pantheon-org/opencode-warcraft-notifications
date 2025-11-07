@@ -8,11 +8,17 @@ import {
   soundExists,
   getSoundPath,
   getRandomSoundPath,
+  getAllianceSoundCategories,
+  getHordeSoundCategories,
+  getSoundsByFaction,
+  getRandomSoundFromFaction,
+  getRandomSoundPathFromFaction,
 } from './sounds.ts';
 
 describe('sounds data structure', () => {
   test('should have all expected categories', () => {
     const expectedCategories = [
+      // Alliance sounds
       'humanSelected',
       'humanAcknowledge',
       'dwarfSelected',
@@ -27,6 +33,24 @@ describe('sounds data structure', () => {
       'peasantAcknowledge',
       'shipSelected',
       'shipAcknowledge',
+      // Horde sounds
+      'orcSelected',
+      'orcAcknowledge',
+      'deathKnightSelected',
+      'deathKnightAcknowledge',
+      'dragonSelected',
+      'dragonAcknowledge',
+      'goblinSapperSelected',
+      'goblinSapperAcknowledge',
+      'ogreSelected',
+      'ogreAcknowledge',
+      'ogreMageSelected',
+      'ogreMageAcknowledge',
+      'trollSelected',
+      'trollAcknowledge',
+      'hordeShipSelected',
+      'hordeShipAcknowledge',
+      // Special sounds
       'special',
     ];
 
@@ -194,5 +218,111 @@ describe('soundExists()', () => {
     } finally {
       spyExists.mockRestore();
     }
+  });
+});
+
+describe('faction-aware functions', () => {
+  test('getAllianceSoundCategories returns correct categories', () => {
+    const allianceCategories = getAllianceSoundCategories();
+    const expectedAlliance = [
+      'humanSelected',
+      'humanAcknowledge',
+      'dwarfSelected',
+      'dwarfAcknowledge',
+      'elfSelected',
+      'elfAcknowledge',
+      'knightSelected',
+      'knightAcknowledge',
+      'mageSelected',
+      'mageAcknowledge',
+      'peasantSelected',
+      'peasantAcknowledge',
+      'shipSelected',
+      'shipAcknowledge',
+    ] as (keyof typeof sounds)[];
+
+    expect(allianceCategories.sort()).toEqual(expectedAlliance.sort());
+  });
+
+  test('getHordeSoundCategories returns correct categories', () => {
+    const hordeCategories = getHordeSoundCategories();
+    const expectedHorde = [
+      'orcSelected',
+      'orcAcknowledge',
+      'deathKnightSelected',
+      'deathKnightAcknowledge',
+      'dragonSelected',
+      'dragonAcknowledge',
+      'goblinSapperSelected',
+      'goblinSapperAcknowledge',
+      'ogreSelected',
+      'ogreAcknowledge',
+      'ogreMageSelected',
+      'ogreMageAcknowledge',
+      'trollSelected',
+      'trollAcknowledge',
+      'hordeShipSelected',
+      'hordeShipAcknowledge',
+    ] as (keyof typeof sounds)[];
+
+    expect(hordeCategories.sort()).toEqual(expectedHorde.sort());
+  });
+
+  test('getSoundsByFaction returns correct sounds for each faction', () => {
+    const allianceSounds = getSoundsByFaction('alliance');
+    const hordeSounds = getSoundsByFaction('horde');
+    const bothSounds = getSoundsByFaction('both');
+    const specialSounds = sounds.special;
+
+    expect(allianceSounds.length).toBeGreaterThan(0);
+    expect(hordeSounds.length).toBeGreaterThan(0);
+    expect(bothSounds.length).toBeGreaterThan(allianceSounds.length);
+    expect(bothSounds.length).toBeGreaterThan(hordeSounds.length);
+
+    // Both should equal alliance + horde - special sounds (since special is included in both alliance and horde individually)
+    expect(bothSounds.length).toBe(
+      allianceSounds.length + hordeSounds.length - specialSounds.length,
+    );
+
+    // Check that alliance sounds don't contain horde-specific unit sounds (excluding special sounds)
+    const allianceNonSpecialSounds = allianceSounds.filter(
+      (s) => !(specialSounds as readonly string[]).includes(s),
+    );
+    expect(allianceNonSpecialSounds.some((s) => s.startsWith('orc_'))).toBe(false);
+
+    // Check that horde sounds contain horde-specific sounds
+    expect(hordeSounds.some((s) => s.startsWith('orc_'))).toBe(true);
+  });
+
+  test('getRandomSoundFromFaction returns valid sounds', () => {
+    const allianceSound = getRandomSoundFromFaction('alliance');
+    const hordeSound = getRandomSoundFromFaction('horde');
+    const bothSound = getRandomSoundFromFaction('both');
+
+    const allianceSounds = getSoundsByFaction('alliance');
+    const hordeSounds = getSoundsByFaction('horde');
+    const bothSounds = getSoundsByFaction('both');
+
+    expect(allianceSounds).toContain(allianceSound);
+    expect(hordeSounds).toContain(hordeSound);
+    expect(bothSounds).toContain(bothSound);
+  });
+
+  test('getRandomSoundPathFromFaction returns valid paths', () => {
+    const alliancePath = getRandomSoundPathFromFaction('alliance');
+    const hordePath = getRandomSoundPathFromFaction('horde');
+    const bothPath = getRandomSoundPathFromFaction('both');
+
+    expect(typeof alliancePath).toBe('string');
+    expect(typeof hordePath).toBe('string');
+    expect(typeof bothPath).toBe('string');
+
+    expect(alliancePath).toMatch(/\.wav$/);
+    expect(hordePath).toMatch(/\.wav$/);
+    expect(bothPath).toMatch(/\.wav$/);
+
+    expect(alliancePath).toContain('opencode');
+    expect(hordePath).toContain('opencode');
+    expect(bothPath).toContain('opencode');
   });
 });

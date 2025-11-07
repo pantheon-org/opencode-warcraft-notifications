@@ -69,7 +69,7 @@ export const sounds = {
     'ship_selected4.wav',
   ],
   shipAcknowledge: ['ship_acknowledge1.wav', 'ship_acknowledge2.wav', 'ship_acknowledge3.wav'],
-  
+
   // HORDE SOUNDS
   orcSelected: [
     'orc_selected1.wav',
@@ -85,20 +85,14 @@ export const sounds = {
     'orc_acknowledge3.wav',
     'orc_acknowledge4.wav',
   ],
-  deathKnightSelected: [
-    'death_knight_selected1.wav',
-    'death_knight_selected2.wav',
-  ],
+  deathKnightSelected: ['death_knight_selected1.wav', 'death_knight_selected2.wav'],
   deathKnightAcknowledge: [
     'death_knight_acknowledge1.wav',
     'death_knight_acknowledge2.wav',
     'death_knight_acknowledge3.wav',
   ],
   dragonSelected: ['dragon_selected1.wav'],
-  dragonAcknowledge: [
-    'dragon_acknowledge1.wav',
-    'dragon_acknowledge2.wav',
-  ],
+  dragonAcknowledge: ['dragon_acknowledge1.wav', 'dragon_acknowledge2.wav'],
   goblinSapperSelected: [
     'goblin_sapper_selected1.wav',
     'goblin_sapper_selected2.wav',
@@ -117,11 +111,7 @@ export const sounds = {
     'ogre_selected3.wav',
     'ogre_selected4.wav',
   ],
-  ogreAcknowledge: [
-    'ogre_acknowledge1.wav',
-    'ogre_acknowledge2.wav',
-    'ogre_acknowledge3.wav',
-  ],
+  ogreAcknowledge: ['ogre_acknowledge1.wav', 'ogre_acknowledge2.wav', 'ogre_acknowledge3.wav'],
   ogreMageSelected: [
     'ogre_mage_selected1.wav',
     'ogre_mage_selected2.wav',
@@ -133,16 +123,8 @@ export const sounds = {
     'ogre_mage_acknowledge2.wav',
     'ogre_mage_acknowledge3.wav',
   ],
-  trollSelected: [
-    'troll_selected1.wav',
-    'troll_selected2.wav',
-    'troll_selected3.wav',
-  ],
-  trollAcknowledge: [
-    'troll_acknowledge1.wav',
-    'troll_acknowledge2.wav',
-    'troll_acknowledge3.wav',
-  ],
+  trollSelected: ['troll_selected1.wav', 'troll_selected2.wav', 'troll_selected3.wav'],
+  trollAcknowledge: ['troll_acknowledge1.wav', 'troll_acknowledge2.wav', 'troll_acknowledge3.wav'],
   hordeShipSelected: [
     'horde_ship_selected1.wav',
     'horde_ship_selected2.wav',
@@ -154,7 +136,7 @@ export const sounds = {
     'horde_ship_acknowledge2.wav',
     'horde_ship_acknowledge3.wav',
   ],
-  
+
   // SPECIAL SOUNDS (both factions)
   special: ['work_completed.wav', 'jobs_done.wav', 'orc_work_completed.wav'],
 } as const;
@@ -223,13 +205,20 @@ export const getRandomSoundPath = (dataDir?: string): string => {
  */
 export const getAllianceSoundCategories = (): (keyof typeof sounds)[] => {
   return [
-    'humanSelected', 'humanAcknowledge',
-    'dwarfSelected', 'dwarfAcknowledge',
-    'elfSelected', 'elfAcknowledge',
-    'knightSelected', 'knightAcknowledge',
-    'mageSelected', 'mageAcknowledge',
-    'peasantSelected', 'peasantAcknowledge',
-    'shipSelected', 'shipAcknowledge'
+    'humanSelected',
+    'humanAcknowledge',
+    'dwarfSelected',
+    'dwarfAcknowledge',
+    'elfSelected',
+    'elfAcknowledge',
+    'knightSelected',
+    'knightAcknowledge',
+    'mageSelected',
+    'mageAcknowledge',
+    'peasantSelected',
+    'peasantAcknowledge',
+    'shipSelected',
+    'shipAcknowledge',
   ];
 };
 
@@ -239,14 +228,22 @@ export const getAllianceSoundCategories = (): (keyof typeof sounds)[] => {
  */
 export const getHordeSoundCategories = (): (keyof typeof sounds)[] => {
   return [
-    'orcSelected', 'orcAcknowledge',
-    'deathKnightSelected', 'deathKnightAcknowledge',
-    'dragonSelected', 'dragonAcknowledge',
-    'goblinSapperSelected', 'goblinSapperAcknowledge',
-    'ogreSelected', 'ogreAcknowledge',
-    'ogreMageSelected', 'ogreMageAcknowledge',
-    'trollSelected', 'trollAcknowledge',
-    'hordeShipSelected', 'hordeShipAcknowledge'
+    'orcSelected',
+    'orcAcknowledge',
+    'deathKnightSelected',
+    'deathKnightAcknowledge',
+    'dragonSelected',
+    'dragonAcknowledge',
+    'goblinSapperSelected',
+    'goblinSapperAcknowledge',
+    'ogreSelected',
+    'ogreAcknowledge',
+    'ogreMageSelected',
+    'ogreMageAcknowledge',
+    'trollSelected',
+    'trollAcknowledge',
+    'hordeShipSelected',
+    'hordeShipAcknowledge',
   ];
 };
 
@@ -257,7 +254,7 @@ export const getHordeSoundCategories = (): (keyof typeof sounds)[] => {
  */
 export const getSoundsByFaction = (faction: 'alliance' | 'horde' | 'both'): string[] => {
   let categories: (keyof typeof sounds)[] = [];
-  
+
   switch (faction) {
     case 'alliance':
       categories = getAllianceSoundCategories();
@@ -269,11 +266,11 @@ export const getSoundsByFaction = (faction: 'alliance' | 'horde' | 'both'): stri
       categories = [...getAllianceSoundCategories(), ...getHordeSoundCategories()];
       break;
   }
-  
+
   // Add special sounds for all factions
   categories.push('special');
-  
-  return categories.flatMap(category => sounds[category]);
+
+  return categories.flatMap((category) => sounds[category]);
 };
 
 /**
@@ -292,7 +289,10 @@ export const getRandomSoundFromFaction = (faction: 'alliance' | 'horde' | 'both'
  * @param dataDir - Optional override data directory
  * @returns Absolute path to a random sound file from the specified faction(s)
  */
-export const getRandomSoundPathFromFaction = (faction: 'alliance' | 'horde' | 'both', dataDir?: string): string => {
+export const getRandomSoundPathFromFaction = (
+  faction: 'alliance' | 'horde' | 'both',
+  dataDir?: string,
+): string => {
   const randomSound = getRandomSoundFromFaction(faction);
   return getSoundPath(randomSound, dataDir);
 };

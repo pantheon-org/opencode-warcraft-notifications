@@ -8,13 +8,13 @@ This document provides comprehensive documentation for all GitHub Actions workfl
 
 The repository uses 5 streamlined GitHub Actions workflows that provide comprehensive CI/CD automation:
 
-| Workflow                                      | File                         | Triggers                        | Purpose                                 |
-| --------------------------------------------- | ---------------------------- | ------------------------------- | --------------------------------------- |
-| [PR Validation](#pr-validation)               | `pr-validation.yml`          | Pull Requests                   | Quality assurance and security scanning |
-| [Smart Version Bump](#smart-version-bump)     | `smart-version-bump.yml`     | Push to main, Manual            | AI-powered semantic versioning          |
-| [Sync Package Version](#sync-package-version) | `sync-package-version.yml`   | Tag creation                    | Sync package.json with Git tags         |
-| [Release & Publish](#release--publish)        | `release-publish.yml`        | Tag creation, Manual            | Build, test, and publish to npm         |
-| [Cleanup Old Releases](#cleanup-old-releases) | `cleanup-old-releases.yml`   | Schedule, Tag creation, Manual  | Maintain limited release history        |
+| Workflow                                      | File                       | Triggers                       | Purpose                                 |
+| --------------------------------------------- | -------------------------- | ------------------------------ | --------------------------------------- |
+| [PR Validation](#pr-validation)               | `pr-validation.yml`        | Pull Requests                  | Quality assurance and security scanning |
+| [Smart Version Bump](#smart-version-bump)     | `smart-version-bump.yml`   | Push to main, Manual           | AI-powered semantic versioning          |
+| [Sync Package Version](#sync-package-version) | `sync-package-version.yml` | Tag creation                   | Sync package.json with Git tags         |
+| [Release & Publish](#release--publish)        | `release-publish.yml`      | Tag creation, Manual           | Build, test, and publish to npm         |
+| [Cleanup Old Releases](#cleanup-old-releases) | `cleanup-old-releases.yml` | Schedule, Tag creation, Manual | Maintain limited release history        |
 
 ## 🔄 Workflow Flow
 
@@ -36,7 +36,7 @@ graph TD
     M --> N[Create GitHub release]
     N --> O[Cleanup Old Releases triggers]
     O --> P[Maintain release history limits]
-    
+
     Q[Weekly Schedule] --> O
     R[Manual Cleanup] --> O
 ```
@@ -439,7 +439,7 @@ v3.2.5, v3.2.4, v3.2.3, v3.2.2, v3.2.1, v3.1.9, v3.1.8, v3.1.7, v3.1.6, v3.1.5  
 v2.8.1                                                                               (1 kept - latest of v2.x.x)
 v1.15.2                                                                              (1 kept - latest of v1.x.x)
 
-// Deleted: 
+// Deleted:
 // - v3.1.4, v3.1.3 (exceeded 10 limit for current major v3.x.x)
 // - v2.8.0, v2.7.9, v2.7.8, v2.7.7, v2.7.6 (older releases from v2.x.x)
 // - v1.15.1, v1.15.0 (older releases from v1.x.x)
@@ -476,6 +476,7 @@ gh workflow run "Cleanup Old Releases" -f dry_run=true
 ```
 
 **Output:**
+
 - ✅ Shows detailed analysis of what would be deleted
 - ✅ No actual deletions performed
 - ✅ Safe to run anytime for analysis
@@ -488,6 +489,7 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 ```
 
 **Output:**
+
 - 🗑️ Actually deletes old releases and tags
 - ⚠️ **Irreversible** - deleted releases cannot be recovered
 - 📊 Reports deletion success/failure statistics
@@ -501,6 +503,7 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 ### Output Examples
 
 #### Dry Run Output
+
 ```
 🧹 Starting release cleanup (dry run: true)
 📦 Found 25 total releases
@@ -508,7 +511,7 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 🏷️ Found 3 major version groups: v3.x.x, v2.x.x, v1.x.x
 📌 Keeping major versions: v3.x.x, v2.x.x, v1.x.x
 📦 Major v3: keeping 10/15 releases
-📦 Major v2: keeping 6/6 releases  
+📦 Major v2: keeping 6/6 releases
 📦 Major v1: keeping 3/3 releases
 
 📊 Summary:
@@ -527,6 +530,7 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 ```
 
 #### Live Execution Output
+
 ```
 🧹 Starting release cleanup (dry run: false)
 [... analysis output same as dry run ...]
@@ -546,15 +550,18 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 ### Use Cases
 
 #### Regular Maintenance
+
 - **Automated**: Weekly cleanup keeps release history manageable
 - **Post-Release**: Cleanup after new releases maintains current limits
 - **Storage**: Reduces repository storage used by old release artifacts
 
 #### Repository Migration
+
 - **Before Migration**: Clean up old releases to reduce transfer size
 - **After Migration**: Establish clean release history in new location
 
 #### Compliance Requirements
+
 - **Data Retention**: Meet organizational policies for artifact retention
 - **Storage Limits**: Stay within repository or organization storage quotas
 
@@ -563,18 +570,22 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 #### Common Issues
 
 **No Releases Deleted:**
+
 - **Cause**: All releases within retention limits
 - **Solution**: Normal operation, no action needed
 
 **Permission Denied:**
+
 - **Cause**: `GITHUB_TOKEN` lacks sufficient permissions
 - **Solution**: Verify repository settings and workflow permissions
 
 **Rate Limiting:**
+
 - **Cause**: Too many API calls in short period
 - **Solution**: Workflow includes delays; retry later if needed
 
 **Invalid Version Format:**
+
 - **Cause**: Release tags don't follow semantic versioning
 - **Solution**: Workflow skips invalid versions; consider standardizing tag format
 
@@ -600,16 +611,19 @@ gh release list --json tagName --jq '.[].tagName' | grep -E '^v[0-9]+\.' | cut -
 ### Best Practices
 
 #### Monitoring
+
 - **Review Logs**: Check weekly cleanup logs for unexpected deletions
 - **Storage Metrics**: Monitor repository storage usage trends
 - **Release Usage**: Track which old releases are still being downloaded
 
 #### Configuration
+
 - **Dry Run Testing**: Always test changes with dry-run mode first
 - **Retention Tuning**: Adjust retention numbers based on project needs
 - **Schedule Timing**: Run during low-activity periods (weekends)
 
 #### Emergency Recovery
+
 - **Tag Recreation**: Can recreate Git tags from commit history if needed
 - **Release Recreation**: Can recreate releases from tags, but artifacts are lost
 - **Backup Strategy**: Consider backing up important release artifacts externally

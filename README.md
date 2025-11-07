@@ -42,7 +42,7 @@ You can customize where sound files are stored by creating a `plugin.json` file:
 Choose which faction sounds to play using the `faction` configuration option:
 
 - `"alliance"` - Play only Alliance unit sounds
-- `"horde"` - Play only Horde unit sounds  
+- `"horde"` - Play only Horde unit sounds
 - `"both"` - Play random sounds from both factions (default)
 
 **Project-specific configuration** (`.opencode/plugin.json` in your project root):
@@ -86,6 +86,7 @@ If no configuration is provided, sounds are stored in:
 ### Example Sounds
 
 **Alliance Units:**
+
 - **Human Units**: "Your command?", "Yes, sire?", "At your service"
 - **Knights**: "Your majesty?", "For the king!", "Defending your honor"
 - **Elven Archers**: "Your eminence?", "For the alliance!", "By your command"
@@ -94,6 +95,7 @@ If no configuration is provided, sounds are stored in:
 - **Ships**: "Captain on the bridge!", "Aye aye sir!", "Under way"
 
 **Horde Units:**
+
 - **Orcs**: "Zug zug!", "Lok tar!", "Dah boo!"
 - **Death Knights**: "Yes?", "Make it quick", "Of course, master"
 - **Ogres**: "Huh what?", "Yes master", "Okay"
@@ -111,6 +113,7 @@ If no configuration is provided, sounds are stored in:
 ## Sound Sources
 
 Sounds are downloaded from the Warcraft II sound archives at thanatosrealms.com:
+
 - Alliance sounds from the humans section
 - Horde sounds from the orcs section
 
