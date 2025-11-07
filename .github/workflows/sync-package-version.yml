@@ -141,7 +141,50 @@ jobs:
 
             console.log('Created PR #' + pr.number + ': ' + pr.html_url);
 
-            console.log('✅ PR created successfully! It will be merged according to branch protection rules.');
+            // Try to enable auto-merge on the created PR
+            try {
+              await github.graphql(`
+                mutation($pullRequestId: ID!) {
+                  enablePullRequestAutoMerge(input: {
+                    pullRequestId: $pullRequestId,
+                    mergeMethod: SQUASH
+                  }) {
+                    pullRequest {
+                      autoMergeRequest {
+                        enabledAt
+                      }
+                    }
+                  }
+                }
+              `, {
+                pullRequestId: pr.node_id
+              });
+              
+              console.log('✅ Auto-merge enabled for PR #' + pr.number);
+              
+              // Add explanatory comment
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr.number,
+                body: `🤖 **Auto-merge enabled**
+
+This version sync PR will be automatically merged once all required checks pass.
+
+**What happens next:**
+1. 🔄 PR validation workflow will run (lint, test, type-check, build)
+2. ✅ If all checks pass → automatic squash merge
+3. ❌ If checks fail → manual review required
+
+*Auto-merge was enabled by the Sync Package Version workflow.*`
+              });
+              
+            } catch (error) {
+              console.log('⚠️ Could not enable auto-merge (this is normal if auto-merge is not available):', error.message);
+              console.log('The auto-merge-version-sync.yml workflow will handle merging after checks pass.');
+            }
+
+            console.log('✅ PR created successfully! Auto-merge configured.');
             console.log('PR URL: ' + pr.html_url);
 
       - name: Skip if no update needed
