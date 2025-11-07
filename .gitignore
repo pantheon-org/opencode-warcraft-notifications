@@ -1,8 +1,10 @@
 # dependencies (bun install)
 node_modules
 
-# GitHub Actions
-!.github/workflows/
+# GitHub Actions - override global gitignore that excludes .github directories
+!.github/
+!.github/**
+.github/.DS_Store
 
 # Opencode instructions
 .opencode/
