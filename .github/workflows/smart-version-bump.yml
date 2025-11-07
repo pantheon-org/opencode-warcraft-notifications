@@ -30,6 +30,7 @@ jobs:
       version_type: ${{ steps.decision.outputs.version_type }}
       new_version: ${{ steps.decision.outputs.new_version }}
       changelog: ${{ steps.decision.outputs.changelog }}
+      ai_decision: ${{ steps.ai-analysis.outputs.ai_decision }}
     
     steps:
       - name: Checkout repository
@@ -200,6 +201,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Configure Git
@@ -211,9 +213,12 @@ jobs:
         run: |
           NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
           
-          # Check if tag already exists
+          # Check if tag already exists (both locally and remotely)
           if git tag -l "v$NEW_VERSION" | grep -q "v$NEW_VERSION"; then
-            echo "⚠️ Tag v$NEW_VERSION already exists - skipping tag creation"
+            echo "⚠️ Tag v$NEW_VERSION already exists locally - skipping tag creation"
+            echo "This may happen if workflow is re-run or tag was manually created"
+          elif git ls-remote --tags origin | grep -q "refs/tags/v$NEW_VERSION$"; then
+            echo "⚠️ Tag v$NEW_VERSION already exists on remote - skipping tag creation"
             echo "This may happen if workflow is re-run or tag was manually created"
           else
             git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION
@@ -225,8 +230,15 @@ jobs:
           1. Package version sync via sync-package-version.yml
           2. NPM publishing via release-publish.yml"
             
-            git push origin --tags
-            echo "✅ Created and pushed tag v$NEW_VERSION"
+            # Push tags with error handling
+            if git push origin --tags; then
+              echo "✅ Created and pushed tag v$NEW_VERSION"
+            else
+              echo "❌ Failed to push tag v$NEW_VERSION - may already exist on remote"
+              echo "Checking remote tags..."
+              git ls-remote --tags origin | grep "v$NEW_VERSION" || echo "Tag not found on remote"
+              exit 1
+            fi
           fi
 
       - name: Summary
@@ -236,7 +248,7 @@ jobs:
           echo "📊 Analysis Results:"
           echo "  - Version Type: ${{ needs.analyze-changes.outputs.version_type }}"
           echo "  - New Version: ${{ needs.analyze-changes.outputs.new_version }}"
-          echo "  - AI Decision: ${{ steps.ai-analysis.outputs.ai_decision }}"
+          echo "  - AI Decision: ${{ needs.analyze-changes.outputs.ai_decision }}"
           echo ""
           echo "🔄 Next Steps (Automated):"
           echo "  1. ✅ Tag v${{ needs.analyze-changes.outputs.new_version }} created"
