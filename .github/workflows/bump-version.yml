@@ -1,0 +1,192 @@
+name: Bump package version on merge
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Determine bump level from PR and commits
+        id: determine
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) core.setFailed('No pull_request payload available');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = pr.number;
+            const commitsResp = await github.rest.pulls.listCommits({ owner, repo, pull_number: prNumber });
+            const commits = commitsResp.data.map(c => c.commit.message || '');
+            const labels = (pr.labels || []).map(l => l.name.toLowerCase());
+
+            // Helper to extract override from labels like 'major', 'version:minor', 'bump-major'
+            function extractOverride(labels){
+              for(const l of labels){
+                const m1 = l.match(/^(major|minor|patch)$/i);
+                if(m1) return m1[1].toLowerCase();
+                const m2 = l.match(/(?:^|[:\-\/\s])(?:version|v|bump)?[:\-\/]?(major|minor|patch)$/i);
+                if(m2) return m2[1].toLowerCase();
+              }
+              return null;
+            }
+
+            const override = extractOverride(labels);
+            let bump = null;
+
+            if(override){
+              bump = override;
+              console.log('Using label override for bump:', bump);
+            } else {
+              // Analyze commits and PR content using Conventional Commits
+              let major = false;
+              let minor = false;
+              let patch = false;
+
+              const conventionalRegex = /^(\w+)(?:\([^\)]*\))?(\!)?:/; // captures type and optional !
+
+              for(const msg of commits){
+                const header = (msg.split('\n')[0] || '').trim();
+                const m = header.match(conventionalRegex);
+                if(m){
+                  const type = m[1].toLowerCase();
+                  const breakingMark = !!m[2];
+                  if(breakingMark) major = true;
+                  if(/breaking change/i.test(msg)) major = true;
+                  if(type === 'feat') minor = true;
+                  if(['fix','perf','refactor','docs','test','chore','ci','build','style'].includes(type)) patch = true;
+                } else {
+                  // fallback: look for keywords anywhere
+                  if(/BREAKING CHANGE/i.test(msg)) major = true;
+                  if(/(^|\n)feat(\(|:|\b)/i.test(msg)) minor = true;
+                  if(/(^|\n)(fix|perf|refactor)(\(|:|\b)/i.test(msg)) patch = true;
+                }
+              }
+
+              // Also inspect PR title and body
+              const prText = (pr.title||'') + '\n' + (pr.body||'');
+              if(/BREAKING CHANGE|BREAKING-CHANGE|BREAKING_CHANGE|\bBREAKING\b/i.test(prText)) major = true;
+              if(/(^|\n)feat(\(|:|\b)/i.test(prText)) minor = true;
+              if(/(^|\n)(fix|perf|refactor)(\(|:|\b)/i.test(prText)) patch = true;
+              // '!' in title after type, e.g., feat!: do major
+              if(/\w+![:\s]/.test(pr.title||'')) major = true;
+
+              if(major) bump = 'major';
+              else if(minor) bump = 'minor';
+              else if(patch) bump = 'patch';
+              else bump = 'patch';
+
+              console.log('Heuristic bump decision ->', bump, {major, minor, patch});
+            }
+
+            core.setOutput('bump', bump);
+            core.setOutput('commit_samples', JSON.stringify(commits.slice(0, 10)));
+            core.setOutput('labels', JSON.stringify(labels));
+
+      - name: Bump version in package.json
+        id: bump
+        run: |
+          BUMP=${{ steps.determine.outputs.bump }}
+          echo "Bump type: $BUMP"
+          node -e "
+            const fs = require('fs');
+            const p = 'package.json';
+            const pkg = JSON.parse(fs.readFileSync(p,'utf8'));
+            const v = pkg.version || '0.0.0';
+            const parts = v.split('.').map(x=>Number(x));
+            while(parts.length<3) parts.push(0);
+            if (process.env.BUMP === 'major') { parts[0] = (parts[0]||0)+1; parts[1]=0; parts[2]=0; }
+            else if (process.env.BUMP === 'minor') { parts[1] = (parts[1]||0)+1; parts[2]=0; }
+            else { parts[2] = (parts[2]||0)+1; }
+            const newv = parts.join('.');
+            pkg.version = newv;
+            fs.writeFileSync(p, JSON.stringify(pkg, null, 2)+"\n");
+            console.log('Version bumped to', newv);
+          "
+          echo "new_version=$(node -e \"console.log(JSON.parse(require('fs').readFileSync('package.json','utf8')).version)\")" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: bump package version to ${{ steps.bump.outputs.new_version }}" || echo "No changes to commit"
+          git push
+
+      - name: Create tag for new version
+        id: tag
+        run: |
+          TAG="v${{ steps.bump.outputs.new_version }}"
+          echo "Tag: $TAG"
+          git fetch --prune --unshallow || true
+          git tag "$TAG" || (echo "Tag already exists" && exit 0)
+          git push origin "$TAG"
+
+      - name: Generate changelog
+        id: generate_changelog
+        uses: requarks/changelog-action@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          filename: CHANGELOG.md
+          tag_prefix: 'v'
+          unreleased: 'false'
+
+      - name: Commit generated changelog
+        if: ${{ always() }}
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add CHANGELOG.md
+            git commit -m "chore: update CHANGELOG for v${{ steps.bump.outputs.new_version }}" || echo "No changelog changes to commit"
+            git push
+          else
+            echo "No CHANGELOG.md generated"
+          fi
+
+      - name: Read changelog for release body
+        id: read_changelog
+        if: ${{ always() }}
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            echo "changelog<<EOF" >> $GITHUB_OUTPUT
+            sed -n '1,10000p' CHANGELOG.md >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "changelog=No changelog available" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: "v${{ steps.bump.outputs.new_version }}"
+          release_name: "v${{ steps.bump.outputs.new_version }}"
+          body: |
+            Auto-generated release for version v${{ steps.bump.outputs.new_version }}
+
+            Bump reason: ${{ steps.determine.outputs.bump }}
+
+            Sample commits:
+            ${{ steps.determine.outputs.commit_samples }}
+
+            Changelog:
+            ${{ steps.read_changelog.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

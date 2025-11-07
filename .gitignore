@@ -1,8 +1,11 @@
 # dependencies (bun install)
 node_modules
 
-# Data files
-src/sounds/data/
-
 # GitHub Actions
 !.github/workflows/release.yml
+!.github/workflows/ci.yml
+!.github/workflows/bump-version.yml
+
+# Opencode instructions
+.opencode/
+!.opencode/knowledge-base/opencode-development-plugin-guide.md
