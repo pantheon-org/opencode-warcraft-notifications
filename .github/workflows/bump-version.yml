@@ -13,9 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (merge commit)
         uses: actions/checkout@v4
         with:
+          # ensure full history for changelog and tags
+          fetch-depth: 0
+          # checkout the exact merge commit to operate on main state after merge
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           persist-credentials: true
 
       - name: Setup Node.js
