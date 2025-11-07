@@ -6,14 +6,15 @@ This document provides comprehensive documentation for all GitHub Actions workfl
 
 ## 📋 Workflow Overview
 
-The repository uses 4 streamlined GitHub Actions workflows that provide comprehensive CI/CD automation:
+The repository uses 5 streamlined GitHub Actions workflows that provide comprehensive CI/CD automation:
 
-| Workflow                                      | File                       | Triggers             | Purpose                                 |
-| --------------------------------------------- | -------------------------- | -------------------- | --------------------------------------- |
-| [PR Validation](#pr-validation)               | `pr-validation.yml`        | Pull Requests        | Quality assurance and security scanning |
-| [Smart Version Bump](#smart-version-bump)     | `smart-version-bump.yml`   | Push to main, Manual | AI-powered semantic versioning          |
-| [Sync Package Version](#sync-package-version) | `sync-package-version.yml` | Tag creation         | Sync package.json with Git tags         |
-| [Release & Publish](#release--publish)        | `release-publish.yml`      | Tag creation, Manual | Build, test, and publish to npm         |
+| Workflow                                      | File                         | Triggers                        | Purpose                                 |
+| --------------------------------------------- | ---------------------------- | ------------------------------- | --------------------------------------- |
+| [PR Validation](#pr-validation)               | `pr-validation.yml`          | Pull Requests                   | Quality assurance and security scanning |
+| [Smart Version Bump](#smart-version-bump)     | `smart-version-bump.yml`     | Push to main, Manual            | AI-powered semantic versioning          |
+| [Sync Package Version](#sync-package-version) | `sync-package-version.yml`   | Tag creation                    | Sync package.json with Git tags         |
+| [Release & Publish](#release--publish)        | `release-publish.yml`        | Tag creation, Manual            | Build, test, and publish to npm         |
+| [Cleanup Old Releases](#cleanup-old-releases) | `cleanup-old-releases.yml`   | Schedule, Tag creation, Manual  | Maintain limited release history        |
 
 ## 🔄 Workflow Flow
 
@@ -33,6 +34,11 @@ graph TD
     K --> L[Release & Publish triggers]
     L --> M[Build, test, and publish to npm]
     M --> N[Create GitHub release]
+    N --> O[Cleanup Old Releases triggers]
+    O --> P[Maintain release history limits]
+    
+    Q[Weekly Schedule] --> O
+    R[Manual Cleanup] --> O
 ```
 
 ---
@@ -364,6 +370,249 @@ steps:
 - **npm Package:** Published to npm registry with provenance
 - **GitHub Release:** Detailed release with package information
 - **Notifications:** Summary of publication results
+
+---
+
+## Cleanup Old Releases
+
+**File:** `.github/workflows/cleanup-old-releases.yml`  
+**Purpose:** Automatically maintain a limited number of releases by cleaning up old versions
+
+### Triggers
+
+- **Schedule**: Weekly on Sundays at 2 AM UTC (automated maintenance)
+- **Tag creation**: After new releases are published (keeps history current)
+- **Manual dispatch**: On-demand cleanup with dry-run option
+
+### Manual Inputs
+
+- `dry_run`: Boolean (default: `true`) - Show what would be deleted without actually deleting
+
+### Retention Policy
+
+The workflow maintains releases according to these rules:
+
+- **Major Versions**: Keep up to **5 latest major versions** (e.g., v1.x.x, v2.x.x, v3.x.x, v4.x.x, v5.x.x)
+- **Current Major**: Keep up to **10 latest minor/patch releases** for the **current (newest) major version only**
+- **Older Majors**: Keep only the **latest release** for each older major version
+
+### Jobs
+
+#### 1. Cleanup Releases (`cleanup-releases`)
+
+Comprehensive release cleanup with smart version management:
+
+```yaml
+steps:
+  - Checkout repository
+  - Setup Node.js for GitHub API operations
+  - Fetch all releases from GitHub API
+  - Parse and validate semantic version formats
+  - Sort releases by version (newest first)
+  - Group releases by major version
+  - Apply retention policy rules
+  - Determine releases to keep vs delete
+  - Show summary of planned actions
+  - Execute deletions (if not dry-run)
+  - Clean up associated Git tags
+  - Report cleanup results
+```
+
+**Version Analysis Process:**
+
+1. **Version Parsing**: Validates semantic version format (`v1.2.3`, `1.2.3-beta.1`)
+2. **Categorization**: Groups releases by major version numbers
+3. **Sorting**: Orders releases by semantic version (newest first)
+4. **Policy Application**: Applies retention rules to determine cleanup candidates
+5. **Safety Checks**: Shows detailed summary before any deletions
+
+**Retention Logic:**
+
+```typescript
+// Example: Current releases
+v3.2.5, v3.2.4, v3.2.3, v3.2.2, v3.2.1, v3.1.9, v3.1.8, v3.1.7, v3.1.6, v3.1.5, v3.1.4, v3.1.3
+v2.8.1, v2.8.0, v2.7.9, v2.7.8, v2.7.7, v2.7.6
+v1.15.2, v1.15.1, v1.15.0
+
+// After cleanup:
+v3.2.5, v3.2.4, v3.2.3, v3.2.2, v3.2.1, v3.1.9, v3.1.8, v3.1.7, v3.1.6, v3.1.5  (10 kept - current major)
+v2.8.1                                                                               (1 kept - latest of v2.x.x)
+v1.15.2                                                                              (1 kept - latest of v1.x.x)
+
+// Deleted: 
+// - v3.1.4, v3.1.3 (exceeded 10 limit for current major v3.x.x)
+// - v2.8.0, v2.7.9, v2.7.8, v2.7.7, v2.7.6 (older releases from v2.x.x)
+// - v1.15.1, v1.15.0 (older releases from v1.x.x)
+```
+
+**Safety Features:**
+
+- **Dry Run Default**: All manual executions default to dry-run mode
+- **Detailed Logging**: Shows exactly what would be deleted before action
+- **Version Validation**: Skips releases with invalid version formats
+- **Git Tag Cleanup**: Removes associated Git tags after release deletion
+- **Error Handling**: Continues cleanup even if individual deletions fail
+- **Rate Limiting**: Adds delays between API calls to avoid GitHub rate limits
+
+### Environment Requirements
+
+- **Node.js**: Version 20 for GitHub API operations
+- **GitHub API**: Repository write access for release management
+- **Permissions**: `contents: write` for deleting releases and tags
+
+### Secrets Used
+
+- `GITHUB_TOKEN` (automatic) - For GitHub API operations
+
+### Execution Modes
+
+#### Dry Run Mode (Default)
+
+```bash
+# Manual execution (dry run)
+gh workflow run "Cleanup Old Releases"
+# OR
+gh workflow run "Cleanup Old Releases" -f dry_run=true
+```
+
+**Output:**
+- ✅ Shows detailed analysis of what would be deleted
+- ✅ No actual deletions performed
+- ✅ Safe to run anytime for analysis
+
+#### Live Execution Mode
+
+```bash
+# Manual execution (live deletions)
+gh workflow run "Cleanup Old Releases" -f dry_run=false
+```
+
+**Output:**
+- 🗑️ Actually deletes old releases and tags
+- ⚠️ **Irreversible** - deleted releases cannot be recovered
+- 📊 Reports deletion success/failure statistics
+
+#### Scheduled Execution
+
+- **When**: Every Sunday at 2 AM UTC
+- **Mode**: Live execution (dry_run=false)
+- **Purpose**: Automated maintenance without manual intervention
+
+### Output Examples
+
+#### Dry Run Output
+```
+🧹 Starting release cleanup (dry run: true)
+📦 Found 25 total releases
+📊 Parsed 25 valid releases
+🏷️ Found 3 major version groups: v3.x.x, v2.x.x, v1.x.x
+📌 Keeping major versions: v3.x.x, v2.x.x, v1.x.x
+📦 Major v3: keeping 10/15 releases
+📦 Major v2: keeping 6/6 releases  
+📦 Major v1: keeping 3/3 releases
+
+📊 Summary:
+  ✅ Releases to keep: 19
+  🗑️ Releases to delete: 5
+
+📋 Releases to delete:
+  - v3.1.4 (3.1.4) - created 2024-10-15T10:30:00Z
+  - v3.1.3 (3.1.3) - created 2024-10-10T14:20:00Z
+  - v3.1.2 (3.1.2) - created 2024-10-05T09:15:00Z
+  - v3.1.1 (3.1.1) - created 2024-09-28T16:45:00Z
+  - v3.1.0 (3.1.0) - created 2024-09-20T11:30:00Z
+
+🔍 DRY RUN: No releases were actually deleted.
+💡 To perform the actual cleanup, run this workflow with 'dry_run' set to false.
+```
+
+#### Live Execution Output
+```
+🧹 Starting release cleanup (dry run: false)
+[... analysis output same as dry run ...]
+
+🗑️ Starting deletion process...
+🗑️ Deleting release: v3.1.4
+🏷️ Deleted tag: v3.1.4
+🗑️ Deleting release: v3.1.3
+🏷️ Deleted tag: v3.1.3
+[...]
+
+✅ Cleanup completed!
+  🗑️ Successfully deleted: 5 releases
+  📦 Remaining releases: 19
+```
+
+### Use Cases
+
+#### Regular Maintenance
+- **Automated**: Weekly cleanup keeps release history manageable
+- **Post-Release**: Cleanup after new releases maintains current limits
+- **Storage**: Reduces repository storage used by old release artifacts
+
+#### Repository Migration
+- **Before Migration**: Clean up old releases to reduce transfer size
+- **After Migration**: Establish clean release history in new location
+
+#### Compliance Requirements
+- **Data Retention**: Meet organizational policies for artifact retention
+- **Storage Limits**: Stay within repository or organization storage quotas
+
+### Troubleshooting
+
+#### Common Issues
+
+**No Releases Deleted:**
+- **Cause**: All releases within retention limits
+- **Solution**: Normal operation, no action needed
+
+**Permission Denied:**
+- **Cause**: `GITHUB_TOKEN` lacks sufficient permissions
+- **Solution**: Verify repository settings and workflow permissions
+
+**Rate Limiting:**
+- **Cause**: Too many API calls in short period
+- **Solution**: Workflow includes delays; retry later if needed
+
+**Invalid Version Format:**
+- **Cause**: Release tags don't follow semantic versioning
+- **Solution**: Workflow skips invalid versions; consider standardizing tag format
+
+#### Debug Commands
+
+```bash
+# List current releases
+gh release list --limit 20
+
+# Check workflow runs
+gh run list --workflow="cleanup-old-releases.yml" --limit 5
+
+# View specific workflow execution
+gh run view <run-id> --log
+
+# Manual dry run test
+gh workflow run "Cleanup Old Releases" -f dry_run=true
+
+# Count releases by major version
+gh release list --json tagName --jq '.[].tagName' | grep -E '^v[0-9]+\.' | cut -d. -f1 | sort | uniq -c
+```
+
+### Best Practices
+
+#### Monitoring
+- **Review Logs**: Check weekly cleanup logs for unexpected deletions
+- **Storage Metrics**: Monitor repository storage usage trends
+- **Release Usage**: Track which old releases are still being downloaded
+
+#### Configuration
+- **Dry Run Testing**: Always test changes with dry-run mode first
+- **Retention Tuning**: Adjust retention numbers based on project needs
+- **Schedule Timing**: Run during low-activity periods (weekends)
+
+#### Emergency Recovery
+- **Tag Recreation**: Can recreate Git tags from commit history if needed
+- **Release Recreation**: Can recreate releases from tags, but artifacts are lost
+- **Backup Strategy**: Consider backing up important release artifacts externally
 
 ---
 
@@ -789,6 +1038,7 @@ This section documents the structure and architecture of the `.github/` director
 │   └── sync-version.cjs       # Version synchronization script
 └── workflows/                  # GitHub Actions workflows
     ├── auto-merge-bot.yml     # Auto-merge workflow (uses external script)
+    ├── cleanup-old-releases.yml # Release cleanup and maintenance
     ├── pr-validation.yml      # PR validation and testing
     ├── release-publish.yml    # Release publishing workflow
     ├── smart-version-bump.yml # Smart version bumping
