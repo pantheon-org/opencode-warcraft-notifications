@@ -15,9 +15,10 @@ This directory contains GitHub-specific configuration files including workflows,
 │   ├── release-publish.yml    # Release publishing workflow
 │   ├── smart-version-bump.yml # Smart version bumping
 │   └── sync-package-version.yml # Package version sync (uses external script)
-└── workflows-disabled/        # Backup of original complex workflows
-    ├── auto-merge-bot.yml     # Original complex auto-merge workflow
-    └── sync-package-version.yml # Original complex version sync workflow
+└── workflows-disabled/        # Legacy workflows (DO NOT RE-ENABLE)
+    ├── README.md              # Documentation explaining why these are disabled
+    ├── auto-merge-bot.yml     # Legacy complex auto-merge workflow (REFERENCE ONLY)
+    └── sync-package-version.yml # Legacy complex version sync workflow (REFERENCE ONLY)
 ```
 
 ## Workflow Architecture
@@ -49,3 +50,17 @@ The repository `.gitignore` includes specific patterns to ensure `.github` files
 ```
 
 This overrides global gitignore patterns that might exclude `.github` directories.
+
+## Important Notes
+
+### workflows-disabled/ Directory
+
+⚠️ **DO NOT move files from `workflows-disabled/` back to `workflows/`** ⚠️
+
+The `workflows-disabled/` directory contains legacy workflow files that:
+- Had complex embedded JavaScript causing YAML syntax errors
+- Were replaced by the current simplified workflows + external scripts approach
+- Are kept for reference and documentation purposes only
+- Will cause the same issues we fixed if re-enabled
+
+See `workflows-disabled/README.md` for detailed explanation.
