@@ -48,3 +48,21 @@ jobs:
           git add package.json
           git commit -m "chore: bump package version to ${{ steps.bump.outputs.new_version }}" || echo "No changes to commit"
           git push
+
+      - name: Create tag for new version
+        id: tag
+        run: |
+          TAG="v${{ steps.bump.outputs.new_version }}"
+          echo "Tag: $TAG"
+          git fetch --prune --unshallow || true
+          git tag "$TAG" || (echo "Tag already exists" && exit 0)
+          git push origin "$TAG"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: "v${{ steps.bump.outputs.new_version }}"
+          release_name: "v${{ steps.bump.outputs.new_version }}"
+          body: "Auto-generated release for version v${{ steps.bump.outputs.new_version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
