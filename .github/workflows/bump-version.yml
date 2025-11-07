@@ -37,18 +37,68 @@ jobs:
             const commits = commitsResp.data.map(c => c.commit.message || '');
             const labels = (pr.labels || []).map(l => l.name.toLowerCase());
 
-            // Heuristics for bumping
-            let bump = 'patch';
+            // Helper to extract override from labels like 'major', 'version:minor', 'bump-major'
+            function extractOverride(labels){
+              for(const l of labels){
+                const m1 = l.match(/^(major|minor|patch)$/i);
+                if(m1) return m1[1].toLowerCase();
+                const m2 = l.match(/(?:^|[:\-\/\s])(?:version|v|bump)?[:\-\/]?(major|minor|patch)$/i);
+                if(m2) return m2[1].toLowerCase();
+              }
+              return null;
+            }
 
-            // Major bump if labeled as major or contains BREAKING CHANGE or conventional '!' marker
-            const hasBreaking = labels.includes('major') || commits.some(m => /BREAKING CHANGE|:\s*BREAKING CHANGE|!\)|!\s|\bBREAKING CHANGE\b/i.test(m)) || /BREAKING CHANGE|!\b/.test(pr.title || '') || /BREAKING CHANGE|!\b/.test(pr.body || '');
-            if (hasBreaking) bump = 'major';
-            else if (commits.some(m => /^feat(\(|:|\b)/i.test(m) || /^feat\b/i.test(pr.title || '') || /(^|\n)feat(\(|:|\b)/i.test(pr.body || ''))) bump = 'minor';
-            else if (commits.some(m => /^fix(\(|:|\b)/i.test(m) || /^perf(\(|:|\b)/i.test(m) || /^refactor(\(|:|\b)/i.test(m))) bump = 'patch';
+            const override = extractOverride(labels);
+            let bump = null;
 
-            console.log('Determined bump:', bump);
+            if(override){
+              bump = override;
+              console.log('Using label override for bump:', bump);
+            } else {
+              // Analyze commits and PR content using Conventional Commits
+              let major = false;
+              let minor = false;
+              let patch = false;
+
+              const conventionalRegex = /^(\w+)(?:\([^\)]*\))?(\!)?:/; // captures type and optional !
+
+              for(const msg of commits){
+                const header = (msg.split('\n')[0] || '').trim();
+                const m = header.match(conventionalRegex);
+                if(m){
+                  const type = m[1].toLowerCase();
+                  const breakingMark = !!m[2];
+                  if(breakingMark) major = true;
+                  if(/breaking change/i.test(msg)) major = true;
+                  if(type === 'feat') minor = true;
+                  if(['fix','perf','refactor','docs','test','chore','ci','build','style'].includes(type)) patch = true;
+                } else {
+                  // fallback: look for keywords anywhere
+                  if(/BREAKING CHANGE/i.test(msg)) major = true;
+                  if(/(^|\n)feat(\(|:|\b)/i.test(msg)) minor = true;
+                  if(/(^|\n)(fix|perf|refactor)(\(|:|\b)/i.test(msg)) patch = true;
+                }
+              }
+
+              // Also inspect PR title and body
+              const prText = (pr.title||'') + '\n' + (pr.body||'');
+              if(/BREAKING CHANGE|BREAKING-CHANGE|BREAKING_CHANGE|\bBREAKING\b/i.test(prText)) major = true;
+              if(/(^|\n)feat(\(|:|\b)/i.test(prText)) minor = true;
+              if(/(^|\n)(fix|perf|refactor)(\(|:|\b)/i.test(prText)) patch = true;
+              // '!' in title after type, e.g., feat!: do major
+              if(/\w+![:\s]/.test(pr.title||'')) major = true;
+
+              if(major) bump = 'major';
+              else if(minor) bump = 'minor';
+              else if(patch) bump = 'patch';
+              else bump = 'patch';
+
+              console.log('Heuristic bump decision ->', bump, {major, minor, patch});
+            }
+
             core.setOutput('bump', bump);
             core.setOutput('commit_samples', JSON.stringify(commits.slice(0, 10)));
+            core.setOutput('labels', JSON.stringify(labels));
 
       - name: Bump version in package.json
         id: bump
