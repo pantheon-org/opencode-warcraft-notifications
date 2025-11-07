@@ -22,23 +22,33 @@ async function checkRepositorySettings() {
 
   try {
     // Get current repository settings
-    const repoData = exec('gh api repos/pantheon-org/opencode-warcraft-notifications --jq "{allow_squash_merge, allow_merge_commit, allow_rebase_merge, delete_branch_on_merge}"');
-    
+    const repoData = exec(
+      'gh api repos/pantheon-org/opencode-warcraft-notifications --jq "{allow_squash_merge, allow_merge_commit, allow_rebase_merge, delete_branch_on_merge}"',
+    );
+
     if (!repoData) {
-      console.error('❌ Failed to fetch repository settings. Make sure GitHub CLI is authenticated.');
+      console.error(
+        '❌ Failed to fetch repository settings. Make sure GitHub CLI is authenticated.',
+      );
       process.exit(1);
     }
 
     const settings = JSON.parse(repoData);
-    
+
     console.log('📊 Current Repository Settings:');
     console.log(`   Allow Squash Merge: ${settings.allow_squash_merge ? '✅' : '❌'}`);
-    console.log(`   Allow Merge Commit: ${settings.allow_merge_commit ? '⚠️ ENABLED' : '✅ DISABLED'}`);
-    console.log(`   Allow Rebase Merge: ${settings.allow_rebase_merge ? '⚠️ ENABLED' : '✅ DISABLED'}`);
-    console.log(`   Delete Branch on Merge: ${settings.delete_branch_on_merge ? '✅' : '⚠️ DISABLED'}\n`);
+    console.log(
+      `   Allow Merge Commit: ${settings.allow_merge_commit ? '⚠️ ENABLED' : '✅ DISABLED'}`,
+    );
+    console.log(
+      `   Allow Rebase Merge: ${settings.allow_rebase_merge ? '⚠️ ENABLED' : '✅ DISABLED'}`,
+    );
+    console.log(
+      `   Delete Branch on Merge: ${settings.delete_branch_on_merge ? '✅' : '⚠️ DISABLED'}\n`,
+    );
 
     // Check if configuration is optimal for single-release-per-PR
-    const isOptimal = 
+    const isOptimal =
       settings.allow_squash_merge === true &&
       settings.allow_merge_commit === false &&
       settings.allow_rebase_merge === false &&
@@ -49,7 +59,7 @@ async function checkRepositorySettings() {
       return true;
     } else {
       console.log('⚠️ Repository configuration needs adjustment for optimal release management.\n');
-      
+
       console.log('🔧 Required Changes:');
       if (!settings.allow_squash_merge) {
         console.log('   • Enable "Allow squash merging"');
@@ -63,12 +73,14 @@ async function checkRepositorySettings() {
       if (!settings.delete_branch_on_merge) {
         console.log('   • Enable "Automatically delete head branches" (cleanup)');
       }
-      
+
       console.log('\n📖 Manual Configuration Required:');
-      console.log('   Go to: https://github.com/pantheon-org/opencode-warcraft-notifications/settings');
+      console.log(
+        '   Go to: https://github.com/pantheon-org/opencode-warcraft-notifications/settings',
+      );
       console.log('   Navigate to: General → Pull Requests');
       console.log('   Apply the changes listed above');
-      
+
       return false;
     }
   } catch (error) {
@@ -81,21 +93,27 @@ async function checkBranchProtection() {
   console.log('\n🛡️ Checking branch protection for main branch...\n');
 
   try {
-    const protectionData = exec('gh api repos/pantheon-org/opencode-warcraft-notifications/branches/main/protection 2>/dev/null');
-    
+    const protectionData = exec(
+      'gh api repos/pantheon-org/opencode-warcraft-notifications/branches/main/protection 2>/dev/null',
+    );
+
     if (!protectionData) {
       console.log('⚠️ No branch protection rules found for main branch');
-      console.log('📖 Recommended: Set up branch protection to require PR reviews and status checks');
+      console.log(
+        '📖 Recommended: Set up branch protection to require PR reviews and status checks',
+      );
       return false;
     }
 
     const protection = JSON.parse(protectionData);
-    
+
     console.log('🛡️ Branch Protection Status:');
     console.log(`   Require PR Reviews: ${protection.required_pull_request_reviews ? '✅' : '❌'}`);
     console.log(`   Require Status Checks: ${protection.required_status_checks ? '✅' : '❌'}`);
-    console.log(`   Up to Date Branches: ${protection.required_status_checks?.strict ? '✅' : '❌'}`);
-    
+    console.log(
+      `   Up to Date Branches: ${protection.required_status_checks?.strict ? '✅' : '❌'}`,
+    );
+
     return true;
   } catch (error) {
     console.log('⚠️ Unable to check branch protection (may not be configured)');
@@ -112,7 +130,7 @@ async function main() {
   const protectionOk = await checkBranchProtection();
 
   console.log('\n📋 Summary:');
-  
+
   if (settingsOk && protectionOk) {
     console.log('✅ Repository is properly configured for single release per merge request!');
     console.log('🎯 Benefits:');
@@ -128,11 +146,11 @@ async function main() {
     console.log('   3. Test with a sample PR to confirm behavior');
     console.log('\n📚 Documentation: docs/squash-merge-configuration.md');
   }
-  
+
   console.log(`\n🏁 Configuration check complete!`);
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('❌ Configuration check failed:', error);
   process.exit(1);
 });
