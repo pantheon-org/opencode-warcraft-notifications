@@ -1,0 +1,251 @@
+name: Smart Version Bump
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Force version bump type'
+        required: false
+        type: choice
+        options:
+          - 'auto'
+          - 'major'
+          - 'minor'
+          - 'patch'
+        default: 'auto'
+
+permissions:
+  contents: write
+  pull-requests: read
+  actions: read
+
+jobs:
+  analyze-changes:
+    name: Analyze Changes & Determine Version
+    runs-on: ubuntu-latest
+    outputs:
+      should_bump: ${{ steps.decision.outputs.should_bump }}
+      version_type: ${{ steps.decision.outputs.version_type }}
+      new_version: ${{ steps.decision.outputs.new_version }}
+      changelog: ${{ steps.decision.outputs.changelog }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Get commit history since last tag
+        id: commits
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -z "$LATEST_TAG" ]; then
+            # No tags found, get all commits
+            COMMITS=$(git log --oneline --no-merges)
+            echo "No previous tags found. Analyzing all commits."
+          else
+            # Get commits since last tag
+            COMMITS=$(git log ${LATEST_TAG}..HEAD --oneline --no-merges)
+            echo "Analyzing commits since ${LATEST_TAG}"
+          fi
+          
+          # Save commits to file for AI analysis
+          echo "$COMMITS" > commits.txt
+          
+          # Also get file changes
+          if [ -z "$LATEST_TAG" ]; then
+            git diff --name-status HEAD~10 HEAD > changes.txt 2>/dev/null || git ls-files > changes.txt
+          else
+            git diff --name-status ${LATEST_TAG}..HEAD > changes.txt
+          fi
+          
+          echo "commits_count=$(echo "$COMMITS" | wc -l)" >> $GITHUB_OUTPUT
+
+      - name: Install Google AI CLI (Gemini)
+        run: |
+          curl -o- https://generativelanguage.googleapis.com/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Analyze changes with AI
+        id: ai-analysis
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+        run: |
+          # Create analysis prompt
+          cat > analysis_prompt.txt << 'EOF'
+          You are a semantic versioning expert. Analyze the following git commits and file changes to determine the appropriate version bump.
+          
+          Rules:
+          - MAJOR: Breaking changes, API changes, major architecture changes
+          - MINOR: New features, new functionality, backwards-compatible additions
+          - PATCH: Bug fixes, documentation updates, small improvements, refactoring
+          - NONE: Only CI/config changes, formatting, or no significant changes
+          
+          Consider:
+          1. Commit messages and their conventional commit prefixes (feat:, fix:, BREAKING CHANGE:, etc.)
+          2. File changes (new files, deleted files, modified core files)
+          3. Overall impact of changes
+          
+          Commits:
+          EOF
+          
+          cat commits.txt >> analysis_prompt.txt
+          
+          echo -e "\n\nFile Changes:" >> analysis_prompt.txt
+          cat changes.txt >> analysis_prompt.txt
+          
+          echo -e "\n\nRespond with only one word: MAJOR, MINOR, PATCH, or NONE" >> analysis_prompt.txt
+          
+          # Use Gemini to analyze (fallback to simple analysis if API fails)
+          if command -v gemini &> /dev/null && [ -n "$GOOGLE_API_KEY" ]; then
+            AI_DECISION=$(gemini generate "$(cat analysis_prompt.txt)" 2>/dev/null | tail -1 | tr -d '\n\r' | tr '[:lower:]' '[:upper:]') || AI_DECISION=""
+          else
+            AI_DECISION=""
+          fi
+          
+          # Fallback analysis based on conventional commits
+          if [ -z "$AI_DECISION" ] || [[ ! "$AI_DECISION" =~ ^(MAJOR|MINOR|PATCH|NONE)$ ]]; then
+            echo "AI analysis failed, using conventional commit analysis"
+            if grep -qi "BREAKING CHANGE\|!:" commits.txt; then
+              AI_DECISION="MAJOR"
+            elif grep -qi "^feat\|^feature" commits.txt; then
+              AI_DECISION="MINOR"  
+            elif grep -qi "^fix\|^bugfix\|^patch" commits.txt; then
+              AI_DECISION="PATCH"
+            elif grep -qi "^docs\|^doc\|^chore\|^ci\|^build\|^style\|^refactor" commits.txt; then
+              AI_DECISION="PATCH"
+            else
+              AI_DECISION="PATCH"
+            fi
+          fi
+          
+          echo "ai_decision=$AI_DECISION" >> $GITHUB_OUTPUT
+          echo "AI decided: $AI_DECISION"
+
+      - name: Make version decision
+        id: decision
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Use manual input if provided, otherwise use AI decision
+          if [ "${{ github.event.inputs.version_type }}" != "auto" ] && [ -n "${{ github.event.inputs.version_type }}" ]; then
+            VERSION_TYPE="${{ github.event.inputs.version_type }}"
+            echo "Using manual version type: $VERSION_TYPE"
+          else
+            VERSION_TYPE=$(echo "${{ steps.ai-analysis.outputs.ai_decision }}" | tr '[:upper:]' '[:lower:]')
+            echo "Using AI decision: $VERSION_TYPE"
+          fi
+          
+          if [ "$VERSION_TYPE" = "none" ]; then
+            echo "should_bump=false" >> $GITHUB_OUTPUT
+            echo "No version bump needed"
+            exit 0
+          fi
+          
+          # Calculate new version
+          IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
+          major=${version_parts[0]}
+          minor=${version_parts[1]}
+          patch=${version_parts[2]}
+          
+          case $VERSION_TYPE in
+            major)
+              major=$((major + 1))
+              minor=0
+              patch=0
+              ;;
+            minor)
+              minor=$((minor + 1))
+              patch=0
+              ;;
+            patch)
+              patch=$((patch + 1))
+              ;;
+          esac
+          
+          NEW_VERSION="${major}.${minor}.${patch}"
+          
+          echo "should_bump=true" >> $GITHUB_OUTPUT
+          echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+          # Generate changelog
+          CHANGELOG="## Changes in v${NEW_VERSION}\n\n"
+          while IFS= read -r commit; do
+            CHANGELOG="${CHANGELOG}- ${commit}\n"
+          done < commits.txt
+          
+          echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
+          
+          echo "Version will be bumped from $CURRENT_VERSION to $NEW_VERSION (type: $VERSION_TYPE)"
+
+  bump-version:
+    name: Bump Version & Create Tag
+    runs-on: ubuntu-latest
+    needs: analyze-changes
+    if: needs.analyze-changes.outputs.should_bump == 'true'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Update package.json version
+        run: |
+          NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
+          npm version $NEW_VERSION --no-git-tag-version
+          
+          echo "Updated package.json to version $NEW_VERSION"
+
+      - name: Commit version change
+        run: |
+          NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
+          git add package.json
+          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+
+      - name: Create and push tag
+        run: |
+          NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
+          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
+          git push origin main --tags
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ needs.analyze-changes.outputs.new_version }}
+          release_name: Release v${{ needs.analyze-changes.outputs.new_version }}
+          body: |
+            ## 🚀 Release v${{ needs.analyze-changes.outputs.new_version }}
+            
+            **Version Type:** ${{ needs.analyze-changes.outputs.version_type }}
+            
+            ${{ needs.analyze-changes.outputs.changelog }}
+            
+            ---
+            *This release was automatically generated based on commit analysis.*
+          draft: false
+          prerelease: false
