@@ -1,0 +1,122 @@
+name: Repository Configuration Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Check configuration weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
+  push:
+    paths:
+      - '.github/scripts/check-repo-config.cjs'
+      - '.github/workflows/repo-config-check.yml'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check-config:
+    name: Verify Repository Configuration
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup GitHub CLI
+        run: |
+          # GitHub CLI should already be available in ubuntu-latest
+          gh --version
+
+      - name: Run repository configuration check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔍 Running repository configuration check..."
+          node .github/scripts/check-repo-config.cjs
+
+      - name: Create issue on configuration problems
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Check if there's already an open issue about repository configuration
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'configuration,automation'
+            });
+
+            const existingIssue = issues.find(issue => 
+              issue.title.includes('Repository Configuration') && 
+              issue.title.includes('Single Release')
+            );
+
+            if (existingIssue) {
+              console.log(`Issue already exists: #${existingIssue.number}`);
+              return;
+            }
+
+            // Create new issue
+            const { data: issue } = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🔧 Repository Configuration Issue: Single Release per Merge Request',
+              labels: ['configuration', 'automation', 'bug'],
+              body: `## Issue
+            
+            The repository configuration check detected that the current settings may allow multiple releases per merge request.
+            
+            ## Problem
+            
+            Our merge request should always be a squash so we do not have excessive number of releases being created. We want one and only one release per merge request.
+            
+            ## Solution
+            
+            Please review and apply the configuration changes detailed in:
+            - 📚 **Documentation**: [docs/squash-merge-configuration.md](./docs/squash-merge-configuration.md)
+            - 🔧 **Check Script**: Run \`.github/scripts/check-repo-config.cjs\` for current status
+            
+            ## Required Actions
+            
+            1. Go to [Repository Settings](https://github.com/${context.repo.owner}/${context.repo.repo}/settings)
+            2. Navigate to **General → Pull Requests**
+            3. Configure merge settings:
+               - ✅ Enable "Allow squash merging"
+               - ❌ Disable "Allow merge commits"
+               - ❌ Disable "Allow rebase merging"
+               - ✅ Enable "Automatically delete head branches"
+            
+            ## Verification
+            
+            After making changes, run the configuration check workflow or script to verify:
+            \`\`\`bash
+            node .github/scripts/check-repo-config.cjs
+            \`\`\`
+            
+            ---
+            *This issue was automatically created by the Repository Configuration Check workflow.*
+            *Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}*`
+            });
+
+            console.log(`Created issue: #${issue.number}`);
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "📊 Repository Configuration Check Summary"
+          echo "======================================"
+          echo ""
+          echo "🎯 Goal: Ensure single release per merge request"
+          echo "🔧 Method: Enforce squash merge strategy"
+          echo "📚 Documentation: docs/squash-merge-configuration.md"
+          echo "🛠️ Tools: .github/scripts/check-repo-config.cjs"
+          echo ""
+          echo "For manual configuration, visit:"
+          echo "https://github.com/${{ github.repository }}/settings"
