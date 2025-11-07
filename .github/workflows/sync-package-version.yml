@@ -8,6 +8,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
+  checks: write
 
 jobs:
   sync-package-version:
@@ -139,21 +141,8 @@ jobs:
 
             console.log('Created PR #' + pr.number + ': ' + pr.html_url);
 
-            // Try to merge immediately
-            try {
-              await github.rest.pulls.merge({
-                owner,
-                repo,
-                pull_number: pr.number,
-                commit_title: prTitle,
-                commit_message: 'Sync package.json version with tag ' + tag + '\n\n[skip ci]',
-                merge_method: 'squash'
-              });
-              console.log('✅ Successfully auto-merged PR #' + pr.number);
-            } catch (error) {
-              console.log('⚠️ Could not auto-merge PR #' + pr.number + ': ' + error.message);
-              console.log('PR created and waiting for manual merge or status checks to complete.');
-            }
+            console.log('✅ PR created successfully! It will be merged according to branch protection rules.');
+            console.log('PR URL: ' + pr.html_url);
 
       - name: Skip if no update needed
         if: steps.check.outputs.needs_update == 'false'
