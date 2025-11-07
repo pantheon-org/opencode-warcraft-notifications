@@ -2,7 +2,7 @@
 
 This document explains the streamlined GitHub Actions workflow setup for automated testing, intelligent versioning, and publishing.
 
-> 📖 **For detailed workflow documentation including step-by-step breakdowns, troubleshooting, and configuration details, see [GitHub Workflows Documentation](./github-workflows.md)**
+> 📖 **For detailed workflow documentation including step-by-step breakdowns, troubleshooting, and configuration details, see [GitHub Workflows Overview](./overview.md)**
 
 ## 🎯 **Streamlined Architecture Overview**
 
@@ -273,9 +273,9 @@ If you encounter issues:
 
 ## 📚 Additional Documentation
 
-- **[GitHub Workflows Documentation](./github-workflows.md)** - Comprehensive technical documentation for all workflows
-- **[Sounds Usage Guide](./sounds-usage.md)** - How to use the notification sounds
-- **[Sounds Download Strategy](./sounds-download-strategy.md)** - Sound asset management
+- **[GitHub Workflows Overview](./overview.md)** - Comprehensive technical documentation for all workflows
+- **[Sounds Usage Guide](../sounds-usage.md)** - How to use the notification sounds
+- **[Sounds Download Strategy](../sounds-download-strategy.md)** - Sound asset management
 
 ---
 
