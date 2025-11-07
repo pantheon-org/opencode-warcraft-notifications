@@ -23,22 +23,53 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Bump patch version in package.json
+      - name: Determine bump level from PR and commits
+        id: determine
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) core.setFailed('No pull_request payload available');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = pr.number;
+            const commitsResp = await github.rest.pulls.listCommits({ owner, repo, pull_number: prNumber });
+            const commits = commitsResp.data.map(c => c.commit.message || '');
+            const labels = (pr.labels || []).map(l => l.name.toLowerCase());
+
+            // Heuristics for bumping
+            let bump = 'patch';
+
+            // Major bump if labeled as major or contains BREAKING CHANGE or conventional '!' marker
+            const hasBreaking = labels.includes('major') || commits.some(m => /BREAKING CHANGE|:\s*BREAKING CHANGE|!\)|!\s|\bBREAKING CHANGE\b/i.test(m)) || /BREAKING CHANGE|!\b/.test(pr.title || '') || /BREAKING CHANGE|!\b/.test(pr.body || '');
+            if (hasBreaking) bump = 'major';
+            else if (commits.some(m => /^feat(\(|:|\b)/i.test(m) || /^feat\b/i.test(pr.title || '') || /(^|\n)feat(\(|:|\b)/i.test(pr.body || ''))) bump = 'minor';
+            else if (commits.some(m => /^fix(\(|:|\b)/i.test(m) || /^perf(\(|:|\b)/i.test(m) || /^refactor(\(|:|\b)/i.test(m))) bump = 'patch';
+
+            console.log('Determined bump:', bump);
+            core.setOutput('bump', bump);
+            core.setOutput('commit_samples', JSON.stringify(commits.slice(0, 10)));
+
+      - name: Bump version in package.json
         id: bump
         run: |
-          node <<'NODE'
-          const fs = require('fs');
-          const p = 'package.json';
-          const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
-          const v = pkg.version || '0.0.0';
-          const parts = v.split('.').map(x => Number(x));
-          while (parts.length < 3) parts.push(0);
-          parts[2] = (parts[2] || 0) + 1;
-          const newv = parts.join('.');
-          pkg.version = newv;
-          fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
-          console.log('Version bumped to', newv);
-          NODE
+          BUMP=${{ steps.determine.outputs.bump }}
+          echo "Bump type: $BUMP"
+          node -e "
+            const fs = require('fs');
+            const p = 'package.json';
+            const pkg = JSON.parse(fs.readFileSync(p,'utf8'));
+            const v = pkg.version || '0.0.0';
+            const parts = v.split('.').map(x=>Number(x));
+            while(parts.length<3) parts.push(0);
+            if (process.env.BUMP === 'major') { parts[0] = (parts[0]||0)+1; parts[1]=0; parts[2]=0; }
+            else if (process.env.BUMP === 'minor') { parts[1] = (parts[1]||0)+1; parts[2]=0; }
+            else { parts[2] = (parts[2]||0)+1; }
+            const newv = parts.join('.');
+            pkg.version = newv;
+            fs.writeFileSync(p, JSON.stringify(pkg, null, 2)+"\n");
+            console.log('Version bumped to', newv);
+          "
           echo "new_version=$(node -e \"console.log(JSON.parse(require('fs').readFileSync('package.json','utf8')).version)\")" >> $GITHUB_OUTPUT
 
       - name: Commit version bump
@@ -63,6 +94,6 @@ jobs:
         with:
           tag_name: "v${{ steps.bump.outputs.new_version }}"
           release_name: "v${{ steps.bump.outputs.new_version }}"
-          body: "Auto-generated release for version v${{ steps.bump.outputs.new_version }}"
+          body: "Auto-generated release for version v${{ steps.bump.outputs.new_version }}\n\nBump reason: ${{ steps.determine.outputs.bump }}\n\nSample commits:\n${{ steps.determine.outputs.commit_samples }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
