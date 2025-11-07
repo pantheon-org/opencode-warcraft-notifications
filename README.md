@@ -89,4 +89,4 @@ This will verify sound downloads and test random sound selection.
 
 _"Work complete!"_ - Warcraft II Peasant
 
-> **Note:** This plugin now uses an advanced AI-powered workflow system for automated versioning and publishing.
+> **Note:** This plugin now uses an advanced AI-powered workflow system for automated versioning, publishing, and auto-merging of version sync PRs.
