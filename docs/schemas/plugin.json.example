@@ -1,0 +1,5 @@
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "soundsDir": "~/.cache/opencode-warcraft-sounds"
+  }
+}

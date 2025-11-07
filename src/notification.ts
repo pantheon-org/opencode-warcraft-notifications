@@ -1,7 +1,71 @@
 import type { Plugin } from '@opencode-ai/plugin';
 import { getRandomSoundPath, soundExists } from './sounds.js';
 import { ensureSoundAvailable } from './download.js';
+import { join } from 'path';
+import { exists } from 'fs/promises';
+import { homedir } from 'os';
 /* eslint-disable jsdoc/require-param */
+
+/**
+ * Configuration interface for the warcraft notifications plugin
+ */
+interface WarcraftNotificationConfig {
+  /** Directory where sound files should be stored and cached */
+  soundsDir?: string;
+}
+
+/**
+ * Plugin configuration file structure
+ */
+interface PluginConfig {
+  [pluginName: string]: unknown;
+}
+
+/**
+ * Get the appropriate config directory based on the operating system
+ */
+const getConfigDir = (): string => {
+  const home = homedir();
+
+  switch (process.platform) {
+    case 'darwin':
+      return join(home, '.config');
+    case 'win32':
+      return process.env.APPDATA ?? join(home, 'AppData', 'Roaming');
+    default: // Linux and other Unix-like systems
+      return process.env.XDG_CONFIG_HOME ?? join(home, '.config');
+  }
+};
+
+/**
+ * Load plugin configuration from plugin.json files
+ * Looks in:
+ * 1. CWD/.opencode/plugin.json
+ * 2. ~/.config/opencode/plugin.json
+ */
+const loadPluginConfig = async (pluginName: string): Promise<WarcraftNotificationConfig> => {
+  const configPaths = [
+    join(process.cwd(), '.opencode', 'plugin.json'),
+    join(getConfigDir(), 'opencode', 'plugin.json'),
+  ];
+
+  for (const configPath of configPaths) {
+    try {
+      if (await exists(configPath)) {
+        const configFile = Bun.file(configPath);
+        const configData: PluginConfig = await configFile.json();
+
+        if (configData[pluginName]) {
+          return configData[pluginName] as WarcraftNotificationConfig;
+        }
+      }
+    } catch (error) {
+      console.warn(`Failed to load plugin config from ${configPath}:`, error);
+    }
+  }
+
+  return {}; // Return empty config if no valid config found
+};
 
 /**
  * Notification idle plugin
@@ -10,24 +74,28 @@ import { ensureSoundAvailable } from './download.js';
  * and displays a notification with a short summary of the last message.
  *
  * The plugin downloads sounds on demand into:
- * 1. `directory/.opencode-sounds` (per-project cache when directory context is available)
- * 2. `SOUNDS_DATA_DIR` environment variable if set
+ * 1. `SOUNDS_DATA_DIR` environment variable if set
+ * 2. Configured sounds directory from plugin.json (soundsDir property) if available
  * 3. `~/.config/opencode/sounds` (default machine-wide location)
  */
 export const NotificationPlugin: Plugin = async (ctx) => {
-  const { project: _project, client: _client, $, directory, worktree: _worktree } = ctx;
+  const { project: _project, client: _client, $, worktree: _worktree } = ctx;
   // We'll download sounds on demand. Keep a simple cache flag to avoid repeated checks.
   const checkedSoundCache = new Map<string, boolean>();
   void _project;
   void _client;
   void _worktree;
 
+  // Load plugin configuration from plugin.json
+  const pluginName = '@pantheon-ai/opencode-warcraft-notifications';
+  const pluginConfig = await loadPluginConfig(pluginName);
+
   const ensureAndGetSoundPath = async () => {
     // Determine explicit data directory preference:
-    // 1. Per-project cache: `directory/.opencode-sounds` if directory context is available
-    // 2. Environment override: `SOUNDS_DATA_DIR` if set
+    // 1. Environment override: `SOUNDS_DATA_DIR` if set
+    // 2. Configuration from opencode.json: `soundsDir` property
     // 3. Default: `~/.config/opencode/sounds` (handled by DEFAULT_DATA_DIR)
-    const explicitDataDir = directory ? `${directory}/.opencode-sounds` : undefined; // Let DEFAULT_DATA_DIR handle the fallback logic
+    const explicitDataDir = pluginConfig.soundsDir || undefined; // Use configured directory or let DEFAULT_DATA_DIR handle fallback
 
     // Choose a random sound filename
     const soundPath = getRandomSoundPath(explicitDataDir);

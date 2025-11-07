@@ -1,5 +1,4 @@
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 import { homedir } from 'os';
 
 /**
@@ -24,9 +23,7 @@ const getDefaultSoundsDir = (): string => {
   return join(getConfigDir(), 'opencode', 'sounds');
 };
 
-// Get the current directory (was sounds directory) - fallback for backwards compatibility
-const soundsDir = dirname(fileURLToPath(import.meta.url));
-const legacyDataDir = join(soundsDir, '..', 'data');
+// Legacy data directory removed - now using proper config-based directory structure
 
 export const DEFAULT_DATA_DIR = process.env.SOUNDS_DATA_DIR ?? getDefaultSoundsDir();
 export const DEFAULT_BASE_URL =
