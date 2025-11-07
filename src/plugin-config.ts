@@ -8,6 +8,8 @@ import { homedir } from 'os';
 export interface WarcraftNotificationConfig {
   /** Directory where sound files should be stored and cached */
   soundsDir?: string;
+  /** Which faction sounds to use: 'alliance', 'horde', or 'both' (default: 'both') */
+  faction?: 'alliance' | 'horde' | 'both';
 }
 
 /**

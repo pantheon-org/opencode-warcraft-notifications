@@ -1,5 +1,5 @@
 import type { Plugin } from '@opencode-ai/plugin';
-import { getRandomSoundPath, soundExists } from './sounds.js';
+import { getRandomSoundPath, getRandomSoundPathFromFaction, soundExists } from './sounds.js';
 import { ensureSoundAvailable } from './download.js';
 import { loadPluginConfig, type WarcraftNotificationConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */
@@ -7,7 +7,7 @@ import { loadPluginConfig, type WarcraftNotificationConfig } from './plugin-conf
 /**
  * Notification idle plugin
  *
- * This plugin plays a random Warcraft II Alliance sound when the session becomes idle
+ * This plugin plays a random Warcraft II sound (Alliance and/or Horde) when the session becomes idle
  * and displays a notification with a short summary of the last message.
  *
  * The plugin downloads sounds on demand into:
@@ -34,8 +34,11 @@ export const NotificationPlugin: Plugin = async (ctx) => {
     // 3. Default: `~/.config/opencode/sounds` (handled by DEFAULT_DATA_DIR)
     const explicitDataDir = pluginConfig.soundsDir || undefined; // Use configured directory or let DEFAULT_DATA_DIR handle fallback
 
-    // Choose a random sound filename
-    const soundPath = getRandomSoundPath(explicitDataDir);
+    // Determine faction preference (default to 'both')
+    const faction = pluginConfig.faction || 'both';
+
+    // Choose a random sound filename from the specified faction(s)
+    const soundPath = getRandomSoundPathFromFaction(faction, explicitDataDir);
     const filename = soundPath.split('/').pop() as string;
 
     // If we've already confirmed availability, return the path
