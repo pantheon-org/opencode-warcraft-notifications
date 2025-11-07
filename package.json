@@ -41,7 +41,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,cjs,css}\"",
     "clean": "rm -rf dist/ .bun-cache/ coverage/",
     "build": "bun tsc",
-    "dev": "bun tsc --watch"
+    "dev": "bun tsc --watch",
+    "check:repo-config": "node .github/scripts/check-repo-config.cjs"
   },
   "dependencies": {
     "csstype": "^3.1.3",

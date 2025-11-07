@@ -135,7 +135,7 @@ Please review the failed checks and address any issues, or merge manually if the
 
     console.log('🎯 All checks passed - attempting to merge');
 
-    // Attempt to merge the PR
+    // Attempt to merge the PR with squash (enforcing single commit per merge)
     exec(`gh pr merge ${prNumber} --squash --auto --delete-branch`);
 
     console.log(`✅ Successfully enabled auto-merge for PR #${prNumber}`);

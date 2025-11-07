@@ -60,6 +60,14 @@ jobs:
             echo "Analyzing commits since ${LATEST_TAG}"
           fi
           
+          # Check if this is a single squash commit (preferred for releases)
+          COMMIT_COUNT=$(echo "$COMMITS" | wc -l)
+          if [ "$COMMIT_COUNT" -eq 1 ]; then
+            echo "✅ Single commit detected (likely squash merge) - good for release consistency"
+          elif [ "$COMMIT_COUNT" -gt 5 ]; then
+            echo "⚠️ Multiple commits detected ($COMMIT_COUNT) - consider squash merging PRs for cleaner releases"
+          fi
+          
           # Save commits to file for AI analysis
           echo "$COMMITS" > commits.txt
           

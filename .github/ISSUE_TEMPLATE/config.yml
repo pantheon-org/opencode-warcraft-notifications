@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Repository Settings Configuration
+    url: https://github.com/pantheon-org/opencode-warcraft-notifications/settings
+    about: Configure repository merge settings to enforce squash merges
