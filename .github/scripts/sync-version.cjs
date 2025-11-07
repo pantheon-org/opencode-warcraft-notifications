@@ -47,11 +47,12 @@ async function main() {
     const tagDate = exec(`git log -1 --format=%ct ${tag} 2>/dev/null`);
     const currentTime = Math.floor(Date.now() / 1000);
     const tagAge = currentTime - parseInt(tagDate);
-    
-    if (tagAge < 30) { // Less than 30 seconds old
+
+    if (tagAge < 30) {
+      // Less than 30 seconds old
       console.log(`⚠️ Tag ${tag} is very recent (${tagAge}s old) - potential race condition`);
       console.log('⏳ Waiting 30 seconds to ensure tag creation is complete...');
-      await new Promise(resolve => setTimeout(resolve, 30000));
+      await new Promise((resolve) => setTimeout(resolve, 30000));
     }
   } catch (error) {
     console.log('ℹ️ Could not determine tag age, proceeding normally');

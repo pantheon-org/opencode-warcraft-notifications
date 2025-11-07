@@ -26,6 +26,7 @@ Instead of removing the sync workflow entirely, we implemented comprehensive saf
 ### 1. Smart Version Bump Workflow (`smart-version-bump.yml`)
 
 #### Path Filtering
+
 ```yaml
 on:
   push:
@@ -35,9 +36,11 @@ on:
       - 'docs/**'
       - '*.md'
 ```
+
 - Prevents workflow from triggering on documentation or workflow file changes
 
 #### Workflow-Generated Commit Detection
+
 ```bash
 # Check if the latest commit is a workflow-generated commit
 LATEST_COMMIT_MSG=$(git log -1 --pretty=format:"%s")
@@ -46,19 +49,23 @@ if [[ "$LATEST_COMMIT_MSG" =~ ^chore:\ (bump\ version|sync\ package\.json\ versi
   exit 0
 fi
 ```
+
 - Detects commits made by workflows and skips version bumping
 
 #### Concurrency Control
+
 ```yaml
 concurrency:
   group: version-bump-${{ github.ref }}
   cancel-in-progress: false
 ```
+
 - Prevents multiple instances from running simultaneously
 
 ### 2. Sync Package Version Workflow (`sync-package-version.yml`)
 
 #### Pre-check Job
+
 ```yaml
 jobs:
   check-sync-needed:
@@ -66,17 +73,21 @@ jobs:
     outputs:
       sync_needed: ${{ steps.check.outputs.sync_needed }}
 ```
+
 - Adds a job that checks if sync is actually needed before running the main job
 
 #### Conditional Execution
+
 ```yaml
 sync-package-version:
   needs: check-sync-needed
   if: needs.check-sync-needed.outputs.sync_needed == 'true'
 ```
+
 - Only runs the sync job if package.json version doesn't match the tag
 
 #### Manual Trigger for Testing
+
 ```yaml
 workflow_dispatch:
   inputs:
@@ -85,25 +96,30 @@ workflow_dispatch:
       required: true
       type: string
 ```
+
 - Allows manual testing of the sync workflow
 
 ### 3. Sync Script (`sync-version.cjs`)
 
 #### Race Condition Protection
+
 ```javascript
 // Check if this tag was created very recently (potential race condition)
 const tagDate = exec(`git log -1 --format=%ct ${tag} 2>/dev/null`);
 const currentTime = Math.floor(Date.now() / 1000);
 const tagAge = currentTime - parseInt(tagDate);
 
-if (tagAge < 30) { // Less than 30 seconds old
+if (tagAge < 30) {
+  // Less than 30 seconds old
   console.log('⏳ Waiting 30 seconds to ensure tag creation is complete...');
-  await new Promise(resolve => setTimeout(resolve, 30000));
+  await new Promise((resolve) => setTimeout(resolve, 30000));
 }
 ```
+
 - Adds a 30-second delay for very recent tags to prevent race conditions
 
 #### Enhanced Skip CI
+
 ```bash
 git commit -m "chore: sync package.json version to ${version} [skip ci]
 
@@ -112,20 +128,24 @@ This commit should not trigger additional workflows.
 
 [skip ci]"
 ```
+
 - More aggressive use of `[skip ci]` to prevent workflow retriggering
 
 ## Expected Behavior
 
 ### Normal Flow (Primary Path)
+
 1. **PR merged to main** → Smart version bump workflow runs
 2. **Smart version bump** → Updates package.json and creates tag in single commit
 3. **Tag creation** → Sync workflow checks → Finds package.json already correct → Skips
 
 ### Legacy/Fallback Flow
+
 1. **Manual tag creation** (without package.json update) → Sync workflow runs
 2. **Sync workflow** → Creates PR with `[skip ci]` → Merges without retriggering version bump
 
 ### Workflow-Generated Commits
+
 1. **Workflow commit pushed** → Smart version bump detects workflow pattern → Skips
 2. **No additional version bumps** triggered by workflow maintenance commits
 
@@ -140,6 +160,7 @@ This commit should not trigger additional workflows.
 ## Monitoring
 
 After deployment, monitor for:
+
 - Reduced frequency of version releases
 - No workflow-generated commits triggering additional bumps
 - Sync workflow skipping when not needed

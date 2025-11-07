@@ -5,18 +5,20 @@ This directory contains all documentation related to GitHub Actions workflows, a
 ## 📁 Documentation Structure
 
 ### Core Documentation
+
 - **[Overview](./overview.md)** - Comprehensive documentation for all GitHub Actions workflows
 - **[Setup Guide](./setup-guide.md)** - Step-by-step workflow setup instructions
 - **[Architecture Summary](./architecture-summary.md)** - Complete workflow architecture and refactoring history
 
 ### Configuration & Fixes
+
 - **[Cycle Prevention Fix](./cycle-prevention-fix.md)** - Solution for workflow cycle causing excessive releases
 - **[Squash Merge Configuration](./squash-merge-configuration.md)** - Repository merge strategy configuration
 
 ## 🚀 Quick Start
 
 1. **New to the project?** Start with the [Setup Guide](./setup-guide.md)
-2. **Need workflow details?** Check the [Overview](./overview.md) 
+2. **Need workflow details?** Check the [Overview](./overview.md)
 3. **Troubleshooting?** See specific fix documentation above
 
 ## 🔧 Workflow Types
