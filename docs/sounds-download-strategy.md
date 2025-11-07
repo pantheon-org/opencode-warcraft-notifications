@@ -2,11 +2,9 @@
 
 ## Summary
 
-Bundling the sound assets in the project is the recommended approach. Ship pre-encoded, cross-platform artifacts (see `docs/audio-formats.md`) alongside a WAV master for editing. This removes the runtime network dependency, ensures deterministic behaviour, and eliminates startup delays. If bundling is not possible (e.g. licensing or package-size concerns), prefer a lazy on-demand download with caching and a cooldown as a secondary option.
+Bundling the sound assets in the project is still the recommended approach. The repository currently includes pre-bundled WAV files in `data/` so consumers can play sounds without any runtime network dependency. When bundling is not possible (e.g. licensing or package-size concerns), the project implements a lazy on-demand download mechanism as a fallback.
 
-- See `docs/audio-formats.md` for format recommendations (Opus → MP3 → WAV fallback).
 - Original source for these audio files: https://www.thanatosrealms.com/war2/sounds/humans
-
 
 Bundling avoids issues with remote availability, reduces complexity, and provides the best user experience.
 
@@ -14,91 +12,66 @@ Bundling avoids issues with remote availability, reduces complexity, and provide
 
 ## Current behavior (reference)
 
-- On plugin initialization the code checks for the presence of a single file (`human_selected1.wav`). If it is missing, `downloadAllSounds()` is called which tries to download every sound in the catalog.
-- If downloads fail, the plugin falls back to a system sound and continues to run.
-- The base URL used to download is configurable via `SOUNDS_BASE_URL`.
+- The runtime defaults to the bundled `data/` directory in the repository root when no overrides are provided (see `src/sound-data.ts`).
+- The plugin uses lazy, on-demand downloads rather than downloading everything at init. When a sound is required the code will:
+  - Resolve the local data directory (see "Data directory precedence" below).
+  - Check for the file locally via `soundExists(...)`.
+  - If missing, call `ensureSoundAvailable(...)` / `downloadSoundByFilename(...)` to download just that file.
+- There is an exported helper `downloadAllSounds()` that will download every entry, but it is not invoked automatically at runtime (it exists for manual use and tests).
+- If a download fails at play time the plugin falls back to a system sound and continues to run.
 
-Files: `src/sounds/download.ts`, `src/sounds/index.ts`, `src/notification.ts`
-
----
-
-## Problems and risks
-
-- Slow startup: downloading many files on init can cause noticeable delay before the plugin becomes responsive.
-- Fragility: if the remote `SOUNDS_BASE_URL` is down or the files are removed, the init download will fail (and may spam logs).
-- Wasteful network usage: users who never hear most of the sounds still download them.
-- Lack of retry/backoff/cooldown: repeated failures may immediately retry on every run.
-- External dependency: relying on a site you don't control increases maintenance burden.
+Files: `src/sound-data.ts`, `src/download.ts`, `src/notification.ts`
 
 ---
 
-## Recommended options (ranked)
+## Data directory precedence
 
-1. Bundle assets with the plugin (Highest reliability)
-   - Include the `data/` sound files in the package or as a separate asset release / npm package.
-   - Pros: no runtime network dependency, instant availability.
-   - Cons: larger package size and increased repo size if checked into source.
+When determining where to read or write sound files the code follows this precedence:
 
-2. Lazy (on-demand) download with caching + cooldown (Balanced)
-   - Do not download anything at init. When the plugin needs to play a specific sound:
-     - Check local cache (e.g. `data/<filename>`).
-     - If missing, attempt to download just that single file.
-     - If download fails, fallback to system sound and start a cooldown so the same failed download isn't retried for a configurable period.
-   - Pros: fast init, minimal bandwidth, graceful handling of remote failures.
-   - Cons: first play of a sound may be slower while that single file downloads.
+1. If the plugin is supplied a `directory` context (for example when running inside an opencode project), the code will use `${directory}/.opencode-sounds` as the per-project cache (see `src/notification.ts:22`).
+2. Else if the `SOUNDS_DATA_DIR` environment variable is set, that absolute path is used (see `src/sound-data.ts`).
+3. Otherwise the default is the bundled `data/` folder in the repository root (computed in `src/sound-data.ts`).
 
-3. Validate remote availability + mirrors
-   - Use `HEAD` requests to validate file/host availability before starting large downloads.
-   - Support a configurable list of mirrors and try alternates if the primary fails.
-   - Add retry with exponential backoff for transient errors.
-
-4. Provide an explicit offline update command
-   - Add an `npm run update-sounds` or similar script to prefetch and pin files locally for offline users.
+This means that when running from the checked-out repo with no env overrides, the shipped `data/` files are used automatically.
 
 ---
 
-## Concrete code suggestions (minimal changes)
+## Environment variables and what is implemented
 
-- Add `downloadSoundByFilename(filename)` to `src/sounds/download.ts` which finds the path for a single filename and downloads only that file (reusing existing download logic).
-
-- Replace init-time `downloadAllSounds()` call with a lightweight `ensureSoundAvailable(filename)` that:
-  - Returns `true` if `soundExists(filename)` is true.
-  - If not, and a cooldown hasn't elapsed, attempts `downloadSoundByFilename(filename)`.
-  - On failure, sets a cooldown timestamp (e.g. saved in `data/.last_download_attempt` or in-memory) and returns `false` so the caller plays a fallback sound.
-
-- Example pseudocode:
-
-```ts
-// notification.ts (play-time)
-const soundFilename = getRandomSound();
-const ok = await ensureSoundAvailable(soundFilename);
-if (ok) {
-  const soundPath = getSoundPath(soundFilename);
-  // play soundPath
-} else {
-  // fallback to system sound
-}
-```
-
-- Environment variables to support behavior:
-  - `SOUNDS_BASE_URL` — base URL for remote sounds (already present).
-  - `SOUNDS_DOWNLOAD_ON_INIT` — if `true` keep existing behavior; default `false`.
-  - `SOUNDS_DOWNLOAD_COOLDOWN_MS` — cooldown period after failed download attempts.
-  - `SOUNDS_LOCAL_PATH` — override the local data directory (optional).
+- `SOUNDS_DATA_DIR` — Supported. When set, it overrides the default bundled `data/` location.
+- `SOUNDS_BASE_URL` — Supported. Used as the base URL for downloads when the code performs network fetches.
+- `SOUNDS_DOWNLOAD_ON_INIT` — Not implemented in runtime code. There is no automatic init-time bulk download; `downloadAllSounds()` must be invoked explicitly.
+- `SOUNDS_DOWNLOAD_COOLDOWN_MS` — Not implemented. The current implementation does not persist or honor a cooldown after failed download attempts.
 
 ---
 
-## Operational recommendations
+## Problems and considerations (as implemented today)
 
-- If you maintain the remote sound host, consider moving assets to a stable host (GitHub Releases, S3/CloudFront) to reduce risk.
-- Add logging/metrics for remote unavailability so maintainers are aware when the upstream host stops serving assets.
-- Document how to pre-bundle or prefetch sounds (e.g. `npm run update-sounds`) for offline or CI usage.
+- Startup is fast: the lazy approach avoids long init-time downloads.
+- The first play of a missing sound may be slower (because it downloads that single file on-demand).
+- There is no built-in cooldown or backoff in the current code; repeated failures will cause repeated failed attempts if the caller repeatedly requests the same missing sound.
+- The project includes the `downloadAllSounds()` helper if consumers want to prefetch everything explicitly (for packaging or CI).
+
+---
+
+## Recommended actions (small or optional changes)
+
+- If you want an opt-in prefetch step, implement `SOUNDS_DOWNLOAD_ON_INIT` handling and call `downloadAllSounds()` only when that env var is `true`.
+- If you want to avoid repeated failed downloads, implement a simple cooldown (in-memory or a small marker file in the data dir) and honor an env var like `SOUNDS_DOWNLOAD_COOLDOWN_MS`.
+- For best reliability, prefer shipping the `data/` assets with releases or providing a separate artifact containing `data/`.
+
+---
+
+## Operational notes
+
+- `downloadAllSounds()` is available for explicit prefetching (useful in CI or packaging steps).
+- The code already implements a deduplication guard so concurrent attempts to download the same file are merged (see `src/download.ts`).
 
 ---
 
 ## Proposed next steps
 
-- Implement the lazy-on-demand download + cooldown (small code changes to `src/sounds/download.ts` and `src/notification.ts`) — recommended.
-- Alternatively, if preferred, add the sound assets to the repository or package and skip runtime downloads.
+- Update documentation to reflect these defaults (done).
+- Optionally: implement cooldown and/or opt-in init prefetch if you want to change runtime behavior.
 
-If you want, I can implement the lazy-download + cooldown changes now.
+If you want, I can implement the cooldown and/or `SOUNDS_DOWNLOAD_ON_INIT` support next.

@@ -3,3 +3,7 @@ node_modules
 
 # GitHub Actions
 !.github/workflows/release.yml
+
+# Opencode instructions
+.opencode/
+!.opencode/knowledge-base/opencode-development-plugin-guide.md

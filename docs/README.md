@@ -1,36 +1,36 @@
 # Sounds: Download, Local Cache, and CI Guidance
 
-This document explains how the plugin stores and downloads Warcraft II sound assets, the environment variables you can use to control behavior, recommended defaults, and tips for development and CI.
+This document explains how the plugin stores and downloads Warcraft II sound assets, the environment variables the code recognizes, recommended defaults for this repo, and tips for development and CI.
 
-## Where sounds are stored
+## Where sounds are stored (actual behavior)
 
-- Default (developer-friendly): a hidden per-project folder `.opencode-sounds` inside the project directory when the plugin runs in a checked-out repo.
-- Override: set the `SOUNDS_DATA_DIR` environment variable to an absolute path to control where sounds are stored.
-- Example default path (project root): `./.opencode-sounds`
+- Default (bundled): when no overrides are provided the code uses the repository's bundled `data/` folder (see `src/sound-data.ts`).
+- Per-project cache (when running inside an opencode project): the plugin will use `${directory}/.opencode-sounds` if a `directory` context is supplied to the plugin (see `src/notification.ts:22`).
+- Override: set the `SOUNDS_DATA_DIR` environment variable to an absolute path to control where sounds are read from or cached.
 
 Why this is configurable
 
-- Avoids relying on a single implicit `data/` directory that may be present only on some developer machines.
+- Avoids relying on a single implicit `data/` directory on developer machines.
 - Lets CI and automated runners use isolated temporary directories to avoid test flakiness.
 - Enables using a shared or OS-specific cache (e.g., CI cache, `$XDG_CACHE_HOME`, or a mounted volume) if desired.
 
-## Environment variables
+## Environment variables (what the code actually supports)
 
-- `SOUNDS_DATA_DIR` — Absolute path where sound files are read from and cached. When set, it overrides the plugin's project-local default.
-- `SOUNDS_BASE_URL` — Base URL for downloading remote sound assets (the host that serves the WAV files).
-- `SOUNDS_DOWNLOAD_ON_INIT` — (optional) If `true`, keep the legacy behavior of attempting to download all sounds at plugin initialization. Default is `false` to prefer lazy, on-demand downloads.
-- `SOUNDS_DOWNLOAD_COOLDOWN_MS` — (optional) Milliseconds to wait before retrying a failed download. Useful to prevent repeated retries in CI or on flaky networks.
+- `SOUNDS_DATA_DIR` — Supported. Absolute path where sound files are read from and cached. When set it overrides the default bundled `data/` location.
+- `SOUNDS_BASE_URL` — Supported. Base URL for downloading remote sound assets when downloads occur.
+- `SOUNDS_DOWNLOAD_ON_INIT` — Not implemented by runtime code. There is no automatic init-time bulk download; `downloadAllSounds()` must be called explicitly to prefetch everything.
+- `SOUNDS_DOWNLOAD_COOLDOWN_MS` — Not implemented. The current implementation does not persist or honor a cooldown after failed downloads.
 
-## Recommended runtime behavior
+## Recommended runtime behavior (implemented in this repo)
 
-1. Do not download every sound at plugin initialization by default.
-2. When a sound is needed at playback time:
-   - Check `soundExists(filename)` in the configured `SOUNDS_DATA_DIR`.
-   - If missing, call `downloadSoundByFilename(filename)` to fetch just that file.
-   - If download fails, play a system fallback sound and record a cooldown to avoid repeated immediate retry.
-3. Provide `SOUNDS_DOWNLOAD_ON_INIT=true` only for environments that intentionally prefetch (for example when bundling or when CI prepares assets).
+1. The runtime uses lazy, on-demand downloads by default — it does not download every sound at initialization.
+2. When a sound is needed at playback time the code:
+   - Checks `soundExists(filename)` in the resolved data directory.
+   - If missing, calls `ensureSoundAvailable(...)` / `downloadSoundByFilename(...)` to download just that file.
+   - If the download fails at play time, the plugin falls back to a system sound and continues execution.
+3. If you want to prefetch all files, call the `downloadAllSounds()` helper explicitly (useful in CI or packaging steps).
 
-This approach minimizes startup latency and network usage while keeping behavior robust when remote assets are unavailable.
+This minimizes startup latency while still providing an explicit bulk-prefetch option.
 
 ## Development tips
 
@@ -42,21 +42,21 @@ This approach minimizes startup latency and network usage while keeping behavior
     bun test
     ```
 
-- If you prefer to keep sounds in the repository for offline use, add `data/` to version control or provide a separate release artifact containing `data/`.
+- If you prefer to keep sounds in the repository for offline use, the repo already includes `data/` WAV assets.
 
 - To reproduce or debug downloads, set `SOUNDS_BASE_URL` to a test server or local fileserver that serves the same file layout.
 
 ## CI recommendations
 
 - Configure CI to provide a deterministic `SOUNDS_DATA_DIR` (e.g., an ephemeral workspace path or CI cache path) so downloads don't interfere with other builds.
-- Prefer to prefetch required assets in a CI step (for example using an `npm`/`bun` script) and commit them to the build cache or artifact store, rather than letting many builds each download from the public host.
-- If CI must exercise download logic, increase `SOUNDS_DOWNLOAD_COOLDOWN_MS` to avoid noisy retries and set `SOUNDS_BASE_URL` to a stable internal mirror.
+- Prefer to prefetch required assets in a CI step (for example using an `npm`/`bun` script) and store them in the build cache or artifacts, rather than letting many builds each download from the public host.
+- If CI must exercise download logic, point `SOUNDS_BASE_URL` to a stable internal mirror.
 
 ## Example usages
 
-- Use per-project cache (default behavior):
+- Use bundled assets (default):
 
-  No environment variables required — plugin will create and use `./.opencode-sounds`.
+  No environment variables required — the shipped `data/` directory will be used automatically when running from the checked-out repo.
 
 - Override to a shared cache:
 
@@ -72,33 +72,15 @@ This approach minimizes startup latency and network usage while keeping behavior
   bun test
   ```
 
-## Prefetch script (suggested)
+## Prefetch / packaging
 
-You can add a simple script to pre-download or bundle sounds for offline use. Example (not included in this repo by default):
-
-```bash
-# scripts/download-sounds.sh (example)
-set -euo pipefail
-OUT=${SOUNDS_DATA_DIR:-"$(pwd)/.opencode-sounds"}
-mkdir -p "$OUT"
-BASE=${SOUNDS_BASE_URL:-"https://www.thanatosrealms.com/war2/sounds"}
-FILES=(
-  human_selected1.wav
-  human_acknowledge1.wav
-  work_completed.wav
-  # ...add the full manifest you want to prefetch
-)
-for f in "${FILES[@]}"; do
-  curl -sfL "$BASE/$f" -o "$OUT/$f" || echo "warning: failed to fetch $f"
-done
-```
-
-Run it with `SOUNDS_DATA_DIR=/path/to/dir bash scripts/download-sounds.sh`.
+- The helper `downloadAllSounds()` exists in `src/download.ts` for explicit bulk downloads. Call this in CI or packaging steps if you want to prepare a sound bundle.
+- Consider adding a simple script (e.g., `scripts/download-sounds.sh` or an npm script) that calls `downloadAllSounds()` or fetches files to `SOUNDS_DATA_DIR` for offline builds.
 
 ## Notes and next steps
 
-- The project docs include a deeper design discussion in `docs/sounds-download-strategy.md` — review that for the rationale and further implementation suggestions.
-- Consider adding an `npm`/`bun` script `update-sounds` or a small CLI helper to manage prefetching and mirroring.
+- The deeper design discussion is in `docs/sounds-download-strategy.md`.
+- If you want runtime cooldowns or init-time prefetching controlled by env vars, I can implement those features in `src/download.ts` and update the docs accordingly.
 
 ---
 
@@ -118,4 +100,4 @@ Guidance:
 
 ---
 
-This file was added to document how the plugin handles sound assets and how to configure behavior for development and CI.
+This file documents how the plugin handles sound assets and how to configure behavior for development and CI (updated to reflect current code behavior).
