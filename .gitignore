@@ -17,3 +17,4 @@ node_modules
 !.opencode/knowledge-base/opencode-development-plugin-guide.md
 
 .opencode-sounds/
+.context/
