@@ -9,16 +9,12 @@ This directory contains GitHub-specific configuration files including workflows,
 ├── scripts/                    # External workflow scripts
 │   ├── auto-merge.cjs         # Auto-merge logic for version sync PRs
 │   └── sync-version.cjs       # Version synchronization script
-├── workflows/                  # GitHub Actions workflows
-│   ├── auto-merge-bot.yml     # Auto-merge workflow (uses external script)
-│   ├── pr-validation.yml      # PR validation and testing
-│   ├── release-publish.yml    # Release publishing workflow
-│   ├── smart-version-bump.yml # Smart version bumping
-│   └── sync-package-version.yml # Package version sync (uses external script)
-└── workflows-disabled/        # Legacy workflows (DO NOT RE-ENABLE)
-    ├── README.md              # Documentation explaining why these are disabled
-    ├── auto-merge-bot.yml     # Legacy complex auto-merge workflow (REFERENCE ONLY)
-    └── sync-package-version.yml # Legacy complex version sync workflow (REFERENCE ONLY)
+└── workflows/                  # GitHub Actions workflows
+    ├── auto-merge-bot.yml     # Auto-merge workflow (uses external script)
+    ├── pr-validation.yml      # PR validation and testing
+    ├── release-publish.yml    # Release publishing workflow
+    ├── smart-version-bump.yml # Smart version bumping
+    └── sync-package-version.yml # Package version sync (uses external script)
 ```
 
 ## Workflow Architecture
@@ -44,23 +40,24 @@ The repository `.gitignore` includes specific patterns to ensure `.github` files
 
 ```gitignore
 # GitHub Actions - override global gitignore that excludes .github directories
+# Note: Global gitignore has **/.github pattern, so we need to explicitly include
 !.github/
-!.github/**
+!.github/workflows/
+!.github/workflows/**
+!.github/scripts/
+!.github/scripts/**
+
+# Ignore system files in .github but keep workflows and scripts
 .github/.DS_Store
 ```
 
 This overrides global gitignore patterns that might exclude `.github` directories.
 
-## Important Notes
+## Implementation Notes
 
-### workflows-disabled/ Directory
+This workflow architecture was designed to solve maintainability issues with complex embedded JavaScript in YAML files. The external scripts approach provides:
 
-⚠️ **DO NOT move files from `workflows-disabled/` back to `workflows/`** ⚠️
-
-The `workflows-disabled/` directory contains legacy workflow files that:
-- Had complex embedded JavaScript causing YAML syntax errors
-- Were replaced by the current simplified workflows + external scripts approach
-- Are kept for reference and documentation purposes only
-- Will cause the same issues we fixed if re-enabled
-
-See `workflows-disabled/README.md` for detailed explanation.
+- **Better Error Handling**: Scripts can be tested independently
+- **Easier Debugging**: Standard Node.js debugging tools work
+- **No YAML Escaping Issues**: Complex template variables and multiline strings handled properly
+- **Version Control**: Scripts have proper syntax highlighting and diff support

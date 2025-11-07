@@ -2,8 +2,14 @@
 node_modules
 
 # GitHub Actions - override global gitignore that excludes .github directories
+# Note: Global gitignore has **/.github pattern, so we need to explicitly include
 !.github/
-!.github/**
+!.github/workflows/
+!.github/workflows/**
+!.github/scripts/
+!.github/scripts/**
+
+# Ignore system files in .github but keep workflows and scripts
 .github/.DS_Store
 
 # Opencode instructions

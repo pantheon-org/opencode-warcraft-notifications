@@ -20,14 +20,21 @@ This caused several issues:
 
 ```gitignore
 # GitHub Actions - override global gitignore that excludes .github directories
+# Note: Global gitignore has **/.github pattern, so we need to explicitly include
 !.github/
-!.github/**
+!.github/workflows/
+!.github/workflows/**
+!.github/scripts/
+!.github/scripts/**
+
+# Ignore system files in .github but keep workflows and scripts
 .github/.DS_Store
 ```
 
 **Explanation:**
 - `!.github/` - Explicitly include the `.github` directory
-- `!.github/**` - Explicitly include all files and subdirectories within `.github`
+- `!.github/workflows/` and `!.github/workflows/**` - Include all workflow files
+- `!.github/scripts/` and `!.github/scripts/**` - Include all script files
 - `.github/.DS_Store` - Still ignore macOS system files in the directory
 
 ### 2. Added Documentation
@@ -87,7 +94,6 @@ grep github $(git config --get core.excludesfile)
 All files in the `.github` directory are now properly tracked:
 - `.github/workflows/` - All workflow YAML files
 - `.github/scripts/` - External workflow scripts
-- `.github/workflows-disabled/` - Backup workflow files
 - `.github/README.md` - Directory documentation
 
 This ensures that all GitHub Actions configuration is properly version-controlled and can be modified using standard Git workflows.
