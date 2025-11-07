@@ -9,7 +9,10 @@ import { ensureSoundAvailable } from './download.js';
  * This plugin plays a random Warcraft II Alliance sound when the session becomes idle
  * and displays a notification with a short summary of the last message.
  *
- * The plugin downloads sounds on demand into `directory/.opencode-sounds` or `SOUNDS_DATA_DIR`.
+ * The plugin downloads sounds on demand into:
+ * 1. `directory/.opencode-sounds` (per-project cache when directory context is available)
+ * 2. `SOUNDS_DATA_DIR` environment variable if set
+ * 3. `~/.config/opencode/sounds` (default machine-wide location)
  */
 export const NotificationPlugin: Plugin = async (ctx) => {
   const { project: _project, client: _client, $, directory, worktree: _worktree } = ctx;
@@ -20,10 +23,11 @@ export const NotificationPlugin: Plugin = async (ctx) => {
   void _worktree;
 
   const ensureAndGetSoundPath = async () => {
-    // Determine explicit data directory preference: plugin `directory` if available, otherwise env or default
-    const explicitDataDir = directory
-      ? `${directory}/.opencode-sounds`
-      : process.env.SOUNDS_DATA_DIR;
+    // Determine explicit data directory preference:
+    // 1. Per-project cache: `directory/.opencode-sounds` if directory context is available
+    // 2. Environment override: `SOUNDS_DATA_DIR` if set
+    // 3. Default: `~/.config/opencode/sounds` (handled by DEFAULT_DATA_DIR)
+    const explicitDataDir = directory ? `${directory}/.opencode-sounds` : undefined; // Let DEFAULT_DATA_DIR handle the fallback logic
 
     // Choose a random sound filename
     const soundPath = getRandomSoundPath(explicitDataDir);

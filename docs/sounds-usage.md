@@ -4,9 +4,9 @@ This document explains how the plugin stores and downloads Warcraft II sound ass
 
 ## Where sounds are stored (actual behavior)
 
-- Default (bundled): when no overrides are provided the code uses the repository's bundled `data/` folder (see `src/sound-data.ts`).
-- Per-project cache (when running inside an opencode project): the plugin will use `${directory}/.opencode-sounds` if a `directory` context is supplied to the plugin (see `src/notification.ts:22`).
-- Override: set the `SOUNDS_DATA_DIR` environment variable to an absolute path to control where sounds are read from or cached.
+- **Machine-wide cache (default)**: `~/.config/opencode/sounds` (or OS-specific config directory equivalent) when no overrides are provided (see `src/sound-data.ts`).
+- **Per-project cache** (when running inside an opencode project): the plugin will use `${directory}/.opencode-sounds` if a `directory` context is supplied to the plugin (see `src/notification.ts:24`).
+- **Override**: set the `SOUNDS_DATA_DIR` environment variable to an absolute path to control where sounds are read from or cached.
 
 Why this is configurable
 
@@ -54,9 +54,9 @@ This minimizes startup latency while still providing an explicit bulk-prefetch o
 
 ## Example usages
 
-- Use bundled assets (default):
+- Use default machine-wide cache:
 
-  No environment variables required — the shipped `data/` directory will be used automatically when running from the checked-out repo.
+  No environment variables required — sounds will be cached in `~/.config/opencode/sounds` (or OS-specific config directory equivalent) and shared across all opencode instances on the machine.
 
 - Override to a shared cache:
 
