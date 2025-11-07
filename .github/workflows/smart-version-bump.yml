@@ -210,17 +210,24 @@ jobs:
       - name: Create and push tag
         run: |
           NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
-          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION
+          
+          # Check if tag already exists
+          if git tag -l "v$NEW_VERSION" | grep -q "v$NEW_VERSION"; then
+            echo "⚠️ Tag v$NEW_VERSION already exists - skipping tag creation"
+            echo "This may happen if workflow is re-run or tag was manually created"
+          else
+            git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION
 
           Version Type: ${{ needs.analyze-changes.outputs.version_type }}
-          AI Analysis: ${{ steps.ai-analysis.outputs.ai_decision }}
+          AI Analysis: ${{ needs.analyze-changes.outputs.ai_decision }}
           
           This tag will trigger:
           1. Package version sync via sync-package-version.yml
           2. NPM publishing via release-publish.yml"
-          
-          git push origin --tags
-          echo "✅ Created and pushed tag v$NEW_VERSION"
+            
+            git push origin --tags
+            echo "✅ Created and pushed tag v$NEW_VERSION"
+          fi
 
       - name: Summary
         run: |
