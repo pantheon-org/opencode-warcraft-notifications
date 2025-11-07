@@ -133,17 +133,37 @@ jobs:
 
 
       - name: Commit version bump
+        id: bump_commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BUMP_BRANCH="bump/v${{ steps.bump.outputs.new_version }}-${{ github.run_id }}"
+          echo "Creating branch $BUMP_BRANCH"
+          git checkout -b "$BUMP_BRANCH"
           git add package.json
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: bump package version to ${{ steps.bump.outputs.new_version }}"
-            # Push the current HEAD to the remote main branch to update package.json on main
-            git push origin HEAD:main
+            git commit -m "chore: bump package version to v${{ steps.bump.outputs.new_version }}"
+            git push --set-upstream origin "$BUMP_BRANCH"
           fi
+          echo "bump_branch=$BUMP_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Create pull request for version bump
+        uses: actions/github-script@v7
+        id: create_pr
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const branch = process.env.BUMP_BRANCH;
+            const title = `chore: bump package version to v${process.env.NEW_VERSION}`;
+            const body = `Auto-generated bump for version v${process.env.NEW_VERSION} by workflow run ${process.env.GITHUB_RUN_ID}.`;
+            const resp = await github.rest.pulls.create({ owner, repo, title, head: branch, base: 'main', body });
+            core.setOutput('pr_number', resp.data.number);
+        env:
+          BUMP_BRANCH: ${{ steps.bump_commit.outputs.bump_branch }}
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
 
       - name: Create tag for new version
         id: tag
