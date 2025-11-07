@@ -20,12 +20,7 @@ function exec(command) {
 }
 
 // Get environment variables
-const {
-  GITHUB_TOKEN,
-  GITHUB_REPOSITORY,
-  GITHUB_EVENT_NAME,
-  GITHUB_EVENT_PATH
-} = process.env;
+const { GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_EVENT_NAME, GITHUB_EVENT_PATH } = process.env;
 
 // Validate required environment variables
 if (!GITHUB_TOKEN || !GITHUB_REPOSITORY) {
@@ -48,12 +43,18 @@ async function main() {
 
   // Extract PR number based on event type
   let prNumber = null;
-  
+
   if (GITHUB_EVENT_NAME === 'pull_request') {
     prNumber = eventPayload.pull_request?.number;
-  } else if (GITHUB_EVENT_NAME === 'workflow_run' && eventPayload.workflow_run?.pull_requests?.length > 0) {
+  } else if (
+    GITHUB_EVENT_NAME === 'workflow_run' &&
+    eventPayload.workflow_run?.pull_requests?.length > 0
+  ) {
     prNumber = eventPayload.workflow_run.pull_requests[0].number;
-  } else if (GITHUB_EVENT_NAME === 'check_suite' && eventPayload.check_suite?.pull_requests?.length > 0) {
+  } else if (
+    GITHUB_EVENT_NAME === 'check_suite' &&
+    eventPayload.check_suite?.pull_requests?.length > 0
+  ) {
     prNumber = eventPayload.check_suite.pull_requests[0].number;
   }
 
@@ -81,12 +82,11 @@ async function main() {
   console.log(`   State: ${prData.state}`);
 
   // Check if this is a version sync PR that should be auto-merged
-  const isVersionSyncPR = (
+  const isVersionSyncPR =
     /^chore: sync package\.json version to \d+\.\d+\.\d+$/.test(prData.title) &&
     prData.headRefName.startsWith('sync-version/') &&
     prData.author.login === 'github-actions[bot]' &&
-    prData.state === 'OPEN'
-  );
+    prData.state === 'OPEN';
 
   if (!isVersionSyncPR) {
     console.log('❌ Not a version sync PR - skipping auto-merge');
@@ -105,18 +105,18 @@ async function main() {
   try {
     const checksJson = exec(`gh pr checks ${prNumber} --json state,conclusion`);
     const checks = JSON.parse(checksJson);
-    
-    const hasFailedChecks = checks.some(check => 
-      check.state === 'COMPLETED' && check.conclusion !== 'SUCCESS'
+
+    const hasFailedChecks = checks.some(
+      (check) => check.state === 'COMPLETED' && check.conclusion !== 'SUCCESS',
     );
-    
-    const hasPendingChecks = checks.some(check => 
-      check.state === 'IN_PROGRESS' || check.state === 'QUEUED'
+
+    const hasPendingChecks = checks.some(
+      (check) => check.state === 'IN_PROGRESS' || check.state === 'QUEUED',
     );
 
     if (hasFailedChecks) {
       console.log('❌ Some checks failed - will not auto-merge');
-      
+
       // Add comment about failed checks
       exec(`gh pr comment ${prNumber} --body "❌ **Auto-merge blocked**
 
@@ -137,9 +137,9 @@ Please review the failed checks and address any issues, or merge manually if the
 
     // Attempt to merge the PR
     exec(`gh pr merge ${prNumber} --squash --auto --delete-branch`);
-    
+
     console.log(`✅ Successfully enabled auto-merge for PR #${prNumber}`);
-    
+
     // Add success comment
     exec(`gh pr comment ${prNumber} --body "🎉 **Auto-merge enabled!**
 
@@ -151,10 +151,9 @@ This version sync PR will be automatically merged once all checks pass.
 - 🏷️ Version sync will complete automatically
 
 *This action was performed by the Auto-Merge Bot.*"`);
-
   } catch (error) {
     console.error('❌ Failed to merge PR:', error.message);
-    
+
     // Add error comment
     exec(`gh pr comment ${prNumber} --body "⚠️ **Auto-merge failed**
 
@@ -171,7 +170,7 @@ Error: \`${error.message}\`
   }
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('❌ Auto-merge bot failed:', error);
   process.exit(1);
 });

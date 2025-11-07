@@ -10,6 +10,7 @@ The repository's workflow files were not being properly tracked by Git due to a 
 ```
 
 This caused several issues:
+
 - Workflow files required `git add -f` (force-add) to be committed
 - Changes to workflow files might be accidentally ignored
 - New workflow files wouldn't be tracked automatically
@@ -32,6 +33,7 @@ This caused several issues:
 ```
 
 **Explanation:**
+
 - `!.github/` - Explicitly include the `.github` directory
 - `!.github/workflows/` and `!.github/workflows/**` - Include all workflow files
 - `!.github/scripts/` and `!.github/scripts/**` - Include all script files
@@ -44,17 +46,20 @@ Created `.github/README.md` to document the directory structure and ensure it's 
 ## Verification Tests
 
 ✅ **New files are tracked automatically**:
+
 ```bash
 echo "test" > .github/workflows/test.yml
 git status  # Shows as untracked (no force-add needed)
 ```
 
 ✅ **Existing files can be modified normally**:
+
 ```bash
 # Modifying existing workflow files shows up in git status normally
 ```
 
 ✅ **All workflow types are supported**:
+
 - `.github/workflows/*.yml` - Workflow files
 - `.github/scripts/*.cjs` - External scripts
 - `.github/**` - Any other GitHub configuration
@@ -92,6 +97,7 @@ grep github $(git config --get core.excludesfile)
 ## Files Affected by This Fix
 
 All files in the `.github` directory are now properly tracked:
+
 - `.github/workflows/` - All workflow YAML files
 - `.github/scripts/` - External workflow scripts
 - `.github/README.md` - Directory documentation

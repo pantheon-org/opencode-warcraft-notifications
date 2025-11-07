@@ -12,7 +12,7 @@ Bundling avoids issues with remote availability, reduces complexity, and provide
 
 ## Current behavior (reference)
 
-- The runtime defaults to the bundled `data/` directory in the repository root when no overrides are provided (see `src/sound-data.ts`).
+- The runtime defaults to the machine-wide cache directory `~/.config/opencode/sounds` (or OS-specific config directory equivalent) when no overrides are provided (see `src/sound-data.ts`).
 - The plugin uses lazy, on-demand downloads rather than downloading everything at init. When a sound is required the code will:
   - Resolve the local data directory (see "Data directory precedence" below).
   - Check for the file locally via `soundExists(...)`.
@@ -28,17 +28,17 @@ Files: `src/sound-data.ts`, `src/download.ts`, `src/notification.ts`
 
 When determining where to read or write sound files the code follows this precedence:
 
-1. If the plugin is supplied a `directory` context (for example when running inside an opencode project), the code will use `${directory}/.opencode-sounds` as the per-project cache (see `src/notification.ts:22`).
+1. If the plugin is supplied a `directory` context (for example when running inside an opencode project), the code will use `${directory}/.opencode-sounds` as the per-project cache (see `src/notification.ts:24`).
 2. Else if the `SOUNDS_DATA_DIR` environment variable is set, that absolute path is used (see `src/sound-data.ts`).
-3. Otherwise the default is the bundled `data/` folder in the repository root (computed in `src/sound-data.ts`).
+3. Otherwise the default is the machine-wide cache directory `~/.config/opencode/sounds` (or OS-specific config directory equivalent) computed in `src/sound-data.ts`.
 
-This means that when running from the checked-out repo with no env overrides, the shipped `data/` files are used automatically.
+This means that by default, all opencode instances on the same machine will share the same sound cache, reducing redundant downloads and storage usage.
 
 ---
 
 ## Environment variables and what is implemented
 
-- `SOUNDS_DATA_DIR` — Supported. When set, it overrides the default bundled `data/` location.
+- `SOUNDS_DATA_DIR` — Supported. When set, it overrides the default machine-wide cache location.
 - `SOUNDS_BASE_URL` — Supported. Used as the base URL for downloads when the code performs network fetches.
 - `SOUNDS_DOWNLOAD_ON_INIT` — Not implemented in runtime code. There is no automatic init-time bulk download; `downloadAllSounds()` must be invoked explicitly.
 - `SOUNDS_DOWNLOAD_COOLDOWN_MS` — Not implemented. The current implementation does not persist or honor a cooldown after failed download attempts.
@@ -58,7 +58,7 @@ This means that when running from the checked-out repo with no env overrides, th
 
 - If you want an opt-in prefetch step, implement `SOUNDS_DOWNLOAD_ON_INIT` handling and call `downloadAllSounds()` only when that env var is `true`.
 - If you want to avoid repeated failed downloads, implement a simple cooldown (in-memory or a small marker file in the data dir) and honor an env var like `SOUNDS_DOWNLOAD_COOLDOWN_MS`.
-- For best reliability, prefer shipping the `data/` assets with releases or providing a separate artifact containing `data/`.
+- For best reliability, consider pre-populating the cache directory with required assets or providing a separate artifact containing sound files.
 
 ---
 

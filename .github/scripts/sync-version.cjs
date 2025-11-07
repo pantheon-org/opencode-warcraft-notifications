@@ -20,11 +20,7 @@ function exec(command) {
 }
 
 // Get environment variables
-const {
-  GITHUB_TOKEN,
-  GITHUB_REPOSITORY,
-  GITHUB_REF
-} = process.env;
+const { GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_REF } = process.env;
 
 // Validate required environment variables
 if (!GITHUB_TOKEN || !GITHUB_REPOSITORY || !GITHUB_REF) {
@@ -74,7 +70,7 @@ async function main() {
   // Create version sync branch
   const branchName = `sync-version/${tag}`;
   console.log(`🌿 Creating branch: ${branchName}`);
-  
+
   exec(`git checkout -b "${branchName}"`);
 
   // Update package.json version
@@ -113,7 +109,9 @@ This PR will auto-merge once all required checks pass, as it's a simple version 
 ---
 *This PR was automatically created by the Sync Package Version workflow.*`;
 
-    const prResult = exec(`gh pr create --title "${prTitle}" --body "${prBody}" --base main --head "${branchName}"`);
+    const prResult = exec(
+      `gh pr create --title "${prTitle}" --body "${prBody}" --base main --head "${branchName}"`,
+    );
     console.log(`✅ Created PR: ${prResult}`);
 
     // Try to enable auto-merge
@@ -124,7 +122,6 @@ This PR will auto-merge once all required checks pass, as it's a simple version 
       console.log('⚠️ Could not enable auto-merge (this is normal if auto-merge is not available)');
       console.log('The auto-merge-bot workflow will handle merging after checks pass.');
     }
-
   } catch (error) {
     console.error('❌ Failed to create PR:', error.message);
     process.exit(1);
@@ -133,7 +130,7 @@ This PR will auto-merge once all required checks pass, as it's a simple version 
   console.log('✅ Version sync completed successfully!');
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('❌ Version sync failed:', error);
   process.exit(1);
 });

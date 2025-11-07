@@ -130,16 +130,17 @@ describe('getSoundPath()', () => {
     const path = getSoundPath(testFile);
 
     expect(typeof path).toBe('string');
-    expect(path).toContain('data');
+    expect(path).toContain('opencode');
     expect(path).toMatch(new RegExp(testFile + '$'));
   });
 
   test('should use correct base directory', () => {
     const testFile = 'human_selected1.wav' as const;
     const path = getSoundPath(testFile);
-    const expectedPath = join(process.cwd(), 'data', testFile);
 
-    expect(path).toBe(expectedPath);
+    // Should use ~/.config/opencode/sounds by default
+    expect(path).toContain('.config/opencode/sounds');
+    expect(path).toContain(testFile);
   });
 });
 
@@ -149,7 +150,7 @@ describe('getRandomSoundPath()', () => {
     const allSounds = getAllSounds();
 
     expect(typeof randomPath).toBe('string');
-    expect(randomPath).toContain('data');
+    expect(randomPath).toContain('opencode');
     expect(randomPath).toMatch(/\.wav$/);
 
     const filename = randomPath.split('/').pop()!;
