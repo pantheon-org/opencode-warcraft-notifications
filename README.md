@@ -6,7 +6,7 @@ Enhance your OpenCode experience with nostalgic Warcraft II Alliance unit sounds
 
 ## Features
 
-- 🎵 **50+ Authentic Sounds**: Complete collection of Warcraft II Alliance unit voices
+- 🎵 **56 Authentic Sounds**: Complete collection of Warcraft II Alliance unit voices
 - 🔄 **Auto-Download**: Automatically downloads sound files on first use
 - 🎲 **Random Selection**: Plays a different sound each time for variety
 - 💻 **Cross-Platform**: Works on macOS and Linux
@@ -25,7 +25,7 @@ Enhance your OpenCode experience with nostalgic Warcraft II Alliance unit sounds
    ```json
    {
      "$schema": "https://opencode.ai/config.json",
-     "plugin": ["@pantheon-ai/opencode-warcraft-notification"]
+      "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
    }
    ```
 
@@ -66,8 +66,8 @@ Sounds are downloaded from the Warcraft II sound archive at thanatosrealms.com, 
 To get the latest version:
 
 ```bash
-(cd ~ && sed -i.bak '/"opencode-warcraft-notification"/d' .cache/opencode/package.json && \
-rm -rf .cache/opencode/node_modules/opencode-warcraft-notification && \
+(cd ~ && sed -i.bak '/"@pantheon-ai\/opencode-warcraft-notifications"/d' .cache/opencode/package.json && \
+rm -rf .cache/opencode/node_modules/@pantheon-ai/opencode-warcraft-notifications && \
 echo "Plugin update script finished successfully.")
 ```
 
