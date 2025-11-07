@@ -1,0 +1,86 @@
+name: Release on main
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Determine version from package.json
+        id: version
+        run: |
+          node -e "console.log(JSON.parse(require('fs').readFileSync('package.json','utf8')).version)" > /tmp/new_version.txt
+          echo "new_version=$(cat /tmp/new_version.txt)" >> $GITHUB_OUTPUT
+          rm /tmp/new_version.txt
+
+      - name: Create tag for new version
+        id: tag
+        run: |
+          TAG="v${{ steps.version.outputs.new_version }}"
+          echo "Tag: $TAG"
+          git fetch --prune --unshallow || true
+          git tag "$TAG" || (echo "Tag already exists" && exit 0)
+          git push origin "$TAG"
+
+      - name: Generate changelog
+        id: generate_changelog
+        uses: requarks/changelog-action@6d71e098526ee17bae963f058d34cd763378337f
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          filename: CHANGELOG.md
+          tag_prefix: 'v'
+          unreleased: 'false'
+
+      - name: Commit generated changelog
+        if: ${{ always() }}
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add CHANGELOG.md
+            git commit -m "chore: update CHANGELOG for v${{ steps.version.outputs.new_version }}" || echo "No changelog changes to commit"
+            git push origin HEAD:main
+          else
+            echo "No CHANGELOG.md generated"
+          fi
+
+      - name: Read changelog for release body
+        id: read_changelog
+        if: ${{ always() }}
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            echo "changelog<<EOF" >> $GITHUB_OUTPUT
+            sed -n '1,10000p' CHANGELOG.md >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "changelog=No changelog available" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: "v${{ steps.version.outputs.new_version }}"
+          release_name: "v${{ steps.version.outputs.new_version }}"
+          body: |
+            Auto-generated release for version v${{ steps.version.outputs.new_version }}
+
+            Changelog:
+            ${{ steps.read_changelog.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
