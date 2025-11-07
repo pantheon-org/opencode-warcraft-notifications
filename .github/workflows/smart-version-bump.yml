@@ -3,6 +3,10 @@ name: Smart Version Bump
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.github/**'
+      - 'docs/**'
+      - '*.md'
   workflow_dispatch:
     inputs:
       version_type:
@@ -20,6 +24,10 @@ permissions:
   contents: write
   pull-requests: read
   actions: read
+
+concurrency:
+  group: version-bump-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   analyze-changes:
@@ -59,6 +67,17 @@ jobs:
             COMMITS=$(git log ${LATEST_TAG}..HEAD --oneline --no-merges)
             echo "Analyzing commits since ${LATEST_TAG}"
           fi
+          
+          # Check if the latest commit is a workflow-generated commit
+          LATEST_COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+          if [[ "$LATEST_COMMIT_MSG" =~ ^chore:\ (bump\ version|sync\ package\.json\ version) ]] || [[ "$LATEST_COMMIT_MSG" =~ \[skip\ ci\] ]]; then
+            echo "⚠️ Latest commit appears to be workflow-generated: $LATEST_COMMIT_MSG"
+            echo "🛑 Skipping version bump to prevent cycle"
+            echo "workflow_generated=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "workflow_generated=false" >> $GITHUB_OUTPUT
           
           # Check if this is a single squash commit (preferred for releases)
           COMMIT_COUNT=$(echo "$COMMITS" | wc -l)
@@ -144,6 +163,12 @@ jobs:
       - name: Make version decision
         id: decision
         run: |
+          # Skip if this was triggered by a workflow-generated commit
+          if [ "${{ steps.commits.outputs.workflow_generated }}" = "true" ]; then
+            echo "should_bump=false" >> $GITHUB_OUTPUT
+            echo "🛑 Skipping version bump - workflow-generated commit detected"
+            exit 0
+          fi
           # Get the latest tag (which should be the current version)
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [ -z "$LATEST_TAG" ]; then
