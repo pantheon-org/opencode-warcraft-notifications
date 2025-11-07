@@ -137,8 +137,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package.json
-          git commit -m "chore: bump package version to ${{ steps.bump.outputs.new_version }}" || echo "No changes to commit"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: bump package version to ${{ steps.bump.outputs.new_version }}"
+            # Push the current HEAD to the remote main branch to update package.json on main
+            git push origin HEAD:main
+          fi
 
       - name: Create tag for new version
         id: tag
