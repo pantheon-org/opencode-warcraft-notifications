@@ -25,7 +25,7 @@ Enhance your OpenCode experience with nostalgic Warcraft II Alliance unit sounds
    ```json
    {
      "$schema": "https://opencode.ai/config.json",
-      "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
+     "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
    }
    ```
 

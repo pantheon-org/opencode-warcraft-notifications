@@ -408,20 +408,22 @@ CODECOV_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 #### Quick Reference: Required Permissions
 
 ##### Fine-grained Token (Recommended):
+
 ```
 Repository Permissions:
 ✅ Actions: Write
-✅ Contents: Write  
+✅ Contents: Write
 ✅ Metadata: Read
 ✅ Pull requests: Write
 ✅ Issues: Write
 ```
 
 ##### Classic Token (Legacy):
+
 ```
 Scopes:
 ✅ repo
-✅ workflow  
+✅ workflow
 ✅ write:packages (optional)
 ✅ read:packages (optional)
 ```
@@ -435,7 +437,7 @@ You can choose between **Fine-grained tokens** (recommended) or **Classic tokens
 **More secure with repository-specific permissions:**
 
 1. **Go to GitHub Settings:**
-   - Click your profile picture → Settings  
+   - Click your profile picture → Settings
    - Navigate to **Developer settings** (bottom of left sidebar)
    - Click **Personal access tokens** → **Fine-grained tokens**
 
@@ -447,6 +449,7 @@ You can choose between **Fine-grained tokens** (recommended) or **Classic tokens
    - **Repository access:** Select "Selected repositories" → Choose your specific repository
 
 3. **Select Required Repository Permissions:**
+
    ```
    Repository permissions:
    ✅ Actions: Write (Execute workflows and manage workflow runs)
@@ -454,7 +457,7 @@ You can choose between **Fine-grained tokens** (recommended) or **Classic tokens
    ✅ Metadata: Read (Basic repository information)
    ✅ Pull requests: Write (Create and manage pull requests)
    ✅ Issues: Write (Create comments for PR analysis)
-   
+
    Optional (if using GitHub Packages):
    ✅ Packages: Write (Upload packages to GitHub Package Registry)
    ```
@@ -471,7 +474,7 @@ You can choose between **Fine-grained tokens** (recommended) or **Classic tokens
 
 1. **Go to GitHub Settings:**
    - Click your profile picture → Settings
-   - Navigate to **Developer settings** (bottom of left sidebar)  
+   - Navigate to **Developer settings** (bottom of left sidebar)
    - Click **Personal access tokens** → **Tokens (classic)**
 
 2. **Generate New Token:**
@@ -496,7 +499,7 @@ You can choose between **Fine-grained tokens** (recommended) or **Classic tokens
 
 4. **Generate and Copy Token:**
    - Click **Generate token**
-   - **IMPORTANT:** Copy the token immediately 
+   - **IMPORTANT:** Copy the token immediately
      - Fine-grained tokens start with `github_pat_`
      - Classic tokens start with `ghp_`
    - You won't be able to see it again!
@@ -518,12 +521,14 @@ You can choose between **Fine-grained tokens** (recommended) or **Classic tokens
 The PAT must have access to your repository:
 
 ##### For Fine-grained Tokens:
+
 1. **Repository Access:** Token must be configured for the specific repository
 2. **Required Permissions:** Must have Actions (Write), Contents (Write), Pull requests (Write)
 3. **Organization Approval:** Organization may need to approve fine-grained PAT usage
 4. **Verification:** Test token with `gh auth login --with-token` using your token
 
 ##### For Classic Tokens:
+
 1. **Organization Repositories:**
    - The PAT owner must be a repository collaborator with **Write** or **Admin** access
    - Organization may need to approve PAT usage (check organization settings)
@@ -532,24 +537,26 @@ The PAT must have access to your repository:
 
 #### Token Type Comparison
 
-| Feature | Fine-grained Token | Classic Token |
-|---------|-------------------|---------------|
-| **Security** | ✅ Repository-specific | ❌ Broad access |
-| **Permissions** | ✅ Granular control | ❌ Scope-based |
-| **Setup Complexity** | ❌ More complex | ✅ Simpler |
-| **Organization Support** | ⚠️ May need approval | ✅ Standard |
-| **Recommended** | ✅ **Yes (preferred)** | ⚠️ Legacy option |
+| Feature                  | Fine-grained Token     | Classic Token    |
+| ------------------------ | ---------------------- | ---------------- |
+| **Security**             | ✅ Repository-specific | ❌ Broad access  |
+| **Permissions**          | ✅ Granular control    | ❌ Scope-based   |
+| **Setup Complexity**     | ❌ More complex        | ✅ Simpler       |
+| **Organization Support** | ⚠️ May need approval   | ✅ Standard      |
+| **Recommended**          | ✅ **Yes (preferred)** | ⚠️ Legacy option |
 
 #### Why PAT is Required
 
 **GitHub Security Limitation:** Workflows triggered by `GITHUB_TOKEN` cannot trigger other workflows. This prevents infinite workflow loops but breaks our automation chain.
 
 **The Problem:**
+
 ```
 Smart Version Bump (uses GITHUB_TOKEN) → Creates tag → ❌ No follow-up workflows triggered
 ```
 
 **The Solution:**
+
 ```
 Smart Version Bump (uses WORKFLOW_PAT) → Creates tag → ✅ Triggers Sync + Release workflows
 ```
@@ -565,19 +572,22 @@ Smart Version Bump (uses WORKFLOW_PAT) → Creates tag → ✅ Triggers Sync + R
 #### Troubleshooting PAT Issues
 
 ##### Fine-grained Token Issues:
+
 - **Workflows not triggering:** Verify token has Actions (Write) and Contents (Write) permissions
-- **Permission denied on repository:** Ensure token is configured for the specific repository  
+- **Permission denied on repository:** Ensure token is configured for the specific repository
 - **Permission denied on organization:** Organization admin may need to approve fine-grained PAT usage
 - **Cannot create tags:** Verify Contents (Write) permission is granted
 - **Cannot create PRs:** Verify Pull requests (Write) permission is granted
 
 ##### Classic Token Issues:
+
 - **Workflows not triggering:** Verify PAT has `repo` and `workflow` scopes
 - **Permission denied:** Check repository access permissions and collaborator status
 - **Token expired:** Generate new PAT and update secret
 - **Organization restrictions:** Contact organization admin for PAT approval
 
 ##### General Issues:
+
 - **Token format:** Fine-grained tokens start with `github_pat_`, classic tokens start with `ghp_`
 - **Secret not updating:** Delete old secret and create new one with same name
 - **Testing token:** Use `gh auth login --with-token` to test token validity
@@ -642,6 +652,7 @@ Ensure your `package.json` includes these scripts:
 **Root Cause:** Using `GITHUB_TOKEN` instead of Personal Access Token (PAT)
 
 **Symptoms:**
+
 - ✅ Smart Version Bump workflow completes successfully
 - ✅ Git tag is created (e.g., `v1.2.3`)
 - ❌ Sync Package Version workflow never runs
@@ -650,11 +661,13 @@ Ensure your `package.json` includes these scripts:
 - ❌ No npm package published
 
 **Solution:**
+
 1. **Set up WORKFLOW_PAT:** Follow [PAT Setup Guide](#personal-access-token-pat-setup)
 2. **Verify Workflows Use PAT:** Both Smart Version Bump and Sync Package Version should use `${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}`
 3. **Test Automation:** Make a small change, merge PR, verify full workflow chain
 
 **Manual Workaround (if PAT unavailable):**
+
 ```bash
 # 1. Check current versions
 git tag -l --sort=-v:refname | head -3
