@@ -58,10 +58,11 @@ async function main() {
   // Check if update is needed
   if (currentVersion === version) {
     console.log('✅ Package.json version already matches tag version - no sync needed');
+    console.log('This is expected behavior with the new Smart Version Bump workflow');
     return;
   }
 
-  console.log('📦 Package.json needs version update');
+  console.log('📦 Package.json needs version update (legacy mode)');
 
   // Configure Git
   exec('git config --local user.email "action@github.com"');

@@ -15,3 +15,5 @@ node_modules
 # Opencode instructions
 .opencode/
 !.opencode/knowledge-base/opencode-development-plugin-guide.md
+
+.opencode-sounds/

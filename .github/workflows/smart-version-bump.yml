@@ -191,8 +191,8 @@ jobs:
           
           echo "Version will be bumped from $CURRENT_VERSION to $NEW_VERSION (type: $VERSION_TYPE)"
 
-  create-tag:
-    name: Create Version Tag
+  update-version-and-tag:
+    name: Update Version & Create Tag
     runs-on: ubuntu-latest
     needs: analyze-changes
     if: needs.analyze-changes.outputs.should_bump == 'true'
@@ -204,41 +204,67 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      - name: Create and push tag
+      - name: Update package.json version and create tag
         run: |
           NEW_VERSION="${{ needs.analyze-changes.outputs.new_version }}"
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          echo "Current version: $CURRENT_VERSION"
+          echo "New version: $NEW_VERSION"
           
           # Check if tag already exists (both locally and remotely)
           if git tag -l "v$NEW_VERSION" | grep -q "v$NEW_VERSION"; then
-            echo "⚠️ Tag v$NEW_VERSION already exists locally - skipping tag creation"
+            echo "⚠️ Tag v$NEW_VERSION already exists locally - skipping version update and tag creation"
             echo "This may happen if workflow is re-run or tag was manually created"
+            exit 0
           elif git ls-remote --tags origin | grep -q "refs/tags/v$NEW_VERSION$"; then
-            echo "⚠️ Tag v$NEW_VERSION already exists on remote - skipping tag creation"
+            echo "⚠️ Tag v$NEW_VERSION already exists on remote - skipping version update and tag creation"
             echo "This may happen if workflow is re-run or tag was manually created"
-          else
-            git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION
+            exit 0
+          fi
+          
+          # Update package.json version
+          echo "📦 Updating package.json version from $CURRENT_VERSION to $NEW_VERSION"
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '$NEW_VERSION';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+          
+          # Commit the version change
+          git add package.json
+          git commit -m "chore: bump version to $NEW_VERSION
 
           Version Type: ${{ needs.analyze-changes.outputs.version_type }}
           AI Analysis: ${{ needs.analyze-changes.outputs.ai_decision }}
           
-          This tag will trigger:
-          1. Package version sync via sync-package-version.yml
-          2. NPM publishing via release-publish.yml"
-            
-            # Push tags with error handling
-            if git push origin --tags; then
-              echo "✅ Created and pushed tag v$NEW_VERSION"
-            else
-              echo "❌ Failed to push tag v$NEW_VERSION - may already exist on remote"
-              echo "Checking remote tags..."
-              git ls-remote --tags origin | grep "v$NEW_VERSION" || echo "Tag not found on remote"
-              exit 1
-            fi
+          This commit will be tagged as v$NEW_VERSION"
+          
+          # Create and push tag on the new commit
+          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION
+
+          Version Type: ${{ needs.analyze-changes.outputs.version_type }}
+          AI Analysis: ${{ needs.analyze-changes.outputs.ai_decision }}
+          
+          This tag will trigger NPM publishing via release-publish.yml"
+          
+          # Push both the commit and tag
+          if git push origin main && git push origin --tags; then
+            echo "✅ Updated package.json to $NEW_VERSION and created tag v$NEW_VERSION"
+          else
+            echo "❌ Failed to push version update and tag"
+            exit 1
           fi
 
       - name: Summary
@@ -251,8 +277,8 @@ jobs:
           echo "  - AI Decision: ${{ needs.analyze-changes.outputs.ai_decision }}"
           echo ""
           echo "🔄 Next Steps (Automated):"
-          echo "  1. ✅ Tag v${{ needs.analyze-changes.outputs.new_version }} created"
-          echo "  2. 🔄 sync-package-version.yml will sync package.json"
+          echo "  1. ✅ package.json updated to v${{ needs.analyze-changes.outputs.new_version }}"
+          echo "  2. ✅ Tag v${{ needs.analyze-changes.outputs.new_version }} created"
           echo "  3. 🚀 release-publish.yml will publish to npm"
           echo ""
           echo "Monitor workflow progress in the Actions tab."
