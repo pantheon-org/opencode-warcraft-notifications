@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'bun:test';
-import { buildSoundsToDownload, getSoundFileList, DEFAULT_BASE_URL } from './sound-data';
+import { buildSoundsToDownload, getSoundFileList } from './sound-data';
+import { DEFAULT_BASE_URL } from './plugin-config.js';
 
 describe('sound-data module', () => {
   it('getSoundFileList returns a non-empty array and includes known files', () => {

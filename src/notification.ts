@@ -1,71 +1,8 @@
 import type { Plugin } from '@opencode-ai/plugin';
 import { getRandomSoundPath, soundExists } from './sounds.js';
 import { ensureSoundAvailable } from './download.js';
-import { join } from 'path';
-import { exists } from 'fs/promises';
-import { homedir } from 'os';
+import { loadPluginConfig, type WarcraftNotificationConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */
-
-/**
- * Configuration interface for the warcraft notifications plugin
- */
-interface WarcraftNotificationConfig {
-  /** Directory where sound files should be stored and cached */
-  soundsDir?: string;
-}
-
-/**
- * Plugin configuration file structure
- */
-interface PluginConfig {
-  [pluginName: string]: unknown;
-}
-
-/**
- * Get the appropriate config directory based on the operating system
- */
-const getConfigDir = (): string => {
-  const home = homedir();
-
-  switch (process.platform) {
-    case 'darwin':
-      return join(home, '.config');
-    case 'win32':
-      return process.env.APPDATA ?? join(home, 'AppData', 'Roaming');
-    default: // Linux and other Unix-like systems
-      return process.env.XDG_CONFIG_HOME ?? join(home, '.config');
-  }
-};
-
-/**
- * Load plugin configuration from plugin.json files
- * Looks in:
- * 1. CWD/.opencode/plugin.json
- * 2. ~/.config/opencode/plugin.json
- */
-const loadPluginConfig = async (pluginName: string): Promise<WarcraftNotificationConfig> => {
-  const configPaths = [
-    join(process.cwd(), '.opencode', 'plugin.json'),
-    join(getConfigDir(), 'opencode', 'plugin.json'),
-  ];
-
-  for (const configPath of configPaths) {
-    try {
-      if (await exists(configPath)) {
-        const configFile = Bun.file(configPath);
-        const configData: PluginConfig = await configFile.json();
-
-        if (configData[pluginName]) {
-          return configData[pluginName] as WarcraftNotificationConfig;
-        }
-      }
-    } catch (error) {
-      console.warn(`Failed to load plugin config from ${configPath}:`, error);
-    }
-  }
-
-  return {}; // Return empty config if no valid config found
-};
 
 /**
  * Notification idle plugin

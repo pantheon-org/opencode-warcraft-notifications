@@ -1,33 +1,4 @@
-import { join } from 'path';
-import { homedir } from 'os';
-
-/**
- * Get the appropriate config directory based on the operating system
- * @returns The config directory path
- */
-const getConfigDir = (): string => {
-  const home = homedir();
-
-  switch (process.platform) {
-    case 'darwin':
-      return join(home, '.config');
-    case 'win32':
-      return process.env.APPDATA ?? join(home, 'AppData', 'Roaming');
-    default: // Linux and other Unix-like systems
-      return process.env.XDG_CONFIG_HOME ?? join(home, '.config');
-  }
-};
-
-// Default sounds directory should be ~/.config/opencode/sounds (or OS equivalent)
-const getDefaultSoundsDir = (): string => {
-  return join(getConfigDir(), 'opencode', 'sounds');
-};
-
-// Legacy data directory removed - now using proper config-based directory structure
-
-export const DEFAULT_DATA_DIR = process.env.SOUNDS_DATA_DIR ?? getDefaultSoundsDir();
-export const DEFAULT_BASE_URL =
-  process.env.SOUNDS_BASE_URL ?? 'https://www.thanatosrealms.com/war2/sounds/humans';
+import { DEFAULT_DATA_DIR, DEFAULT_BASE_URL } from './plugin-config.js';
 
 export interface SoundFile {
   filename: string;

@@ -1,8 +1,16 @@
 import { describe, it, expect } from 'bun:test';
 import { join } from 'path';
 import { mkdir, writeFile, rm } from 'fs/promises';
+import {
+  getConfigDir,
+  getDefaultSoundsDir,
+  DEFAULT_DATA_DIR,
+  DEFAULT_BASE_URL,
+  loadPluginConfig,
+  type WarcraftNotificationConfig,
+} from './plugin-config';
 
-describe('Plugin configuration loading', () => {
+describe('Plugin configuration module', () => {
   const tempDir = '/tmp/opencode-plugin-test';
 
   // Clean up before and after tests
@@ -13,6 +21,25 @@ describe('Plugin configuration loading', () => {
       // Ignore cleanup errors
     }
   };
+
+  it('should return proper config directory paths', () => {
+    const configDir = getConfigDir();
+    expect(typeof configDir).toBe('string');
+    expect(configDir.length).toBeGreaterThan(0);
+  });
+
+  it('should return proper default sounds directory', () => {
+    const soundsDir = getDefaultSoundsDir();
+    expect(typeof soundsDir).toBe('string');
+    expect(soundsDir).toContain('opencode');
+    expect(soundsDir).toContain('sounds');
+  });
+
+  it('should export default constants', () => {
+    expect(typeof DEFAULT_DATA_DIR).toBe('string');
+    expect(typeof DEFAULT_BASE_URL).toBe('string');
+    expect(DEFAULT_BASE_URL).toContain('http');
+  });
 
   it('should load configuration from plugin.json', async () => {
     await cleanup();
@@ -41,16 +68,12 @@ describe('Plugin configuration loading', () => {
   });
 
   it('should handle missing plugin.json gracefully', async () => {
-    // This simulates what happens when no plugin.json exists
-    const missingConfig = {};
-    expect(missingConfig['@pantheon-ai/opencode-warcraft-notifications']).toBeUndefined();
+    // Test with a non-existent plugin name
+    const config = await loadPluginConfig('non-existent-plugin');
+    expect(config).toEqual({});
   });
 
   it('should validate plugin configuration structure', () => {
-    interface WarcraftNotificationConfig {
-      soundsDir?: string;
-    }
-
     // Test valid config
     const validConfig: WarcraftNotificationConfig = {
       soundsDir: '/valid/path',
