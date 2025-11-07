@@ -109,21 +109,22 @@ jobs:
         run: |
           BUMP=${{ steps.determine.outputs.bump }}
           echo "Bump type: $BUMP"
-          node -e "
-            const fs = require('fs');
-            const p = 'package.json';
-            const pkg = JSON.parse(fs.readFileSync(p,'utf8'));
-            const v = pkg.version || '0.0.0';
-            const parts = v.split('.').map(x=>Number(x));
-            while(parts.length<3) parts.push(0);
-            if (process.env.BUMP === 'major') { parts[0] = (parts[0]||0)+1; parts[1]=0; parts[2]=0; }
-            else if (process.env.BUMP === 'minor') { parts[1] = (parts[1]||0)+1; parts[2]=0; }
-            else { parts[2] = (parts[2]||0)+1; }
-            const newv = parts.join('.');
-            pkg.version = newv;
-            fs.writeFileSync(p, JSON.stringify(pkg, null, 2)+"\n");
-            console.log('Version bumped to', newv);
-          "
+          node <<'NODE'
+          const fs = require('fs');
+          const p = 'package.json';
+          const pkg = JSON.parse(fs.readFileSync(p,'utf8'));
+          const v = pkg.version || '0.0.0';
+          const parts = v.split('.').map(x=>Number(x));
+          while(parts.length<3) parts.push(0);
+          const bump = process.env.BUMP;
+          if (bump === 'major') { parts[0] = (parts[0]||0)+1; parts[1]=0; parts[2]=0; }
+          else if (bump === 'minor') { parts[1] = (parts[1]||0)+1; parts[2]=0; }
+          else { parts[2] = (parts[2]||0)+1; }
+          const newv = parts.join('.');
+          pkg.version = newv;
+          fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + "\n");
+          console.log('Version bumped to', newv);
+          NODE
           echo "new_version=$(node -e \"console.log(JSON.parse(require('fs').readFileSync('package.json','utf8')).version)\")" >> $GITHUB_OUTPUT
 
       - name: Commit version bump
