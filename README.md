@@ -85,4 +85,4 @@ This will verify sound downloads and test random sound selection.
 
 ---
 
-*"Work complete!"* - Warcraft II Peasant
+_"Work complete!"_ - Warcraft II Peasant

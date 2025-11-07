@@ -1,6 +1,12 @@
-import { join } from "path";
-import { mkdir, exists } from "fs/promises";
-import { DEFAULT_BASE_URL, DEFAULT_DATA_DIR, SoundFile, buildSoundsToDownload, getSoundFileList as dataGetSoundFileList } from "./sound-data";
+import { join } from 'path';
+import { mkdir, exists } from 'fs/promises';
+import {
+  DEFAULT_BASE_URL,
+  DEFAULT_DATA_DIR,
+  SoundFile,
+  buildSoundsToDownload,
+  getSoundFileList as dataGetSoundFileList,
+} from './sound-data';
 
 export type FetchLike = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 
@@ -12,10 +18,14 @@ export type FetchLike = (input: RequestInfo, init?: RequestInit) => Promise<Resp
  * @param dataDir - Optional local data directory to write the downloaded file
  * @returns true when the file is present locally (already existed or downloaded successfully)
  */
-export const downloadSound = async (sound: SoundFile, fetchImpl: FetchLike, dataDir?: string): Promise<boolean> => {
+export const downloadSound = async (
+  sound: SoundFile,
+  fetchImpl: FetchLike,
+  dataDir?: string,
+): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const filePath = join(effectiveDataDir, sound.filename);
-  
+
   try {
     // Check if file already exists
     const fileExists = await exists(filePath);
@@ -29,15 +39,15 @@ export const downloadSound = async (sound: SoundFile, fetchImpl: FetchLike, data
 
   try {
     console.log(`Downloading ${sound.filename} (${sound.description})...`);
-    const response = await fetchImpl(sound.url) as Response;
-    
+    const response = (await fetchImpl(sound.url)) as Response;
+
     if (!response || !response.ok) {
-      console.error(`HTTP error! status: ${response?.status ?? "no response"}`);
+      console.error(`HTTP error! status: ${response?.status ?? 'no response'}`);
       return false;
     }
-    
+
     const arrayBuffer = await response.arrayBuffer();
-    
+
     // Write file using Bun's built-in file operations
     await Bun.write(filePath, arrayBuffer);
     console.log(`✓ Downloaded ${sound.filename}`);
@@ -46,7 +56,7 @@ export const downloadSound = async (sound: SoundFile, fetchImpl: FetchLike, data
     console.error(`✗ Failed to download ${sound.filename}:`, error);
     return false;
   }
-}
+};
 
 /**
  * Check if a sound file exists locally
@@ -59,7 +69,7 @@ export const soundExists = async (filename: string, dataDir?: string): Promise<b
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const filePath = join(effectiveDataDir, filename);
   return await exists(filePath);
-}
+};
 
 // Concurrency guard to prevent duplicate downloads for same filename
 const downloadInProgress = new Map<string, Promise<boolean>>();
@@ -76,7 +86,12 @@ const downloadInProgress = new Map<string, Promise<boolean>>();
  * @param dataDir - Optional local directory to store downloaded sounds
  * @returns true when the file exists locally (either pre-existing or downloaded successfully)
  */
-export const downloadSoundByFilename = async (filename: string, fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<boolean> => {
+export const downloadSoundByFilename = async (
+  filename: string,
+  fetchImpl?: FetchLike,
+  baseUrl?: string,
+  dataDir?: string,
+): Promise<boolean> => {
   const effectiveFetch = fetchImpl ?? (globalThis.fetch as unknown as FetchLike);
   const effectiveBaseUrl = baseUrl ?? DEFAULT_BASE_URL;
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
@@ -101,7 +116,7 @@ export const downloadSoundByFilename = async (filename: string, fetchImpl?: Fetc
     try {
       // Build sound list and find the matching entry
       const soundsToDownload = buildSoundsToDownload(effectiveBaseUrl);
-      const sound = soundsToDownload.find(s => s.filename === filename);
+      const sound = soundsToDownload.find((s) => s.filename === filename);
       if (!sound) {
         console.error(`No sound entry found for filename: ${filename}`);
         resolveRef(false);
@@ -124,7 +139,7 @@ export const downloadSoundByFilename = async (filename: string, fetchImpl?: Fetc
       try {
         await mkdir(effectiveDataDir, { recursive: true });
       } catch (error) {
-        console.error("Failed to create data directory:", error);
+        console.error('Failed to create data directory:', error);
         resolveRef(false);
         return;
       }
@@ -139,7 +154,7 @@ export const downloadSoundByFilename = async (filename: string, fetchImpl?: Fetc
   })();
 
   return await placeholder;
-}
+};
 
 /**
  * Ensure a sound is available locally (download on demand).
@@ -152,9 +167,14 @@ export const downloadSoundByFilename = async (filename: string, fetchImpl?: Fetc
  * @param dataDir - Optional local data directory
  * @returns true when the file exists locally
  */
-export const ensureSoundAvailable = async (filename: string, fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<boolean> => {
+export const ensureSoundAvailable = async (
+  filename: string,
+  fetchImpl?: FetchLike,
+  baseUrl?: string,
+  dataDir?: string,
+): Promise<boolean> => {
   return await downloadSoundByFilename(filename, fetchImpl, baseUrl, dataDir);
-}
+};
 
 /**
  * Download all Warcraft II Alliance sounds
@@ -163,31 +183,35 @@ export const ensureSoundAvailable = async (filename: string, fetchImpl?: FetchLi
  * @param baseUrl - Optional base URL to download from
  * @param dataDir - Optional local directory to store sounds
  */
-export const downloadAllSounds = async (fetchImpl?: FetchLike, baseUrl?: string, dataDir?: string): Promise<void> => {
+export const downloadAllSounds = async (
+  fetchImpl?: FetchLike,
+  baseUrl?: string,
+  dataDir?: string,
+): Promise<void> => {
   const effectiveFetch = fetchImpl ?? (globalThis.fetch as unknown as FetchLike);
   const effectiveBaseUrl = baseUrl ?? DEFAULT_BASE_URL;
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
 
-  console.log("Starting Warcraft II Alliance sounds download...");
-  
+  console.log('Starting Warcraft II Alliance sounds download...');
+
   // Create data directory if it doesn't exist
   try {
     await mkdir(effectiveDataDir, { recursive: true });
   } catch (error) {
-    console.error("Failed to create data directory:", error);
+    console.error('Failed to create data directory:', error);
     return;
   }
 
   const soundsToDownload = buildSoundsToDownload(effectiveBaseUrl);
 
   const results = await Promise.allSettled(
-    soundsToDownload.map(sound => downloadSound(sound, effectiveFetch, effectiveDataDir))
+    soundsToDownload.map((sound) => downloadSound(sound, effectiveFetch, effectiveDataDir)),
   );
 
-  const successful = results.filter(result => 
-    result.status === 'fulfilled' && result.value === true
+  const successful = results.filter(
+    (result) => result.status === 'fulfilled' && result.value === true,
   ).length;
-  
+
   const failed = results.length - successful;
 
   console.log(`\nDownload complete!`);
@@ -196,7 +220,7 @@ export const downloadAllSounds = async (fetchImpl?: FetchLike, baseUrl?: string,
     console.log(`✗ Failed: ${failed}`);
   }
   console.log(`📂 Sounds saved to: ${effectiveDataDir}`);
-}
+};
 
 /**
  * Get the list of all sound files that should be downloaded
@@ -205,5 +229,4 @@ export const downloadAllSounds = async (fetchImpl?: FetchLike, baseUrl?: string,
  */
 export const getSoundFileList = (): string[] => {
   return dataGetSoundFileList();
-}
-
+};

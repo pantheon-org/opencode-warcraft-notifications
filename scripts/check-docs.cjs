@@ -37,20 +37,32 @@ function inspectFile(filePath) {
   const results = [];
 
   function visit(node) {
-    if (ts.isFunctionDeclaration(node) && node.modifiers && node.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
+    if (
+      ts.isFunctionDeclaration(node) &&
+      node.modifiers &&
+      node.modifiers.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+    ) {
       const name = node.name ? `function ${node.name.escapedText}` : 'export default function';
       const r = reportIfMissing(filePath, sourceFile, node, name);
       if (r) results.push(r);
     }
 
-    if (ts.isClassDeclaration(node) && node.modifiers && node.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
+    if (
+      ts.isClassDeclaration(node) &&
+      node.modifiers &&
+      node.modifiers.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+    ) {
       const name = node.name ? `class ${node.name.escapedText}` : 'export default class';
       const r = reportIfMissing(filePath, sourceFile, node, name);
       if (r) results.push(r);
     }
 
-    if (ts.isVariableStatement(node) && node.modifiers && node.modifiers.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
-      node.declarationList.declarations.forEach(decl => {
+    if (
+      ts.isVariableStatement(node) &&
+      node.modifiers &&
+      node.modifiers.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+    ) {
+      node.declarationList.declarations.forEach((decl) => {
         const init = decl.initializer;
         if (init && (ts.isArrowFunction(init) || ts.isFunctionExpression(init))) {
           const name = decl.name.getText(sourceFile);
@@ -83,7 +95,7 @@ function main() {
   }
   const files = readDirRecursive(root);
   const all = [];
-  files.forEach(f => {
+  files.forEach((f) => {
     const r = inspectFile(f);
     if (r.length) all.push(...r);
   });
@@ -94,7 +106,7 @@ function main() {
   }
 
   console.log('Missing JSDoc/TSDoc for exported symbols:');
-  all.forEach(l => console.log(' -', l));
+  all.forEach((l) => console.log(' -', l));
   process.exit(2);
 }
 

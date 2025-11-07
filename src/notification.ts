@@ -1,6 +1,6 @@
-import type { Plugin } from "@opencode-ai/plugin"
-import { getRandomSoundPath, soundExists } from "./sounds.js"
-import { ensureSoundAvailable } from "./download.js"
+import type { Plugin } from '@opencode-ai/plugin';
+import { getRandomSoundPath, soundExists } from './sounds.js';
+import { ensureSoundAvailable } from './download.js';
 /* eslint-disable jsdoc/require-param */
 
 /**
@@ -15,15 +15,19 @@ export const NotificationPlugin: Plugin = async (ctx) => {
   const { project: _project, client: _client, $, directory, worktree: _worktree } = ctx;
   // We'll download sounds on demand. Keep a simple cache flag to avoid repeated checks.
   const checkedSoundCache = new Map<string, boolean>();
-  void _project; void _client; void _worktree;
+  void _project;
+  void _client;
+  void _worktree;
 
   const ensureAndGetSoundPath = async () => {
     // Determine explicit data directory preference: plugin `directory` if available, otherwise env or default
-    const explicitDataDir = directory ? `${directory}/.opencode-sounds` : process.env.SOUNDS_DATA_DIR;
+    const explicitDataDir = directory
+      ? `${directory}/.opencode-sounds`
+      : process.env.SOUNDS_DATA_DIR;
 
     // Choose a random sound filename
     const soundPath = getRandomSoundPath(explicitDataDir);
-    const filename = soundPath.split("/").pop() as string;
+    const filename = soundPath.split('/').pop() as string;
 
     // If we've already confirmed availability, return the path
     if (checkedSoundCache.get(filename) === true) return soundPath;
@@ -46,7 +50,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
       // If download failed, fall through to return original path (which may not exist)
       return soundPath;
     } catch (error) {
-      console.error("Error ensuring sound available:", error);
+      console.error('Error ensuring sound available:', error);
       return soundPath;
     }
   };
@@ -59,18 +63,18 @@ export const NotificationPlugin: Plugin = async (ctx) => {
   return {
     event: async ({ event }) => {
       // Save message text for idle summary
-      if (event.type === "message.part.updated" && event.properties.part.type === "text") {
+      if (event.type === 'message.part.updated' && event.properties.part.type === 'text') {
         const { messageID, text } = event.properties.part;
         lastMessage = { messageID, text };
       }
 
-      if (event.type === "session.idle") {
-        const summary = getIdleSummary(lastMessage?.text) ?? "Idle";
+      if (event.type === 'session.idle') {
+        const summary = getIdleSummary(lastMessage?.text) ?? 'Idle';
 
-        if (process.platform === "darwin") {
+        if (process.platform === 'darwin') {
           // Ensure the randomly chosen sound is available (download on demand)
           const soundPath = await ensureAndGetSoundPath();
-          const filename = soundPath.split("/").pop() as string;
+          const filename = soundPath.split('/').pop() as string;
           const existsLocally = await soundExists(filename);
 
           if (existsLocally) {
@@ -110,7 +114,7 @@ const getIdleSummary = (text: string | null) => {
     return idleMatch[1].trim();
   }
   if (text.length > 80) {
-    return text.slice(0, 80) + "...";
+    return text.slice(0, 80) + '...';
   }
   return text;
 };

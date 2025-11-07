@@ -1,3 +1,1 @@
-export {
-  NotificationPlugin,
-} from "./src/notification";
+export { NotificationPlugin } from './src/notification';

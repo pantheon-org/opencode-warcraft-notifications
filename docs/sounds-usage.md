@@ -85,4 +85,3 @@ This minimizes startup latency while still providing an explicit bulk-prefetch o
 ---
 
 This file documents how the plugin handles sound assets and how to configure behavior for development and CI (updated to reflect current code behavior).
-
