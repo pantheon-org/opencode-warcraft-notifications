@@ -1,6 +1,6 @@
 {
   "name": "@pantheon-ai/opencode-warcraft-notifications",
-  "version": "1.0.48",
+  "version": "1.0.49",
   "description": "Warcraft II Alliance notifications plugin for OpenCode",
   "keywords": [
     "opencode",
