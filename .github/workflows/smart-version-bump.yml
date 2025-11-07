@@ -74,6 +74,9 @@ jobs:
             echo "⚠️ Latest commit appears to be workflow-generated: $LATEST_COMMIT_MSG"
             echo "🛑 Skipping version bump to prevent cycle"
             echo "workflow_generated=true" >> $GITHUB_OUTPUT
+            # Still create empty commits.txt and changes.txt for downstream steps
+            touch commits.txt changes.txt
+            echo "commits_count=0" >> $GITHUB_OUTPUT
             exit 0
           fi
           
@@ -127,10 +130,19 @@ jobs:
           Commits:
           EOF
           
-          cat commits.txt >> analysis_prompt.txt
+          if [ -f commits.txt ]; then
+            cat commits.txt >> analysis_prompt.txt
+          else
+            echo "No commits found" >> analysis_prompt.txt
+          fi
           
           echo -e "\n\nFile Changes:" >> analysis_prompt.txt
-          cat changes.txt >> analysis_prompt.txt
+          if [ -f changes.txt ]; then
+            cat changes.txt >> analysis_prompt.txt
+          else
+            echo "No file changes found" >> changes.txt
+            cat changes.txt >> analysis_prompt.txt
+          fi
           
           echo -e "\n\nRespond with only one word: MAJOR, MINOR, PATCH, or NONE" >> analysis_prompt.txt
           
@@ -144,16 +156,21 @@ jobs:
           # Fallback analysis based on conventional commits
           if [ -z "$AI_DECISION" ] || [[ ! "$AI_DECISION" =~ ^(MAJOR|MINOR|PATCH|NONE)$ ]]; then
             echo "AI analysis failed, using conventional commit analysis"
-            if grep -qi "BREAKING CHANGE\|!:" commits.txt; then
-              AI_DECISION="MAJOR"
-            elif grep -qi "^feat\|^feature" commits.txt; then
-              AI_DECISION="MINOR"  
-            elif grep -qi "^fix\|^bugfix\|^patch" commits.txt; then
-              AI_DECISION="PATCH"
-            elif grep -qi "^docs\|^doc\|^chore\|^ci\|^build\|^style\|^refactor" commits.txt; then
-              AI_DECISION="PATCH"
+            if [ -f commits.txt ] && [ -s commits.txt ]; then
+              if grep -qi "BREAKING CHANGE\|!:" commits.txt; then
+                AI_DECISION="MAJOR"
+              elif grep -qi "^feat\|^feature" commits.txt; then
+                AI_DECISION="MINOR"  
+              elif grep -qi "^fix\|^bugfix\|^patch" commits.txt; then
+                AI_DECISION="PATCH"
+              elif grep -qi "^docs\|^doc\|^chore\|^ci\|^build\|^style\|^refactor" commits.txt; then
+                AI_DECISION="PATCH"
+              else
+                AI_DECISION="PATCH"
+              fi
             else
-              AI_DECISION="PATCH"
+              # No commits or empty commits.txt - this should be NONE
+              AI_DECISION="NONE"
             fi
           fi
           
