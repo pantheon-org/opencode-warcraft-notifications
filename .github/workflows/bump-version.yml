@@ -1,0 +1,50 @@
+name: Bump package version on merge
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Bump patch version in package.json
+        id: bump
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const p = 'package.json';
+          const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
+          const v = pkg.version || '0.0.0';
+          const parts = v.split('.').map(x => Number(x));
+          while (parts.length < 3) parts.push(0);
+          parts[2] = (parts[2] || 0) + 1;
+          const newv = parts.join('.');
+          pkg.version = newv;
+          fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + '\n');
+          console.log('Version bumped to', newv);
+          NODE
+          echo "new_version=$(node -e \"console.log(JSON.parse(require('fs').readFileSync('package.json','utf8')).version)\")" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: bump package version to ${{ steps.bump.outputs.new_version }}" || echo "No changes to commit"
+          git push
