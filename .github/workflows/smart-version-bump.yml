@@ -39,6 +39,9 @@ jobs:
       new_version: ${{ steps.decision.outputs.new_version }}
       changelog: ${{ steps.decision.outputs.changelog }}
       ai_decision: ${{ steps.ai-analysis.outputs.ai_decision }}
+      conventional_decision: ${{ steps.validation.outputs.conventional_decision }}
+      mismatch_detected: ${{ steps.validation.outputs.mismatch_detected }}
+      final_decision: ${{ steps.validation.outputs.final_decision }}
     
     steps:
       - name: Checkout repository
@@ -175,9 +178,28 @@ jobs:
                 echo "❓ No conventional commit patterns found - defaulting to PATCH version bump"
               fi
               
-              # Log what was found for debugging
-              echo "📝 Commits analyzed:"
-              cat commits.txt | head -10
+          # Log what was found for debugging and opportunity detection
+          echo "📝 Commits analyzed:"
+          cat commits.txt | head -10
+          
+          # Feature opportunity detection
+          FEAT_COUNT=$(grep -ci "^feat\|^feature" commits.txt 2>/dev/null || echo "0")
+          FIX_COUNT=$(grep -ci "^fix\|^bugfix" commits.txt 2>/dev/null || echo "0")
+          BREAKING_COUNT=$(grep -ci "BREAKING CHANGE\|!:" commits.txt 2>/dev/null || echo "0")
+          
+          echo "📈 Commit Type Analysis:"
+          echo "  - Features (feat:): $FEAT_COUNT"
+          echo "  - Bug fixes (fix:): $FIX_COUNT" 
+          echo "  - Breaking changes: $BREAKING_COUNT"
+          
+          if [ "$FEAT_COUNT" -gt "0" ] && [ "$AI_DECISION" = "PATCH" ]; then
+            echo "🚨 OPPORTUNITY ALERT: $FEAT_COUNT feature(s) detected but classified as PATCH"
+            echo "   Consider if this should be a MINOR release instead"
+          fi
+          
+          if [ "$BREAKING_COUNT" -gt "0" ] && [ "$AI_DECISION" != "MAJOR" ]; then
+            echo "🚨 CRITICAL ALERT: Breaking changes detected but not classified as MAJOR"
+          fi
             else
               # No commits or empty commits.txt - this should be NONE
               AI_DECISION="NONE"
@@ -187,6 +209,73 @@ jobs:
           
           echo "ai_decision=$AI_DECISION" >> $GITHUB_OUTPUT
           echo "AI decided: $AI_DECISION"
+          
+          # Store the AI decision for cross-validation
+          echo "$AI_DECISION" > ai_decision.txt
+
+      - name: Cross-validate version decision
+        id: validation
+        run: |
+          # Perform independent conventional commit analysis for cross-validation
+          echo "🔍 Cross-validating version decision..."
+          
+          if [ -f commits.txt ] && [ -s commits.txt ]; then
+            # Independent conventional commit analysis
+            if grep -qi "BREAKING CHANGE\|!:" commits.txt; then
+              CONVENTIONAL_DECISION="MAJOR"
+            elif grep -qi "^feat\|^feature" commits.txt; then
+              CONVENTIONAL_DECISION="MINOR"
+            elif grep -qi "^fix\|^bugfix\|^patch" commits.txt; then
+              CONVENTIONAL_DECISION="PATCH"
+            elif grep -qi "^docs\|^doc\|^chore\|^ci\|^build\|^style\|^refactor" commits.txt; then
+              CONVENTIONAL_DECISION="PATCH"
+            else
+              CONVENTIONAL_DECISION="PATCH"
+            fi
+          else
+            CONVENTIONAL_DECISION="NONE"
+          fi
+          
+          AI_DECISION="${{ steps.ai-analysis.outputs.ai_decision }}"
+          
+          echo "🤖 AI Analysis: $AI_DECISION"
+          echo "📋 Conventional Commits: $CONVENTIONAL_DECISION"
+          
+          # Cross-validation checks and warnings
+          if [ "$AI_DECISION" != "$CONVENTIONAL_DECISION" ]; then
+            echo "⚠️  WARNING: Version analysis mismatch detected!"
+            echo "   AI suggests: $AI_DECISION"
+            echo "   Conventional commits suggest: $CONVENTIONAL_DECISION"
+            
+            # Specific warnings for common misclassifications
+            if [ "$AI_DECISION" = "PATCH" ] && [ "$CONVENTIONAL_DECISION" = "MINOR" ]; then
+              echo "🚨 POTENTIAL MISSED OPPORTUNITY: This could be a new feature (MINOR) being classified as PATCH"
+              echo "   Please review commits containing 'feat:' prefixes"
+            elif [ "$AI_DECISION" = "PATCH" ] && [ "$CONVENTIONAL_DECISION" = "MAJOR" ]; then
+              echo "🚨 CRITICAL: Potential breaking change being classified as PATCH"
+              echo "   Please review commits containing 'BREAKING CHANGE' or '!'"
+            elif [ "$AI_DECISION" = "MINOR" ] && [ "$CONVENTIONAL_DECISION" = "MAJOR" ]; then
+              echo "🚨 CRITICAL: Potential breaking change being classified as MINOR"
+            fi
+            
+            # Use the higher semantic version level as safer default
+            if [[ "$CONVENTIONAL_DECISION" == "MAJOR" ]] || [[ "$AI_DECISION" == "MAJOR" ]]; then
+              FINAL_DECISION="MAJOR"
+            elif [[ "$CONVENTIONAL_DECISION" == "MINOR" ]] || [[ "$AI_DECISION" == "MINOR" ]]; then
+              FINAL_DECISION="MINOR"
+            else
+              FINAL_DECISION="PATCH"
+            fi
+            
+            echo "🎯 Using safer choice: $FINAL_DECISION"
+          else
+            echo "✅ Both analyses agree: $AI_DECISION"
+            FINAL_DECISION="$AI_DECISION"
+          fi
+          
+          echo "conventional_decision=$CONVENTIONAL_DECISION" >> $GITHUB_OUTPUT
+          echo "mismatch_detected=$([[ "$AI_DECISION" != "$CONVENTIONAL_DECISION" ]] && echo "true" || echo "false")" >> $GITHUB_OUTPUT
+          echo "final_decision=$FINAL_DECISION" >> $GITHUB_OUTPUT
 
       - name: Make version decision
         id: decision
@@ -207,13 +296,21 @@ jobs:
             echo "Latest tag: $LATEST_TAG, current version: $CURRENT_VERSION"
           fi
           
-          # Use manual input if provided, otherwise use AI decision
+          # Use manual input if provided, otherwise use validated decision
           if [ "${{ github.event.inputs.version_type }}" != "auto" ] && [ -n "${{ github.event.inputs.version_type }}" ]; then
             VERSION_TYPE="${{ github.event.inputs.version_type }}"
             echo "Using manual version type: $VERSION_TYPE"
           else
-            VERSION_TYPE=$(echo "${{ steps.ai-analysis.outputs.ai_decision }}" | tr '[:upper:]' '[:lower:]')
-            echo "Using AI decision: $VERSION_TYPE"
+            VERSION_TYPE=$(echo "${{ steps.validation.outputs.final_decision }}" | tr '[:upper:]' '[:lower:]')
+            echo "Using validated decision: $VERSION_TYPE"
+            
+            # Show validation results
+            if [ "${{ steps.validation.outputs.mismatch_detected }}" = "true" ]; then
+              echo "⚠️  Note: Analysis mismatch was detected and resolved"
+              echo "   AI: ${{ steps.ai-analysis.outputs.ai_decision }}"
+              echo "   Conventional: ${{ steps.validation.outputs.conventional_decision }}"
+              echo "   Final: ${{ steps.validation.outputs.final_decision }}"
+            fi
           fi
           
           if [ "$VERSION_TYPE" = "none" ]; then
@@ -343,6 +440,20 @@ jobs:
           echo "  - Version Type: ${{ needs.analyze-changes.outputs.version_type }}"
           echo "  - New Version: ${{ needs.analyze-changes.outputs.new_version }}"
           echo "  - AI Decision: ${{ needs.analyze-changes.outputs.ai_decision }}"
+          echo ""
+          echo "🔍 Validation Results:"
+          echo "  - Conventional Commits: ${{ needs.analyze-changes.outputs.conventional_decision }}"
+          echo "  - Mismatch Detected: ${{ needs.analyze-changes.outputs.mismatch_detected }}"
+          echo "  - Final Decision: ${{ needs.analyze-changes.outputs.final_decision }}"
+          
+          if [ "${{ needs.analyze-changes.outputs.mismatch_detected }}" = "true" ]; then
+            echo ""
+            echo "⚠️  Version Analysis Mismatch:"
+            echo "  A difference was detected between AI and conventional commit analysis."
+            echo "  The safer/higher semantic version level was automatically chosen."
+            echo "  Please review the commit messages to ensure the version bump is appropriate."
+          fi
+          
           echo ""
           echo "🔄 Next Steps (Automated):"
           echo "  1. ✅ package.json updated to v${{ needs.analyze-changes.outputs.new_version }}"
