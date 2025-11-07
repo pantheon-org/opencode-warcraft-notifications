@@ -2,6 +2,8 @@
 
 Enhance your OpenCode experience with nostalgic Warcraft II Alliance unit sounds! This plugin plays authentic Warcraft II Alliance unit audio clips when your OpenCode session goes idle, bringing back memories of commanding peasants, knights, and mages in the classic RTS game.
 
+<!-- Testing full workflow automation with WORKFLOW_PAT -->
+
 ## Features
 
 - 🎵 **50+ Authentic Sounds**: Complete collection of Warcraft II Alliance unit voices
