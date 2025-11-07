@@ -37,6 +37,8 @@
     "test:verbose": "bun test src/ --reporter tap",
     "type-check": "bun tsc --noEmit --project tsconfig.test.json",
     "lint": "eslint src/",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,cjs,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,cjs,css}\"",
     "clean": "rm -rf dist/ .bun-cache/ coverage/",
     "build": "bun tsc",
     "dev": "bun tsc --watch"
@@ -59,6 +61,7 @@
     "eslint-plugin-prefer-arrow": "^1.2.0",
     "eslint-plugin-sonarjs": "^0.16.0",
     "eslint-plugin-tsdoc": "^0.4.0",
+    "prettier": "^2.8.8",
     "typescript": "^5.0.0"
   },
   "engines": {
