@@ -141,7 +141,7 @@ jobs:
 
       - name: Generate changelog
         id: generate_changelog
-        uses: requarks/changelog-action@v2
+        uses: requarks/changelog-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           filename: CHANGELOG.md
