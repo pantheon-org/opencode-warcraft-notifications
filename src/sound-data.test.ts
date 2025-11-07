@@ -6,7 +6,7 @@ import {
   getSoundCounts,
   allianceSoundEntries,
   hordeSoundEntries,
-} from './sound-data';
+} from './sound-data/index.js';
 import { DEFAULT_BASE_URL } from './plugin-config.js';
 
 describe('sound-data module', () => {

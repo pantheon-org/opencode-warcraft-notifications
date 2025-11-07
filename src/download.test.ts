@@ -14,7 +14,7 @@ import os from 'os';
 
 // Mock fetch implementation helper (typed)
 import type { FetchLike } from './download';
-import type { SoundFile } from './sound-data';
+import type { SoundFile } from './sound-data/index.js';
 
 type FetchImpl = FetchLike;
 const makeFetchResponder = (status = 200, body = new Uint8Array([1, 2, 3])): FetchImpl => {

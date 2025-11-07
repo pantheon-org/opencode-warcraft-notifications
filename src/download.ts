@@ -6,7 +6,7 @@ import {
   buildSoundsToDownload,
   buildAllSoundsToDownload,
   getSoundFileList as dataGetSoundFileList,
-} from './sound-data';
+} from './sound-data/index.js';
 import { determineSoundFaction } from './sounds.js';
 
 export type FetchLike = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
