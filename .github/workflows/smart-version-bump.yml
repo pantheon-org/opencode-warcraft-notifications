@@ -136,8 +136,15 @@ jobs:
       - name: Make version decision
         id: decision
         run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "Current version: $CURRENT_VERSION"
+          # Get the latest tag (which should be the current version)
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            CURRENT_VERSION="0.0.0"
+            echo "No tags found, starting from 0.0.0"
+          else
+            CURRENT_VERSION=${LATEST_TAG#v}
+            echo "Latest tag: $LATEST_TAG, current version: $CURRENT_VERSION"
+          fi
           
           # Use manual input if provided, otherwise use AI decision
           if [ "${{ github.event.inputs.version_type }}" != "auto" ] && [ -n "${{ github.event.inputs.version_type }}" ]; then
@@ -154,7 +161,7 @@ jobs:
             exit 0
           fi
           
-          # Calculate new version
+          # Calculate new version based on latest tag, not package.json
           IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
           major=${version_parts[0]}
           minor=${version_parts[1]}
