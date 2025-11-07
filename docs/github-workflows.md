@@ -405,11 +405,73 @@ CODECOV_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 **Required for full workflow automation.** This PAT enables the Smart Version Bump workflow to trigger subsequent workflows automatically.
 
+#### Quick Reference: Required Permissions
+
+##### Fine-grained Token (Recommended):
+```
+Repository Permissions:
+✅ Actions: Write
+✅ Contents: Write  
+✅ Metadata: Read
+✅ Pull requests: Write
+✅ Issues: Write
+```
+
+##### Classic Token (Legacy):
+```
+Scopes:
+✅ repo
+✅ workflow  
+✅ write:packages (optional)
+✅ read:packages (optional)
+```
+
 #### Step 1: Create Personal Access Token
+
+You can choose between **Fine-grained tokens** (recommended) or **Classic tokens**:
+
+##### Option A: Fine-grained Personal Access Token (Recommended)
+
+**More secure with repository-specific permissions:**
+
+1. **Go to GitHub Settings:**
+   - Click your profile picture → Settings  
+   - Navigate to **Developer settings** (bottom of left sidebar)
+   - Click **Personal access tokens** → **Fine-grained tokens**
+
+2. **Generate New Token:**
+   - Click **Generate new token**
+   - **Token name:** Enter descriptive name like "Workflow Automation - [Repository Name]"
+   - **Expiration:** Choose appropriate duration (90 days recommended)
+   - **Resource owner:** Select your username or organization
+   - **Repository access:** Select "Selected repositories" → Choose your specific repository
+
+3. **Select Required Repository Permissions:**
+   ```
+   Repository permissions:
+   ✅ Actions: Write (Execute workflows and manage workflow runs)
+   ✅ Contents: Write (Read and write repository contents, including tags)
+   ✅ Metadata: Read (Basic repository information)
+   ✅ Pull requests: Write (Create and manage pull requests)
+   ✅ Issues: Write (Create comments for PR analysis)
+   
+   Optional (if using GitHub Packages):
+   ✅ Packages: Write (Upload packages to GitHub Package Registry)
+   ```
+
+4. **Account Permissions:**
+   ```
+   Account permissions (usually not needed):
+   ❌ No additional account permissions required
+   ```
+
+##### Option B: Classic Personal Access Token (Legacy)
+
+**Broader permissions but simpler setup:**
 
 1. **Go to GitHub Settings:**
    - Click your profile picture → Settings
-   - Navigate to **Developer settings** (bottom of left sidebar)
+   - Navigate to **Developer settings** (bottom of left sidebar)  
    - Click **Personal access tokens** → **Tokens (classic)**
 
 2. **Generate New Token:**
@@ -420,15 +482,23 @@ CODECOV_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 3. **Select Required Scopes:**
    ```
    ✅ repo (Full control of private repositories)
-     ✅ Full control of private repositories
+     ✅ repo:status (Access commit status)
+     ✅ repo_deployment (Access deployment status)
+     ✅ public_repo (Access public repositories)
+     ✅ repo:invite (Access repository invitations)
+     ✅ security_events (Read and write security events)
    ✅ workflow (Update GitHub Action workflows)
    ✅ write:packages (Upload packages to GitHub Package Registry)
    ✅ read:packages (Download packages from GitHub Package Registry)
    ```
 
+##### Generate and Copy Token
+
 4. **Generate and Copy Token:**
    - Click **Generate token**
-   - **IMPORTANT:** Copy the token immediately (starts with `ghp_`)
+   - **IMPORTANT:** Copy the token immediately 
+     - Fine-grained tokens start with `github_pat_`
+     - Classic tokens start with `ghp_`
    - You won't be able to see it again!
 
 #### Step 2: Add PAT to Repository Secrets
@@ -447,12 +517,28 @@ CODECOV_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 The PAT must have access to your repository:
 
-1. **For Organization Repositories:**
+##### For Fine-grained Tokens:
+1. **Repository Access:** Token must be configured for the specific repository
+2. **Required Permissions:** Must have Actions (Write), Contents (Write), Pull requests (Write)
+3. **Organization Approval:** Organization may need to approve fine-grained PAT usage
+4. **Verification:** Test token with `gh auth login --with-token` using your token
+
+##### For Classic Tokens:
+1. **Organization Repositories:**
    - The PAT owner must be a repository collaborator with **Write** or **Admin** access
    - Organization may need to approve PAT usage (check organization settings)
-
-2. **For Personal Repositories:**
+2. **Personal Repositories:**
    - PAT automatically has access to your own repositories
+
+#### Token Type Comparison
+
+| Feature | Fine-grained Token | Classic Token |
+|---------|-------------------|---------------|
+| **Security** | ✅ Repository-specific | ❌ Broad access |
+| **Permissions** | ✅ Granular control | ❌ Scope-based |
+| **Setup Complexity** | ❌ More complex | ✅ Simpler |
+| **Organization Support** | ⚠️ May need approval | ✅ Standard |
+| **Recommended** | ✅ **Yes (preferred)** | ⚠️ Legacy option |
 
 #### Why PAT is Required
 
@@ -478,10 +564,23 @@ Smart Version Bump (uses WORKFLOW_PAT) → Creates tag → ✅ Triggers Sync + R
 
 #### Troubleshooting PAT Issues
 
+##### Fine-grained Token Issues:
+- **Workflows not triggering:** Verify token has Actions (Write) and Contents (Write) permissions
+- **Permission denied on repository:** Ensure token is configured for the specific repository  
+- **Permission denied on organization:** Organization admin may need to approve fine-grained PAT usage
+- **Cannot create tags:** Verify Contents (Write) permission is granted
+- **Cannot create PRs:** Verify Pull requests (Write) permission is granted
+
+##### Classic Token Issues:
 - **Workflows not triggering:** Verify PAT has `repo` and `workflow` scopes
-- **Permission denied:** Check repository access permissions
+- **Permission denied:** Check repository access permissions and collaborator status
 - **Token expired:** Generate new PAT and update secret
 - **Organization restrictions:** Contact organization admin for PAT approval
+
+##### General Issues:
+- **Token format:** Fine-grained tokens start with `github_pat_`, classic tokens start with `ghp_`
+- **Secret not updating:** Delete old secret and create new one with same name
+- **Testing token:** Use `gh auth login --with-token` to test token validity
 
 ### Branch Protection Rules
 
