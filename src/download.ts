@@ -1,8 +1,7 @@
 import { join } from 'path';
 import { mkdir, exists } from 'fs/promises';
+import { DEFAULT_BASE_URL, DEFAULT_DATA_DIR } from './plugin-config.js';
 import {
-  DEFAULT_BASE_URL,
-  DEFAULT_DATA_DIR,
   SoundFile,
   buildSoundsToDownload,
   getSoundFileList as dataGetSoundFileList,

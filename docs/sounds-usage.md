@@ -5,8 +5,8 @@ This document explains how the plugin stores and downloads Warcraft II sound ass
 ## Where sounds are stored (actual behavior)
 
 - **Machine-wide cache (default)**: `~/.config/opencode/sounds` (or OS-specific config directory equivalent) when no overrides are provided (see `src/sound-data.ts`).
-- **Per-project cache** (when running inside an opencode project): the plugin will use `${directory}/.opencode-sounds` if a `directory` context is supplied to the plugin (see `src/notification.ts:24`).
-- **Override**: set the `SOUNDS_DATA_DIR` environment variable to an absolute path to control where sounds are read from or cached.
+- **Plugin configuration override**: set the `soundsDir` property in your `plugin.json` file (see configuration section below).
+- **Environment override**: set the `SOUNDS_DATA_DIR` environment variable to an absolute path to control where sounds are read from or cached.
 
 Why this is configurable
 
@@ -52,13 +52,56 @@ This minimizes startup latency while still providing an explicit bulk-prefetch o
 - Prefer to prefetch required assets in a CI step (for example using an `npm`/`bun` script) and store them in the build cache or artifacts, rather than letting many builds each download from the public host.
 - If CI must exercise download logic, point `SOUNDS_BASE_URL` to a stable internal mirror.
 
+## Plugin Configuration
+
+The plugin looks for configuration in `plugin.json` files in the following order:
+
+1. `CWD/.opencode/plugin.json` (project-specific configuration)
+2. `~/.config/opencode/plugin.json` (global configuration)
+
+### plugin.json format
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "soundsDir": "/path/to/custom/sounds/directory"
+  }
+}
+```
+
+See [schemas/plugin.json.example](./schemas/plugin.json.example) for a complete example and [schemas/plugin.json.schema](./schemas/plugin.json.schema) for the JSON schema.
+
 ## Example usages
 
 - Use default machine-wide cache:
 
-  No environment variables required — sounds will be cached in `~/.config/opencode/sounds` (or OS-specific config directory equivalent) and shared across all opencode instances on the machine.
+  No configuration required — sounds will be cached in `~/.config/opencode/sounds` (or OS-specific config directory equivalent) and shared across all opencode instances on the machine.
 
-- Override to a shared cache:
+- Configure via plugin.json (project-specific):
+
+  Create `.opencode/plugin.json` in your project root:
+
+  ```json
+  {
+    "@pantheon-ai/opencode-warcraft-notifications": {
+      "soundsDir": "/path/to/project/sounds"
+    }
+  }
+  ```
+
+- Configure via plugin.json (global):
+
+  Create `~/.config/opencode/plugin.json`:
+
+  ```json
+  {
+    "@pantheon-ai/opencode-warcraft-notifications": {
+      "soundsDir": "/home/user/.cache/opencode-warcraft-sounds"
+    }
+  }
+  ```
+
+- Override to a shared cache via environment:
 
   ```bash
   export SOUNDS_DATA_DIR="$HOME/.cache/opencode-warcraft-sounds"

@@ -1,6 +1,7 @@
 import type { Plugin } from '@opencode-ai/plugin';
 import { getRandomSoundPath, soundExists } from './sounds.js';
 import { ensureSoundAvailable } from './download.js';
+import { loadPluginConfig, type WarcraftNotificationConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */
 
 /**
@@ -10,24 +11,28 @@ import { ensureSoundAvailable } from './download.js';
  * and displays a notification with a short summary of the last message.
  *
  * The plugin downloads sounds on demand into:
- * 1. `directory/.opencode-sounds` (per-project cache when directory context is available)
- * 2. `SOUNDS_DATA_DIR` environment variable if set
+ * 1. `SOUNDS_DATA_DIR` environment variable if set
+ * 2. Configured sounds directory from plugin.json (soundsDir property) if available
  * 3. `~/.config/opencode/sounds` (default machine-wide location)
  */
 export const NotificationPlugin: Plugin = async (ctx) => {
-  const { project: _project, client: _client, $, directory, worktree: _worktree } = ctx;
+  const { project: _project, client: _client, $, worktree: _worktree } = ctx;
   // We'll download sounds on demand. Keep a simple cache flag to avoid repeated checks.
   const checkedSoundCache = new Map<string, boolean>();
   void _project;
   void _client;
   void _worktree;
 
+  // Load plugin configuration from plugin.json
+  const pluginName = '@pantheon-ai/opencode-warcraft-notifications';
+  const pluginConfig = await loadPluginConfig(pluginName);
+
   const ensureAndGetSoundPath = async () => {
     // Determine explicit data directory preference:
-    // 1. Per-project cache: `directory/.opencode-sounds` if directory context is available
-    // 2. Environment override: `SOUNDS_DATA_DIR` if set
+    // 1. Environment override: `SOUNDS_DATA_DIR` if set
+    // 2. Configuration from opencode.json: `soundsDir` property
     // 3. Default: `~/.config/opencode/sounds` (handled by DEFAULT_DATA_DIR)
-    const explicitDataDir = directory ? `${directory}/.opencode-sounds` : undefined; // Let DEFAULT_DATA_DIR handle the fallback logic
+    const explicitDataDir = pluginConfig.soundsDir || undefined; // Use configured directory or let DEFAULT_DATA_DIR handle fallback
 
     // Choose a random sound filename
     const soundPath = getRandomSoundPath(explicitDataDir);

@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { exists } from 'fs/promises';
-import { DEFAULT_DATA_DIR } from './sound-data';
+import { DEFAULT_DATA_DIR } from './plugin-config.js';
 
 /**
  * All available Warcraft II Alliance sound files

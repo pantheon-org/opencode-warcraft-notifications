@@ -32,6 +32,41 @@ Enhance your OpenCode experience with nostalgic Warcraft II Alliance unit sounds
 
 3. The plugin will automatically download Warcraft II Alliance sounds on first idle event.
 
+## Configuration
+
+### Custom Sound Directory
+
+You can customize where sound files are stored by creating a `plugin.json` file:
+
+**Project-specific configuration** (`.opencode/plugin.json` in your project root):
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "soundsDir": "/path/to/project/sounds"
+  }
+}
+```
+
+**Global configuration** (`~/.config/opencode/plugin.json`):
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "soundsDir": "/home/user/.cache/warcraft-sounds"
+  }
+}
+```
+
+See [docs/schemas/plugin.json.example](./docs/schemas/plugin.json.example) for a complete example and [docs/schemas/plugin.json.schema](./docs/schemas/plugin.json.schema) for the JSON schema.
+
+### Default Locations
+
+If no configuration is provided, sounds are stored in:
+
+- **Default**: `~/.config/opencode/sounds` (or OS-specific config directory)
+- **Environment Override**: Set `SOUNDS_DATA_DIR` environment variable
+
 ## How It Works
 
 - **Idle Detection**: When your OpenCode session goes idle, the plugin triggers
