@@ -1,12 +1,11 @@
 import { join } from 'path';
 import { exists } from 'fs/promises';
-import { DEFAULT_DATA_DIR } from './plugin-config.js';
+import { DEFAULT_DATA_DIR, type Faction } from './plugin-config.js';
 
 /**
- * All available Warcraft II sound files (Alliance and Horde)
+ * Alliance sound categories and their sound files
  */
-export const sounds = {
-  // ALLIANCE SOUNDS
+export const allianceSounds = {
   humanSelected: [
     'human_selected1.wav',
     'human_selected2.wav',
@@ -69,8 +68,13 @@ export const sounds = {
     'ship_selected4.wav',
   ],
   shipAcknowledge: ['ship_acknowledge1.wav', 'ship_acknowledge2.wav', 'ship_acknowledge3.wav'],
+  special: ['work_completed.wav', 'jobs_done.wav'],
+} as const;
 
-  // HORDE SOUNDS
+/**
+ * Horde sound categories and their sound files
+ */
+export const hordeSounds = {
   orcSelected: [
     'orc_selected1.wav',
     'orc_selected2.wav',
@@ -136,24 +140,123 @@ export const sounds = {
     'horde_ship_acknowledge2.wav',
     'horde_ship_acknowledge3.wav',
   ],
-
-  // SPECIAL SOUNDS (both factions)
-  special: ['work_completed.wav', 'jobs_done.wav', 'orc_work_completed.wav'],
+  special: ['orc_work_completed.wav'],
 } as const;
 
 /**
- * Return a flat list of every known sound filename
- * @returns Array of sound filenames
+ * Combined sounds object for backward compatibility
  */
-export const getAllSounds = (): string[] => Object.values(sounds).flat();
+export const sounds = {
+  ...allianceSounds,
+  ...hordeSounds,
+} as const;
 
 /**
- * Pick a random sound filename from the full set
- * @returns A sound filename
+ * Get sound path for a specific faction
+ * @param filename - Sound filename
+ * @param faction - Faction the sound belongs to
+ * @param dataDir - Optional override data directory
+ * @returns Absolute path to the sound file in faction subdirectory
  */
-export const getRandomSound = (): string => {
-  const allSounds = getAllSounds();
-  return allSounds[Math.floor(Math.random() * allSounds.length)];
+export const getSoundPath = (
+  filename: string,
+  faction: 'alliance' | 'horde',
+  dataDir?: string,
+): string => {
+  const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
+  return join(effectiveDataDir, faction, filename);
+};
+
+/**
+ * Check whether a sound file exists in the faction-specific data directory
+ * @param filename - Name of the sound file
+ * @param faction - Faction the sound belongs to
+ * @param dataDir - Optional override data directory
+ * @returns `true` when the file exists
+ */
+export const soundExists = async (
+  filename: string,
+  faction: 'alliance' | 'horde',
+  dataDir?: string,
+): Promise<boolean> => {
+  const filePath = getSoundPath(filename, faction, dataDir);
+  return await exists(filePath);
+};
+
+/**
+ * Determine which faction a sound belongs to based on filename
+ * @param filename - Sound filename
+ * @returns The faction the sound belongs to
+ */
+export const determineSoundFaction = (filename: string): 'alliance' | 'horde' => {
+  // Check if it's a Horde sound
+  if (
+    filename.startsWith('orc_') ||
+    filename.startsWith('death_knight_') ||
+    filename.startsWith('dragon_') ||
+    filename.startsWith('goblin_sapper_') ||
+    filename.startsWith('ogre_') ||
+    filename.startsWith('troll_') ||
+    filename.startsWith('horde_ship_')
+  ) {
+    return 'horde';
+  }
+  // Default to alliance
+  return 'alliance';
+};
+
+/**
+ * Get all sounds from a specific faction
+ * @param faction - The faction to get sounds from
+ * @returns Array of sound filenames from the specified faction
+ */
+export const getSoundsByFaction = (faction: Faction): string[] => {
+  switch (faction) {
+    case 'alliance':
+      return Object.values(allianceSounds).flat();
+    case 'horde':
+      return Object.values(hordeSounds).flat();
+    case 'both':
+      return [...Object.values(allianceSounds).flat(), ...Object.values(hordeSounds).flat()];
+  }
+};
+
+/**
+ * Get all Alliance sound categories
+ * @returns Array of Alliance sound category keys
+ */
+export const getAllianceSoundCategories = (): (keyof typeof allianceSounds)[] => {
+  return Object.keys(allianceSounds) as (keyof typeof allianceSounds)[];
+};
+
+/**
+ * Get all Horde sound categories
+ * @returns Array of Horde sound category keys
+ */
+export const getHordeSoundCategories = (): (keyof typeof hordeSounds)[] => {
+  return Object.keys(hordeSounds) as (keyof typeof hordeSounds)[];
+};
+
+/**
+ * Pick a random sound from a specific faction
+ * @param faction - 'alliance', 'horde', or 'both'
+ * @returns A random sound filename from the specified faction(s)
+ */
+export const getRandomSoundFromFaction = (faction: Faction): string => {
+  const factionSounds = getSoundsByFaction(faction);
+  return factionSounds[Math.floor(Math.random() * factionSounds.length)];
+};
+
+/**
+ * Pick a random sound from a specific faction and return its resolved path
+ * @param faction - 'alliance', 'horde', or 'both'
+ * @param dataDir - Optional override data directory
+ * @returns Absolute path to a random sound file from the specified faction(s)
+ */
+export const getRandomSoundPathFromFaction = (faction: Faction, dataDir?: string): string => {
+  const randomSound = getRandomSoundFromFaction(faction);
+  const soundFaction = determineSoundFaction(randomSound);
+  return getSoundPath(randomSound, soundFaction, dataDir);
 };
 
 /**
@@ -167,132 +270,27 @@ export const getRandomSoundFromCategory = (category: keyof typeof sounds): strin
 };
 
 /**
- * Check whether a sound file exists in the data directory
- * @param filename - Name of the sound file
- * @param dataDir - Optional override data directory
- * @returns `true` when the file exists
+ * Return a flat list of every known sound filename (backward compatibility)
+ * @returns Array of sound filenames
  */
-export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
-  const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
-  const filePath = join(effectiveDataDir, filename);
-  return await exists(filePath);
+export const getAllSounds = (): string[] => Object.values(sounds).flat();
+
+/**
+ * Pick a random sound filename from the full set (backward compatibility)
+ * @returns A sound filename
+ */
+export const getRandomSound = (): string => {
+  const allSounds = getAllSounds();
+  return allSounds[Math.floor(Math.random() * allSounds.length)];
 };
 
 /**
- * Resolve the absolute path for a sound filename in the data directory
- * @param filename - Sound filename
- * @param dataDir - Optional override data directory
- * @returns Absolute path to the sound file
- */
-export const getSoundPath = (filename: string, dataDir?: string): string => {
-  const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
-  return join(effectiveDataDir, filename);
-};
-
-/**
- * Pick a random sound filename and return its resolved path
+ * Pick a random sound filename and return its resolved path (backward compatibility)
  * @param dataDir - Optional override data directory
  * @returns Absolute path to a random sound file
  */
 export const getRandomSoundPath = (dataDir?: string): string => {
   const randomSound = getRandomSound();
-  return getSoundPath(randomSound, dataDir);
-};
-
-/**
- * Get all Alliance sound categories
- * @returns Array of Alliance sound category keys
- */
-export const getAllianceSoundCategories = (): (keyof typeof sounds)[] => {
-  return [
-    'humanSelected',
-    'humanAcknowledge',
-    'dwarfSelected',
-    'dwarfAcknowledge',
-    'elfSelected',
-    'elfAcknowledge',
-    'knightSelected',
-    'knightAcknowledge',
-    'mageSelected',
-    'mageAcknowledge',
-    'peasantSelected',
-    'peasantAcknowledge',
-    'shipSelected',
-    'shipAcknowledge',
-  ];
-};
-
-/**
- * Get all Horde sound categories
- * @returns Array of Horde sound category keys
- */
-export const getHordeSoundCategories = (): (keyof typeof sounds)[] => {
-  return [
-    'orcSelected',
-    'orcAcknowledge',
-    'deathKnightSelected',
-    'deathKnightAcknowledge',
-    'dragonSelected',
-    'dragonAcknowledge',
-    'goblinSapperSelected',
-    'goblinSapperAcknowledge',
-    'ogreSelected',
-    'ogreAcknowledge',
-    'ogreMageSelected',
-    'ogreMageAcknowledge',
-    'trollSelected',
-    'trollAcknowledge',
-    'hordeShipSelected',
-    'hordeShipAcknowledge',
-  ];
-};
-
-/**
- * Get sounds from a specific faction
- * @param faction - 'alliance', 'horde', or 'both'
- * @returns Array of sound filenames from the specified faction(s)
- */
-export const getSoundsByFaction = (faction: 'alliance' | 'horde' | 'both'): string[] => {
-  let categories: (keyof typeof sounds)[] = [];
-
-  switch (faction) {
-    case 'alliance':
-      categories = getAllianceSoundCategories();
-      break;
-    case 'horde':
-      categories = getHordeSoundCategories();
-      break;
-    case 'both':
-      categories = [...getAllianceSoundCategories(), ...getHordeSoundCategories()];
-      break;
-  }
-
-  // Add special sounds for all factions
-  categories.push('special');
-
-  return categories.flatMap((category) => sounds[category]);
-};
-
-/**
- * Pick a random sound from a specific faction
- * @param faction - 'alliance', 'horde', or 'both'
- * @returns A random sound filename from the specified faction(s)
- */
-export const getRandomSoundFromFaction = (faction: 'alliance' | 'horde' | 'both'): string => {
-  const factionSounds = getSoundsByFaction(faction);
-  return factionSounds[Math.floor(Math.random() * factionSounds.length)];
-};
-
-/**
- * Pick a random sound from a specific faction and return its resolved path
- * @param faction - 'alliance', 'horde', or 'both'
- * @param dataDir - Optional override data directory
- * @returns Absolute path to a random sound file from the specified faction(s)
- */
-export const getRandomSoundPathFromFaction = (
-  faction: 'alliance' | 'horde' | 'both',
-  dataDir?: string,
-): string => {
-  const randomSound = getRandomSoundFromFaction(faction);
-  return getSoundPath(randomSound, dataDir);
+  const soundFaction = determineSoundFaction(randomSound);
+  return getSoundPath(randomSound, soundFaction, dataDir);
 };

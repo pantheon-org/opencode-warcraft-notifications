@@ -8,7 +8,7 @@ import {
   downloadSound,
 } from './download';
 import { join } from 'path';
-import { unlink, writeFile } from 'fs/promises';
+import { unlink, writeFile, mkdir } from 'fs/promises';
 import { mkdtempSync, rmSync } from 'fs';
 import os from 'os';
 
@@ -116,8 +116,15 @@ describe('sounds/download - on-demand API and helpers', () => {
   it('returns true immediately when file already exists', async () => {
     const list = getSoundFileList();
     const filename = list[0];
-    const path = join(tempDir, filename);
+    
+    // Get faction for this filename and create correct directory structure
+    const { determineSoundFaction } = await import('./sounds.js');
+    const faction = determineSoundFaction(filename);
+    const factionDir = join(tempDir, faction);
+    const path = join(factionDir, filename);
+    
     // ensure dir exists
+    await mkdir(factionDir, { recursive: true });
     await writeFile(path, new Uint8Array([0, 1, 2]));
 
     // Use a fetch impl that would fail if called; we expect it NOT to be called
@@ -162,12 +169,20 @@ describe('sounds/download - on-demand API and helpers', () => {
   });
 
   it('soundExists reports presence and absence', async () => {
-    const filename = 'exists-check.wav';
-    const path = join(tempDir, filename);
+    const filename = 'work_completed.wav'; // Use a known filename that has a faction
+    const { determineSoundFaction } = await import('./sounds.js');
+    const faction = determineSoundFaction(filename);
+    const factionDir = join(tempDir, faction);
+    const path = join(factionDir, filename);
+    
     // initially false
     const existsBefore = await soundExists(filename, tempDir);
     expect(existsBefore).toBe(false);
+    
+    // ensure dir exists and create file
+    await mkdir(factionDir, { recursive: true });
     await writeFile(path, new Uint8Array([1]));
+    
     const existsAfter = await soundExists(filename, tempDir);
     expect(existsAfter).toBe(true);
     try {
@@ -209,10 +224,14 @@ describe('sounds/download - on-demand API and helpers', () => {
     const list = getSoundFileList();
     const file = list[0];
     // call downloadSound directly with tempDir
+    const { determineSoundFaction } = await import('./sounds.js');
+    const faction = determineSoundFaction(file);
     const soundMeta: SoundFile = {
       filename: file,
       url: 'http://example.com/does-not-matter.wav',
       description: 'test',
+      faction: faction,
+      subdirectory: faction,
     };
     const ok = await downloadSound(soundMeta, fakeFetch, tempDir);
     expect(ok).toBe(false);

@@ -1,7 +1,7 @@
 import type { Plugin } from '@opencode-ai/plugin';
-import { getRandomSoundPath, getRandomSoundPathFromFaction, soundExists } from './sounds.js';
+import { getRandomSoundPathFromFaction, soundExists, determineSoundFaction } from './sounds.js';
 import { ensureSoundAvailable } from './download.js';
-import { loadPluginConfig, type WarcraftNotificationConfig } from './plugin-config.js';
+import { loadPluginConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */
 
 /**
@@ -40,13 +40,14 @@ export const NotificationPlugin: Plugin = async (ctx) => {
     // Choose a random sound filename from the specified faction(s)
     const soundPath = getRandomSoundPathFromFaction(faction, explicitDataDir);
     const filename = soundPath.split('/').pop() as string;
+    const soundFaction = determineSoundFaction(filename);
 
     // If we've already confirmed availability, return the path
     if (checkedSoundCache.get(filename) === true) return soundPath;
 
     try {
       // If file exists locally, mark and return
-      const existsLocally = await soundExists(filename, explicitDataDir);
+      const existsLocally = await soundExists(filename, soundFaction, explicitDataDir);
       if (existsLocally) {
         checkedSoundCache.set(filename, true);
         return soundPath;
@@ -87,7 +88,10 @@ export const NotificationPlugin: Plugin = async (ctx) => {
           // Ensure the randomly chosen sound is available (download on demand)
           const soundPath = await ensureAndGetSoundPath();
           const filename = soundPath.split('/').pop() as string;
-          const existsLocally = await soundExists(filename);
+
+          // Determine the faction for soundExists call
+          const fileSoundFaction = determineSoundFaction(filename);
+          const existsLocally = await soundExists(filename, fileSoundFaction);
 
           if (existsLocally) {
             await $`osascript -e 'do shell script "afplay ${soundPath}"'`;

@@ -7,7 +7,7 @@ const testPlugin = async () => {
   // Test 1: Check if sounds exist
   console.log('1. Checking if sounds exist...');
   const testSound = 'human_selected1.wav';
-  const exists = await soundExists(testSound);
+  const exists = await soundExists(testSound, 'alliance');
   console.log(`   ${testSound} exists: ${exists}\n`);
 
   if (!exists) {
@@ -31,7 +31,7 @@ const testPlugin = async () => {
   // Check a few random sounds
   const soundsToCheck = ['human_selected1.wav', 'knight_acknowledge3.wav', 'elf_acknowledge3.wav'];
   for (const sound of soundsToCheck) {
-    const soundExists_ = await soundExists(sound);
+    const soundExists_ = await soundExists(sound, 'alliance');
     console.log(`   ${sound}: ${soundExists_ ? '✓' : '✗'}`);
   }
 

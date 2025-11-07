@@ -1,12 +1,24 @@
-import { DEFAULT_DATA_DIR, DEFAULT_BASE_URL } from './plugin-config.js';
+import { type Faction } from './plugin-config.js';
 
 export interface SoundFile {
   filename: string;
   url: string;
   description: string;
+  faction: Faction;
+  subdirectory: 'alliance' | 'horde';
 }
 
-export const soundEntries: Array<{ filename: string; path: string; description: string }> = [
+interface SoundEntry {
+  filename: string;
+  path: string;
+  description: string;
+}
+
+/**
+ * Alliance sound entries with their download paths
+ */
+export const allianceSoundEntries: SoundEntry[] = [
+  // Basic Human Voices
   {
     filename: 'human_selected1.wav',
     path: 'basic-human-voices/selected1.wav',
@@ -37,7 +49,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'basic-human-voices/selected6.wav',
     description: 'At your service',
   },
-
   {
     filename: 'human_acknowledge1.wav',
     path: 'basic-human-voices/acknowledge1.wav',
@@ -59,6 +70,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'At once, sire',
   },
 
+  // Dwarven Demolition Squad
   {
     filename: 'dwarf_selected1.wav',
     path: 'dwarven-demolition-squad/selected1.wav',
@@ -69,7 +81,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'dwarven-demolition-squad/selected2.wav',
     description: 'Auch',
   },
-
   {
     filename: 'dwarf_acknowledge1.wav',
     path: 'dwarven-demolition-squad/acknowledge1.wav',
@@ -96,6 +107,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Yes sir',
   },
 
+  // Elven Archer
   {
     filename: 'elf_selected1.wav',
     path: 'elven-archer/selected1.wav',
@@ -112,7 +124,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'My sovereign?',
   },
   { filename: 'elf_selected4.wav', path: 'elven-archer/selected4.wav', description: 'Your wish?' },
-
   { filename: 'elf_acknowledge1.wav', path: 'elven-archer/acknowledge1.wav', description: 'Yes' },
   {
     filename: 'elf_acknowledge2.wav',
@@ -130,6 +141,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Move out',
   },
 
+  // Knight
   { filename: 'knight_selected1.wav', path: 'knight/selected1.wav', description: 'Your majesty?' },
   {
     filename: 'knight_selected2.wav',
@@ -138,7 +150,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
   },
   { filename: 'knight_selected3.wav', path: 'knight/selected3.wav', description: 'Sire?' },
   { filename: 'knight_selected4.wav', path: 'knight/selected4.wav', description: 'What ho?' },
-
   { filename: 'knight_acknowledge1.wav', path: 'knight/acknowledge1.wav', description: 'We move' },
   {
     filename: 'knight_acknowledge2.wav',
@@ -156,6 +167,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Defending your honor',
   },
 
+  // Mage
   { filename: 'mage_selected1.wav', path: 'mage/selected1.wav', description: 'What is it?' },
   {
     filename: 'mage_selected2.wav',
@@ -163,16 +175,15 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Do you need assistance?',
   },
   { filename: 'mage_selected3.wav', path: 'mage/selected3.wav', description: 'Your request?' },
-
   { filename: 'mage_acknowledge1.wav', path: 'mage/acknowledge1.wav', description: 'As you wish' },
   { filename: 'mage_acknowledge2.wav', path: 'mage/acknowledge2.wav', description: 'Very well' },
   { filename: 'mage_acknowledge3.wav', path: 'mage/acknowledge3.wav', description: 'Alright' },
 
+  // Peasant
   { filename: 'peasant_selected1.wav', path: 'peasant/selected1.wav', description: 'Yes?' },
   { filename: 'peasant_selected2.wav', path: 'peasant/selected2.wav', description: 'My lord?' },
   { filename: 'peasant_selected3.wav', path: 'peasant/selected3.wav', description: 'What is it?' },
   { filename: 'peasant_selected4.wav', path: 'peasant/selected4.wav', description: 'Hello' },
-
   { filename: 'peasant_acknowledge1.wav', path: 'peasant/acknowledge1.wav', description: 'Okay' },
   {
     filename: 'peasant_acknowledge2.wav',
@@ -190,6 +201,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Yes, my lord',
   },
 
+  // Ships
   {
     filename: 'ship_selected1.wav',
     path: 'ships/human1.wav',
@@ -198,20 +210,24 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
   { filename: 'ship_selected2.wav', path: 'ships/human2.wav', description: 'Aye captain?' },
   { filename: 'ship_selected3.wav', path: 'ships/human3.wav', description: 'Skipper?' },
   { filename: 'ship_selected4.wav', path: 'ships/human4.wav', description: 'Set sail?' },
-
   { filename: 'ship_acknowledge1.wav', path: 'ships/acknowledge1.wav', description: 'Aye aye sir' },
   { filename: 'ship_acknowledge2.wav', path: 'ships/acknowledge2.wav', description: 'Aye captain' },
   { filename: 'ship_acknowledge3.wav', path: 'ships/acknowledge3.wav', description: 'Under way' },
 
+  // Special sounds
   {
     filename: 'work_completed.wav',
     path: 'basic-human-voices/work-completed.wav',
     description: 'Work completed',
   },
   { filename: 'jobs_done.wav', path: 'peasant/work-complete.wav', description: 'Jobs done' },
+];
 
-  // HORDE SOUNDS
-  // Basic Orc Voices - Selected
+/**
+ * Horde sound entries with their download paths
+ */
+export const hordeSoundEntries: SoundEntry[] = [
+  // Basic Orc Voices
   {
     filename: 'orc_selected1.wav',
     path: 'basic-orc-voices/selected1.wav',
@@ -242,8 +258,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'basic-orc-voices/selected6.wav',
     description: 'Selected 6',
   },
-
-  // Basic Orc Voices - Acknowledge
   {
     filename: 'orc_acknowledge1.wav',
     path: 'basic-orc-voices/acknowledge1.wav',
@@ -265,7 +279,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Slo boo',
   },
 
-  // Death Knight - Selected
+  // Death Knight
   {
     filename: 'death_knight_selected1.wav',
     path: 'death-knight/selected1.wav',
@@ -276,8 +290,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'death-knight/selected2.wav',
     description: 'Make it quick',
   },
-
-  // Death Knight - Acknowledge
   {
     filename: 'death_knight_acknowledge1.wav',
     path: 'death-knight/acknowledge1.wav',
@@ -294,14 +306,12 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Acknowledge 3',
   },
 
-  // Dragon - Selected
+  // Dragon
   {
     filename: 'dragon_selected1.wav',
     path: 'dragon/selected1.wav',
     description: 'Dragon selected',
   },
-
-  // Dragon - Acknowledge
   {
     filename: 'dragon_acknowledge1.wav',
     path: 'dragon/acknowledge1.wav',
@@ -313,7 +323,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Dragon acknowledge 2',
   },
 
-  // Goblin Sappers - Selected
+  // Goblin Sappers
   {
     filename: 'goblin_sapper_selected1.wav',
     path: 'goblin-sappers/selected1.wav',
@@ -334,8 +344,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'goblin-sappers/selected4.wav',
     description: 'Hello?',
   },
-
-  // Goblin Sappers - Acknowledge
   {
     filename: 'goblin_sapper_acknowledge1.wav',
     path: 'goblin-sappers/acknowledge1.wav',
@@ -357,7 +365,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Alright',
   },
 
-  // Ogre - Selected
+  // Ogre
   {
     filename: 'ogre_selected1.wav',
     path: 'ogre/selected1.wav',
@@ -378,8 +386,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'ogre/selected4.wav',
     description: 'Master?',
   },
-
-  // Ogre - Acknowledge
   {
     filename: 'ogre_acknowledge1.wav',
     path: 'ogre/acknowledge1.wav',
@@ -396,7 +402,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Alright',
   },
 
-  // Ogre-Mage - Selected
+  // Ogre-Mage
   {
     filename: 'ogre_mage_selected1.wav',
     path: 'ogre-mage/selected1.wav',
@@ -417,8 +423,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'ogre-mage/selected4.wav',
     description: 'What is it?',
   },
-
-  // Ogre-Mage - Acknowledge
   {
     filename: 'ogre_mage_acknowledge1.wav',
     path: 'ogre-mage/acknowledge1.wav',
@@ -435,7 +439,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Right away',
   },
 
-  // Troll Axethrower - Selected
+  // Troll Axethrower
   {
     filename: 'troll_selected1.wav',
     path: 'troll-axethrower/selected1.wav',
@@ -451,8 +455,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'troll-axethrower/selected3.wav',
     description: "Who d'you want to kill?",
   },
-
-  // Troll Axethrower - Acknowledge
   {
     filename: 'troll_acknowledge1.wav',
     path: 'troll-axethrower/acknowledge1.wav',
@@ -469,7 +471,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'You the boss',
   },
 
-  // Horde Ships - Selected
+  // Horde Ships
   {
     filename: 'horde_ship_selected1.wav',
     path: 'ships/orc1.wav',
@@ -490,8 +492,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'ships/orc4.wav',
     description: 'Yes captain?',
   },
-
-  // Horde Ships - Acknowledge
   {
     filename: 'horde_ship_acknowledge1.wav',
     path: 'ships/acknowledge1.wav',
@@ -517,39 +517,64 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
 ];
 
 /**
- * Build the list of `SoundFile` objects with absolute URLs based on the given base URL.
+ * Build the list of `SoundFile` objects for a specific faction
+ * @param faction - The faction to build sounds for ('alliance' or 'horde')
  * @param baseUrl - Base URL to prepend to each entry's path
  * @returns Array of `SoundFile` objects ready for download
  */
-export const buildSoundsToDownload = (baseUrl: string): SoundFile[] => {
-  return soundEntries.map((e) => {
-    // Determine if this is a Horde sound based on filename
-    const isHordeSound =
-      e.filename.startsWith('orc_') ||
-      e.filename.startsWith('death_knight_') ||
-      e.filename.startsWith('dragon_') ||
-      e.filename.startsWith('goblin_sapper_') ||
-      e.filename.startsWith('ogre_') ||
-      e.filename.startsWith('troll_') ||
-      e.filename.startsWith('horde_ship_');
+export const buildSoundsToDownload = (
+  faction: 'alliance' | 'horde',
+  baseUrl: string,
+): SoundFile[] => {
+  const entries = faction === 'alliance' ? allianceSoundEntries : hordeSoundEntries;
+  const hordeBaseUrl = 'https://www.thanatosrealms.com/war2/sounds/orcs';
+  const effectiveBaseUrl = faction === 'horde' ? hordeBaseUrl : baseUrl;
 
-    // Use appropriate base URL for the faction
-    const effectiveUrl = isHordeSound
-      ? `https://www.thanatosrealms.com/war2/sounds/orcs/${e.path}`
-      : `${baseUrl}/${e.path}`;
-
-    return {
-      filename: e.filename,
-      url: effectiveUrl,
-      description: e.description,
-    };
-  });
+  return entries.map((e) => ({
+    filename: e.filename,
+    url: `${effectiveBaseUrl}/${e.path}`,
+    description: e.description,
+    faction: faction,
+    subdirectory: faction,
+  }));
 };
 
 /**
- * Return the list of expected sound filenames included in the package.
+ * Build the list of all `SoundFile` objects for both factions
+ * @param allianceBaseUrl - Base URL for Alliance sounds
+ * @returns Array of `SoundFile` objects for both factions
+ */
+export const buildAllSoundsToDownload = (allianceBaseUrl: string): SoundFile[] => {
+  return [
+    ...buildSoundsToDownload('alliance', allianceBaseUrl),
+    ...buildSoundsToDownload('horde', allianceBaseUrl), // baseUrl not used for horde, they have their own
+  ];
+};
+
+/**
+ * Return the list of expected sound filenames for a specific faction
+ * @param faction - The faction to get filenames for
  * @returns Array of sound filenames
  */
-export const getSoundFileList = (): string[] => {
-  return soundEntries.map((e) => e.filename);
+export const getSoundFileList = (faction?: 'alliance' | 'horde'): string[] => {
+  if (faction === 'alliance') {
+    return allianceSoundEntries.map((e) => e.filename);
+  }
+  if (faction === 'horde') {
+    return hordeSoundEntries.map((e) => e.filename);
+  }
+  // Return all sounds if no faction specified
+  return [...allianceSoundEntries, ...hordeSoundEntries].map((e) => e.filename);
+};
+
+/**
+ * Get the count of sounds for each faction
+ * @returns Object with counts for each faction
+ */
+export const getSoundCounts = () => {
+  return {
+    alliance: allianceSoundEntries.length,
+    horde: hordeSoundEntries.length,
+    total: allianceSoundEntries.length + hordeSoundEntries.length,
+  };
 };
