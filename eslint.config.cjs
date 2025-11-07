@@ -16,6 +16,7 @@ module.exports = [
       import: require('eslint-plugin-import'),
       tsdoc: require('eslint-plugin-tsdoc'),
       jsdoc: require('eslint-plugin-jsdoc'),
+      'prettier': require('eslint-plugin-prettier'),
     },
     settings: {
       'import/resolver': {
@@ -26,6 +27,16 @@ module.exports = [
       },
     },
     rules: {
+      'prettier/prettier': [
+        'error',
+        {
+          singleQuote: true,
+          tabWidth: 2,
+          semi: true,
+          trailingComma: 'all',
+        },
+      ],
+
       'max-lines': ['warn', { max: 300, skipBlankLines: true, skipComments: true }],
       'max-statements': ['error', 30],
       'prefer-arrow/prefer-arrow-functions': [
@@ -74,6 +85,7 @@ module.exports = [
     files: ['**/*.test.ts'],
     rules: {
       'tsdoc/syntax': 'off',
+      'prettier/prettier': 'off',
     },
   },
 ];
