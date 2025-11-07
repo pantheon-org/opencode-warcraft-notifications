@@ -45,7 +45,7 @@ describe('sounds data structure', () => {
   test('should have wav file extensions', () => {
     Object.entries(sounds).forEach(([_category, soundFiles]) => {
       void _category;
-      soundFiles.forEach((file) => {
+      soundFiles.forEach((file: string) => {
         expect(file).toMatch(/\.wav$/);
       });
     });
@@ -65,8 +65,8 @@ describe('getAllSounds()', () => {
     const allSounds = getAllSounds();
 
     // Check that sounds from each category are included
-    Object.values(sounds).forEach((categorySounds) => {
-      categorySounds.forEach((sound) => {
+    Object.values(sounds).forEach((categorySounds: readonly string[]) => {
+      categorySounds.forEach((sound: string) => {
         expect(allSounds).toContain(sound);
       });
     });
@@ -84,7 +84,7 @@ describe('getRandomSound()', () => {
   });
 
   test('should return different sounds across multiple calls', () => {
-    const results = new Set();
+    const results = new Set<string>();
     for (let i = 0; i < 10; i++) {
       results.add(getRandomSound());
     }

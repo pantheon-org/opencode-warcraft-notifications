@@ -14,6 +14,7 @@ import os from 'os';
 
 // Mock fetch implementation helper (typed)
 import type { FetchLike } from './download';
+import type { SoundFile } from './sound-data';
 
 type FetchImpl = FetchLike;
 const makeFetchResponder = (status = 200, body = new Uint8Array([1, 2, 3])): FetchImpl => {
@@ -164,10 +165,10 @@ describe('sounds/download - on-demand API and helpers', () => {
     const filename = 'exists-check.wav';
     const path = join(tempDir, filename);
     // initially false
-    let existsBefore = await soundExists(filename, tempDir);
+    const existsBefore = await soundExists(filename, tempDir);
     expect(existsBefore).toBe(false);
     await writeFile(path, new Uint8Array([1]));
-    let existsAfter = await soundExists(filename, tempDir);
+    const existsAfter = await soundExists(filename, tempDir);
     expect(existsAfter).toBe(true);
     try {
       rmSync(tempDir, { recursive: true });
@@ -208,11 +209,11 @@ describe('sounds/download - on-demand API and helpers', () => {
     const list = getSoundFileList();
     const file = list[0];
     // call downloadSound directly with tempDir
-    const soundMeta = {
+    const soundMeta: SoundFile = {
       filename: file,
       url: 'http://example.com/does-not-matter.wav',
       description: 'test',
-    } as any;
+    };
     const ok = await downloadSound(soundMeta, fakeFetch, tempDir);
     expect(ok).toBe(false);
 
