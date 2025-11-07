@@ -2,9 +2,7 @@
 node_modules
 
 # GitHub Actions
-!.github/workflows/release.yml
-!.github/workflows/ci.yml
-!.github/workflows/bump-version.yml
+!.github/workflows/
 
 # Opencode instructions
 .opencode/
