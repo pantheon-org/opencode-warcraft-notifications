@@ -2,12 +2,14 @@
 
 This document explains the streamlined GitHub Actions workflow setup for automated testing, intelligent versioning, and publishing.
 
+> 📖 **For detailed workflow documentation including step-by-step breakdowns, troubleshooting, and configuration details, see [GitHub Workflows Documentation](./github-workflows.md)**
+
 ## 🎯 **Streamlined Architecture Overview**
 
 The workflow system has been optimized from 7 legacy workflows down to **4 essential workflows** that provide comprehensive automation:
 
 - **43% reduction** in workflow complexity (7 → 4 workflows)
-- **AI-powered** semantic versioning 
+- **AI-powered** semantic versioning
 - **Enhanced security** and quality gates
 - **Branch protection compliance** with automated PR creation
 - **Comprehensive automation** with intelligent decision-making
@@ -15,6 +17,7 @@ The workflow system has been optimized from 7 legacy workflows down to **4 essen
 ## 🏗️ Workflow Architecture
 
 ### 1. **PR Validation** (`pr-validation.yml`)
+
 - **Triggers:** All pull requests to `main` or `develop`
 - **Purpose:** Quality assurance before merge
 - **Features:**
@@ -24,7 +27,8 @@ The workflow system has been optimized from 7 legacy workflows down to **4 essen
   - PR size analysis and warnings
   - Code coverage reporting
 
-### 2. **Smart Version Bump** (`smart-version-bump.yml`) 
+### 2. **Smart Version Bump** (`smart-version-bump.yml`)
+
 - **Triggers:** Push to `main` branch or manual workflow dispatch
 - **Purpose:** AI-powered semantic versioning
 - **Features:**
@@ -34,6 +38,7 @@ The workflow system has been optimized from 7 legacy workflows down to **4 essen
   - Generates changelogs
 
 ### 3. **Sync Package Version** (`sync-package-version.yml`)
+
 - **Triggers:** New Git tags (`v*`)
 - **Purpose:** Sync package.json version with Git tags
 - **Features:**
@@ -43,6 +48,7 @@ The workflow system has been optimized from 7 legacy workflows down to **4 essen
   - Maintains version consistency across repository
 
 ### 4. **Release & Publish** (`release-publish.yml`)
+
 - **Triggers:** New version tags (`v*`) or manual dispatch
 - **Purpose:** Build, test, and publish to npm
 - **Features:**
@@ -82,20 +88,20 @@ CODECOV_TOKEN=your_codecov_token_here
 2. Create a new API key
 3. Add it as `GOOGLE_AI_API_KEY` secret in GitHub
 
-*Note: If no AI API key is provided, the workflow falls back to conventional commit analysis.*
+_Note: If no AI API key is provided, the workflow falls back to conventional commit analysis._
 
 ### 4. Branch Protection Rules
 
 Set up branch protection for `main`:
 
 1. Go to `Settings > Branches`
-2. Add rule for `main` branch  
+2. Add rule for `main` branch
 3. Enable:
    - "Require a pull request before merging"
    - "Require status checks to pass before merging"
    - Select these checks from the workflows:
      - **"validate"** (from PR Validation workflow)
-     - **"security"** (from PR Validation workflow) 
+     - **"security"** (from PR Validation workflow)
      - **"pr-analysis"** (from PR Validation workflow)
    - "Require branches to be up to date before merging"
 
@@ -147,7 +153,7 @@ For best AI analysis results, use conventional commit format:
 
 ```bash
 feat: add new sound notification system
-fix: resolve audio playback issue  
+fix: resolve audio playback issue
 docs: update README with new examples
 BREAKING CHANGE: remove deprecated API methods
 ```
@@ -157,6 +163,7 @@ BREAKING CHANGE: remove deprecated API methods
 ### Workflow Status
 
 Monitor workflows in the `Actions` tab:
+
 - Green ✅ = Success
 - Red ❌ = Failed (check logs)
 - Yellow 🟡 = In progress
@@ -220,7 +227,7 @@ Ensure your `package.json` has:
 The following legacy workflows have been **removed** as they were redundant:
 
 - ❌ **`ci.yml`** - Basic CI superseded by comprehensive `pr-validation.yml`
-- ❌ **`bump-version.yml`** - Manual PR-based versioning superseded by AI-powered `smart-version-bump.yml`  
+- ❌ **`bump-version.yml`** - Manual PR-based versioning superseded by AI-powered `smart-version-bump.yml`
 - ❌ **`release-on-main.yml`** - Basic releases superseded by integrated smart versioning
 - ❌ **`release.yml`** - Basic npm publishing superseded by comprehensive `release-publish.yml`
 
@@ -235,18 +242,18 @@ The following legacy workflows have been **removed** as they were redundant:
 
 ### Workflow Comparison
 
-| Old System (7 workflows) | New System (4 workflows) | Improvement |
-|--------------------------|---------------------------|-------------|
-| Basic CI testing | Comprehensive PR validation | ✅ Security + Coverage + Analysis |
-| Manual version bumping | AI-powered semantic versioning | ✅ Intelligent automation |
-| Branch protection conflicts | Auto-merging version sync PRs | ✅ Branch protection compliant |
-| Fragmented release process | Integrated release pipeline | ✅ Streamlined flow |
-| Basic npm publishing | Comprehensive publish validation | ✅ Provenance + Validation |
+| Old System (7 workflows)    | New System (4 workflows)         | Improvement                       |
+| --------------------------- | -------------------------------- | --------------------------------- |
+| Basic CI testing            | Comprehensive PR validation      | ✅ Security + Coverage + Analysis |
+| Manual version bumping      | AI-powered semantic versioning   | ✅ Intelligent automation         |
+| Branch protection conflicts | Auto-merging version sync PRs    | ✅ Branch protection compliant    |
+| Fragmented release process  | Integrated release pipeline      | ✅ Streamlined flow               |
+| Basic npm publishing        | Comprehensive publish validation | ✅ Provenance + Validation        |
 
 ## 📊 Benefits of New Setup
 
 - **🤖 Intelligent Versioning:** AI-powered semantic version determination
-- **🔒 Enhanced Security:** Vulnerability scanning and provenance publishing  
+- **🔒 Enhanced Security:** Vulnerability scanning and provenance publishing
 - **📈 Better Monitoring:** Coverage reports, PR analysis, detailed release notes
 - **⚡ Improved Efficiency:** Automated workflows reduce manual overhead
 - **🎯 Quality Gates:** Comprehensive validation before merge and publish
@@ -264,4 +271,12 @@ If you encounter issues:
 
 ---
 
-*This setup provides a production-ready CI/CD pipeline with intelligent automation while maintaining full control and transparency.*
+## 📚 Additional Documentation
+
+- **[GitHub Workflows Documentation](./github-workflows.md)** - Comprehensive technical documentation for all workflows
+- **[Sounds Usage Guide](./sounds-usage.md)** - How to use the notification sounds
+- **[Sounds Download Strategy](./sounds-download-strategy.md)** - Sound asset management
+
+---
+
+_This setup provides a production-ready CI/CD pipeline with intelligent automation while maintaining full control and transparency._

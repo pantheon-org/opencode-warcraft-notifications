@@ -16,7 +16,7 @@ module.exports = [
       import: require('eslint-plugin-import'),
       tsdoc: require('eslint-plugin-tsdoc'),
       jsdoc: require('eslint-plugin-jsdoc'),
-      'prettier': require('eslint-plugin-prettier'),
+      prettier: require('eslint-plugin-prettier'),
     },
     settings: {
       'import/resolver': {
