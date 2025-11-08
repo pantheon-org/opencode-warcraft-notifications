@@ -6,8 +6,8 @@ import {
   getSoundCounts,
   allianceSoundEntries,
   hordeSoundEntries,
-} from './sound-data/index.js';
-import { DEFAULT_BASE_URL } from './plugin-config.js';
+} from './index.js';
+import { DEFAULT_BASE_URL } from '../plugin-config.js';
 
 // Unit tests: pure data utilities (no IO)
 describe('sound-data module [unit] - pure data utilities', () => {

@@ -36,11 +36,16 @@ export const silenceConsole = () => {
   };
 };
 
-export const setGlobalFetch = (fetchImpl: any) => {
-  const orig = typeof globalThis !== 'undefined' ? (globalThis as any).fetch : undefined;
-  if (typeof globalThis !== 'undefined') (globalThis as any).fetch = fetchImpl;
+export const setGlobalFetch = (fetchImpl: FetchImpl) => {
+  const orig =
+    typeof globalThis !== 'undefined'
+      ? (globalThis as unknown as { fetch?: FetchImpl }).fetch
+      : undefined;
+  if (typeof globalThis !== 'undefined')
+    (globalThis as unknown as { fetch?: FetchImpl }).fetch = fetchImpl;
   return () => {
-    if (typeof globalThis !== 'undefined') (globalThis as any).fetch = orig;
+    if (typeof globalThis !== 'undefined')
+      (globalThis as unknown as { fetch?: FetchImpl }).fetch = orig;
   };
 };
 
