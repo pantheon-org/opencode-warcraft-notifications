@@ -1,10 +1,6 @@
 import type { Plugin } from '@opencode-ai/plugin';
 import { getRandomSoundPathFromFaction, soundExists, determineSoundFaction } from './sounds.js';
-<<<<<<< HEAD
 import { ensureSoundAvailable, installBundledSoundsIfMissing } from './bundled-sounds.js';
-=======
-import { ensureSoundAvailable, installBundledSoundsIfMissing } from './download.js';
->>>>>>> ba3816b (feat(bundled): install bundled sound assets on first run (download installer called from init))
 import { loadPluginConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */
 
