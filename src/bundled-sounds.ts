@@ -50,26 +50,23 @@ const copyIfMissing = async (
 };
 
 /**
- * Check whether a bundled sound file exists in the plugin data directory.
- * @param filename - Sound filename
- * @param dataDir - Optional override for the base data directory
- * @returns `true` when the file exists
+ * Check if a sound file exists locally in faction-specific subdirectory
  */
 export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const faction = determineSoundFaction(filename);
   const factionDir = join(effectiveDataDir, faction);
   const filePath = join(factionDir, filename);
-  return await fileExists(filePath);
+  try {
+    return await exists(filePath);
+  } catch {
+    return false;
+  }
 };
 
 /**
- * Ensure the given bundled sound is available in the data directory.
- * Currently this simply checks if the file exists; future implementations may
- * attempt installation from bundled data when missing.
- * @param filename - Sound filename
- * @param dataDir - Optional override for the base data directory
- * @returns `true` when the sound is available
+ * Presence check for a sound. This function does not perform network downloads.
+ * It simply returns whether the named file exists in the configured data dir.
  */
 export const ensureSoundAvailable = async (
   filename: string,
@@ -78,74 +75,63 @@ export const ensureSoundAvailable = async (
   return await soundExists(filename, dataDir);
 };
 
-const processBundledSubdir = async (
-  bundledDataDir: string,
-  subdir: string,
-  effectiveDataDir: string,
-) => {
-  const subdirPath = join(bundledDataDir, subdir);
-  let files: string[] = [];
-  try {
-    files = await readdir(subdirPath);
-  } catch (err) {
-    if (DEBUG) console.warn('Failed to read bundled subdir:', subdirPath, err);
-    return;
-  }
-
-  for (const file of files) {
-    if (!file.toLowerCase().endsWith('.wav')) continue;
-    const source = join(subdirPath, file);
-    const targetDir = join(effectiveDataDir, subdir);
-    await copyIfMissing(source, targetDir, file);
-  }
-};
-
-const processBundledRootFile = async (
-  bundledDataDir: string,
-  filename: string,
-  effectiveDataDir: string,
-) => {
-  const source = join(bundledDataDir, filename);
-  const faction = determineSoundFaction(filename);
-  const targetDir = join(effectiveDataDir, faction);
-  await copyIfMissing(source, targetDir, filename);
-};
-
 /**
- * Install bundled sounds from the repository `data/` directory into the
- * user's plugin data directory when missing. Non-.wav files are skipped and
- * existing files are not overwritten.
- * @param dataDir - Optional override for the base data directory
+ * Copy bundled sounds from the repository `data/` directory into the user's
+ * configured sounds directory. The repository may organize sounds in
+ * subdirectories such as `data/alliance` and `data/horde`.
+ *
+ * This function will:
+ * - read the repository `data/` directory
+ * - copy any `.wav` files found in the root or in one-level subdirectories
+ *   into the target data directory under the same subdirectory name (or
+ *   under the faction name when files are at repo root)
+ * - skip files that already exist in the destination
  */
 export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<void> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const bundledDataDir = join(process.cwd(), 'data');
 
-  let entries;
   try {
-    entries = await readdir(bundledDataDir, { withFileTypes: true });
+    const entries = await readdir(bundledDataDir, { withFileTypes: true });
+
+    // Ensure base data directory exists
+    if (!(await ensureDirExists(effectiveDataDir))) return;
+
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        const subdir = entry.name;
+        const subdirPath = join(bundledDataDir, subdir);
+        let files: string[] = [];
+        try {
+          files = await readdir(subdirPath);
+        } catch (err) {
+          if (DEBUG) console.warn('Failed to read bundled subdir:', subdirPath, err);
+          continue;
+        }
+
+        for (const file of files) {
+          if (!file.toLowerCase().endsWith('.wav')) continue;
+          const targetDir = join(effectiveDataDir, subdir);
+          const source = join(subdirPath, file);
+          await copyIfMissing(source, targetDir, file);
+        }
+      } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.wav')) {
+        // file at repo data/ root: determine faction and copy into faction dir
+        const filename = entry.name;
+        const faction = determineSoundFaction(filename);
+        const targetDir = join(effectiveDataDir, faction);
+        const source = join(bundledDataDir, filename);
+        await copyIfMissing(source, targetDir, filename);
+      }
+    }
   } catch (err) {
-    if (DEBUG)
+    // If the bundled directory doesn't exist or is unreadable, silently return
+    if (DEBUG) {
       console.warn('No bundled sounds installed (data/ directory missing or unreadable):', err);
-    return;
-  }
-
-  // Ensure base data directory exists
-  if (!(await ensureDirExists(effectiveDataDir))) return;
-
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      await processBundledSubdir(bundledDataDir, entry.name, effectiveDataDir);
-    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.wav')) {
-      await processBundledRootFile(bundledDataDir, entry.name, effectiveDataDir);
     }
   }
 };
 
-/**
- * Return the list of known bundled sound filenames.
- * @returns Array of bundled sound filenames
- */
 export const getSoundFileList = (): string[] => {
   return dataGetSoundFileList();
 };
