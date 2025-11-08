@@ -104,7 +104,7 @@ export const withPlatform = async <T = unknown>(
     return await fn();
   } finally {
     if (desc) Object.defineProperty(process, 'platform', desc);
-    else delete (process as any).platform;
+    else delete (process as unknown as { platform?: string }).platform;
   }
 };
 
