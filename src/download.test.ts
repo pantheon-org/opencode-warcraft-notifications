@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
+import * as downloadModule from './download';
 import {
   downloadSoundByFilename,
   ensureSoundAvailable,
@@ -32,7 +33,6 @@ describe('sounds/download - on-demand API and helpers', () => {
   let tempDir: string;
   let origConsoleLog: typeof console.log;
   let origConsoleError: typeof console.error;
-  let origBunWrite: any;
   let origFetch: any;
 
   beforeEach(() => {
@@ -66,13 +66,9 @@ describe('sounds/download - on-demand API and helpers', () => {
       void e;
     }
 
-    // Restore Bun.write if a test replaced it
+    // Restore platformWrite to original implementation
     try {
-      // @ts-ignore
-      if (typeof Bun !== 'undefined' && origBunWrite) {
-        // @ts-ignore
-        Bun.write = origBunWrite;
-      }
+      downloadModule.resetPlatformWrite();
     } catch (e) {
       void e;
     }
@@ -228,14 +224,11 @@ describe('sounds/download - on-demand API and helpers', () => {
         arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer,
       }) as Response;
 
-    // Monkeypatch Bun.write to throw and save global orig
+    // Monkeypatch platformWrite to throw
     try {
-      // @ts-ignore
-      origBunWrite = typeof Bun !== 'undefined' ? Bun.write : undefined;
-      // @ts-ignore
-      Bun.write = async () => {
+      downloadModule.setPlatformWrite(async () => {
         throw new Error('disk full');
-      };
+      });
     } catch (e) {
       void e;
     }

@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { mkdir, exists } from 'fs/promises';
+import { mkdir, exists, writeFile } from 'fs/promises';
 import { DEFAULT_BASE_URL, DEFAULT_DATA_DIR } from './plugin-config.js';
 import {
   SoundFile,
@@ -10,6 +10,33 @@ import {
 import { determineSoundFaction } from './sounds.js';
 
 export type FetchLike = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+
+export let platformWrite = async (path: string, data: ArrayBuffer | Uint8Array): Promise<any> => {
+  // Prefer Bun.write when available for Bun runtime performance; otherwise fall back to fs/promises.writeFile
+  // @ts-ignore
+  if (typeof Bun !== 'undefined' && typeof Bun.write === 'function') {
+    // @ts-ignore
+    return Bun.write(path, data instanceof ArrayBuffer ? data : data);
+  }
+  if (data instanceof ArrayBuffer) data = new Uint8Array(data);
+  return await writeFile(path, data);
+};
+
+const _originalPlatformWrite = platformWrite;
+
+/**
+ * Test/runtime helper: override the platform write implementation.
+ * Use `resetPlatformWrite()` to restore original behavior.
+ */
+export const setPlatformWrite = (
+  fn: (path: string, data: ArrayBuffer | Uint8Array) => Promise<any>,
+) => {
+  platformWrite = fn;
+};
+
+export const resetPlatformWrite = () => {
+  platformWrite = _originalPlatformWrite;
+};
 
 /**
  * Download a single sound file to faction-specific subdirectory
@@ -23,6 +50,7 @@ export const downloadSound = async (
   sound: SoundFile,
   fetchImpl: FetchLike,
   dataDir?: string,
+  writeImpl?: (path: string, data: ArrayBuffer | Uint8Array) => Promise<any>,
 ): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const factionDir = join(effectiveDataDir, sound.subdirectory);
@@ -53,8 +81,8 @@ export const downloadSound = async (
     // Ensure faction directory exists
     await mkdir(factionDir, { recursive: true });
 
-    // Write file using Bun's built-in file operations
-    await Bun.write(filePath, arrayBuffer);
+    // Write file using runtime-appropriate wrapper
+    await platformWrite(filePath, arrayBuffer);
     console.log(`✓ Downloaded ${sound.filename}`);
     return true;
   } catch (error) {

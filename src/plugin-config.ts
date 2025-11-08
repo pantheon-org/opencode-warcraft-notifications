@@ -88,7 +88,10 @@ export const loadPluginConfig = async (pluginName: string): Promise<WarcraftNoti
         }
       }
     } catch (error) {
-      console.warn(`Failed to load plugin config from ${configPath}:`, error);
+      // Only warn when explicit debug flag is set to avoid noisy logs during tests
+      if (process.env.DEBUG_OPENCODE) {
+        console.warn(`Failed to load plugin config from ${configPath}:`, error);
+      }
     }
   }
 
