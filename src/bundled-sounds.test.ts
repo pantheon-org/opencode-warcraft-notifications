@@ -122,12 +122,13 @@ describe('sounds/bundled-sounds [integration] - installer and filesystem behavio
   });
 
   it('ensureSoundAvailable throws when passed an invalid filename type', async () => {
+    // Pass a non-string filename to exercise type-related errors
     // pass a non-string to exercise runtime type handling
-    // @ts-ignore
-    const badFilename: any = {};
+    // @ts-ignore - deliberate runtime type test
+    const badFilename: unknown = {};
     let threw = false;
     try {
-      await ensureSoundAvailable(badFilename, tempDir);
+      await ensureSoundAvailable(badFilename as any, tempDir);
     } catch (e) {
       threw = true;
       expect(e).toBeTruthy();
