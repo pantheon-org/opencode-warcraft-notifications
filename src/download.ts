@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { mkdir, exists, writeFile } from 'fs/promises';
+import { mkdir, exists, writeFile, readdir, copyFile } from 'fs/promises';
 import { DEFAULT_BASE_URL, DEFAULT_DATA_DIR } from './plugin-config.js';
 import {
   SoundFile,
@@ -264,6 +264,59 @@ export const downloadAllSounds = async (
  *
  * @returns list of filenames
  */
+export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<void> => {
+  const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
+  const bundledDataDir = join(process.cwd(), 'data');
+
+  try {
+    const entries = await readdir(bundledDataDir);
+    const wavFiles = entries.filter((e) => e.toLowerCase().endsWith('.wav'));
+
+    if (wavFiles.length === 0) {
+      // Nothing to install
+      return;
+    }
+
+    // Ensure base data directory exists
+    try {
+      await mkdir(effectiveDataDir, { recursive: true });
+    } catch (err) {
+      console.error('Failed to create data directory for bundled sounds:', err);
+      return;
+    }
+
+    for (const filename of wavFiles) {
+      try {
+        const faction = determineSoundFaction(filename);
+        const targetDir = join(effectiveDataDir, faction);
+        const targetPath = join(targetDir, filename);
+
+        // Skip if already present
+        try {
+          if (await exists(targetPath)) {
+            // already installed
+            continue;
+          }
+        } catch {
+          // proceed to copy
+        }
+
+        await mkdir(targetDir, { recursive: true });
+        const sourcePath = join(bundledDataDir, filename);
+        await copyFile(sourcePath, targetPath);
+        console.log(`✓ Installed bundled sound: ${filename} -> ${targetPath}`);
+      } catch (err) {
+        console.error(`Failed to install bundled sound ${filename}:`, err);
+      }
+    }
+  } catch (err) {
+    // If the bundled directory doesn't exist or is unreadable, silently return
+    if (process.env.DEBUG_OPENCODE) {
+      console.warn('No bundled sounds installed (data/ directory missing or unreadable):', err);
+    }
+  }
+};
+
 export const getSoundFileList = (): string[] => {
   return dataGetSoundFileList();
 };

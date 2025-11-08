@@ -1,6 +1,6 @@
 import type { Plugin } from '@opencode-ai/plugin';
 import { getRandomSoundPathFromFaction, soundExists, determineSoundFaction } from './sounds.js';
-import { ensureSoundAvailable } from './download.js';
+import { ensureSoundAvailable, installBundledSoundsIfMissing } from './download.js';
 import { loadPluginConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */
 
@@ -26,6 +26,13 @@ export const NotificationPlugin: Plugin = async (ctx) => {
   // Load plugin configuration from plugin.json
   const pluginName = '@pantheon-ai/opencode-warcraft-notifications';
   const pluginConfig = await loadPluginConfig(pluginName);
+
+  // Install bundled sounds into the user's config on first run
+  try {
+    await installBundledSoundsIfMissing(pluginConfig.soundsDir);
+  } catch (err) {
+    if (process.env.DEBUG_OPENCODE) console.warn('installBundledSoundsIfMissing failed:', err);
+  }
 
   const ensureAndGetSoundPath = async () => {
     // Determine explicit data directory preference:
