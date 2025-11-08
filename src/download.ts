@@ -1,16 +1,45 @@
 import { join } from 'path';
-import { mkdir, exists } from 'fs/promises';
+import { mkdir, exists, writeFile } from 'fs/promises';
 import { DEFAULT_BASE_URL, DEFAULT_DATA_DIR } from './plugin-config.js';
 import {
   SoundFile,
   buildSoundsToDownload,
+  buildAllSoundsToDownload,
   getSoundFileList as dataGetSoundFileList,
-} from './sound-data';
+} from './sound-data/index.js';
+import { determineSoundFaction } from './sounds.js';
 
 export type FetchLike = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 
+export let platformWrite = async (path: string, data: ArrayBuffer | Uint8Array): Promise<any> => {
+  // Prefer Bun.write when available for Bun runtime performance; otherwise fall back to fs/promises.writeFile
+  // @ts-ignore
+  if (typeof Bun !== 'undefined' && typeof Bun.write === 'function') {
+    // @ts-ignore
+    return Bun.write(path, data instanceof ArrayBuffer ? data : data);
+  }
+  if (data instanceof ArrayBuffer) data = new Uint8Array(data);
+  return await writeFile(path, data);
+};
+
+const _originalPlatformWrite = platformWrite;
+
 /**
- * Download a single sound file
+ * Test/runtime helper: override the platform write implementation.
+ * Use `resetPlatformWrite()` to restore original behavior.
+ */
+export const setPlatformWrite = (
+  fn: (path: string, data: ArrayBuffer | Uint8Array) => Promise<any>,
+) => {
+  platformWrite = fn;
+};
+
+export const resetPlatformWrite = () => {
+  platformWrite = _originalPlatformWrite;
+};
+
+/**
+ * Download a single sound file to faction-specific subdirectory
  *
  * @param sound - SoundFile metadata describing the filename, url and description
  * @param fetchImpl - A fetch-like implementation used to retrieve the resource
@@ -21,9 +50,11 @@ export const downloadSound = async (
   sound: SoundFile,
   fetchImpl: FetchLike,
   dataDir?: string,
+  writeImpl?: (path: string, data: ArrayBuffer | Uint8Array) => Promise<any>,
 ): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
-  const filePath = join(effectiveDataDir, sound.filename);
+  const factionDir = join(effectiveDataDir, sound.subdirectory);
+  const filePath = join(factionDir, sound.filename);
 
   try {
     // Check if file already exists
@@ -47,8 +78,11 @@ export const downloadSound = async (
 
     const arrayBuffer = await response.arrayBuffer();
 
-    // Write file using Bun's built-in file operations
-    await Bun.write(filePath, arrayBuffer);
+    // Ensure faction directory exists
+    await mkdir(factionDir, { recursive: true });
+
+    // Write file using runtime-appropriate wrapper
+    await platformWrite(filePath, arrayBuffer);
     console.log(`✓ Downloaded ${sound.filename}`);
     return true;
   } catch (error) {
@@ -58,7 +92,7 @@ export const downloadSound = async (
 };
 
 /**
- * Check if a sound file exists locally
+ * Check if a sound file exists locally in faction-specific subdirectory
  *
  * @param filename - Name of the sound file (e.g. "human_selected1.wav")
  * @param dataDir - Optional data directory override
@@ -66,7 +100,9 @@ export const downloadSound = async (
  */
 export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
-  const filePath = join(effectiveDataDir, filename);
+  const faction = determineSoundFaction(filename);
+  const factionDir = join(effectiveDataDir, faction);
+  const filePath = join(factionDir, filename);
   return await exists(filePath);
 };
 
@@ -113,8 +149,9 @@ export const downloadSoundByFilename = async (
 
   (async () => {
     try {
-      // Build sound list and find the matching entry
-      const soundsToDownload = buildSoundsToDownload(effectiveBaseUrl);
+      // Determine faction and build appropriate sound list
+      const faction = determineSoundFaction(filename);
+      const soundsToDownload = buildSoundsToDownload(faction, effectiveBaseUrl);
       const sound = soundsToDownload.find((s) => s.filename === filename);
       if (!sound) {
         console.error(`No sound entry found for filename: ${filename}`);
@@ -123,7 +160,8 @@ export const downloadSoundByFilename = async (
       }
 
       // If file exists already, resolve true
-      const filePath = join(effectiveDataDir, filename);
+      const factionDir = join(effectiveDataDir, faction);
+      const filePath = join(factionDir, filename);
       try {
         const fileExists = await exists(filePath);
         if (fileExists) {
@@ -134,7 +172,7 @@ export const downloadSoundByFilename = async (
         // continue to attempt download
       }
 
-      // Ensure data directory exists
+      // Ensure base data directory exists
       try {
         await mkdir(effectiveDataDir, { recursive: true });
       } catch (error) {
@@ -176,10 +214,10 @@ export const ensureSoundAvailable = async (
 };
 
 /**
- * Download all Warcraft II Alliance sounds
+ * Download all Warcraft II sounds (both Alliance and Horde)
  *
  * @param fetchImpl - Optional fetch-like implementation used for downloads
- * @param baseUrl - Optional base URL to download from
+ * @param baseUrl - Optional base URL to download from (used for Alliance sounds)
  * @param dataDir - Optional local directory to store sounds
  */
 export const downloadAllSounds = async (
@@ -191,9 +229,9 @@ export const downloadAllSounds = async (
   const effectiveBaseUrl = baseUrl ?? DEFAULT_BASE_URL;
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
 
-  console.log('Starting Warcraft II Alliance sounds download...');
+  console.log('Starting Warcraft II sounds download...');
 
-  // Create data directory if it doesn't exist
+  // Create base data directory if it doesn't exist
   try {
     await mkdir(effectiveDataDir, { recursive: true });
   } catch (error) {
@@ -201,7 +239,7 @@ export const downloadAllSounds = async (
     return;
   }
 
-  const soundsToDownload = buildSoundsToDownload(effectiveBaseUrl);
+  const soundsToDownload = buildAllSoundsToDownload(effectiveBaseUrl);
 
   const results = await Promise.allSettled(
     soundsToDownload.map((sound) => downloadSound(sound, effectiveFetch, effectiveDataDir)),

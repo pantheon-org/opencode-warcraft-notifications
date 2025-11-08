@@ -64,12 +64,13 @@ The plugin looks for configuration in `plugin.json` files in the following order
 ```json
 {
   "@pantheon-ai/opencode-warcraft-notifications": {
-    "soundsDir": "/path/to/custom/sounds/directory"
+    "soundsDir": "/path/to/custom/sounds/directory",
+    "faction": "both"
   }
 }
 ```
 
-See [schemas/plugin.json.example](./schemas/plugin.json.example) for a complete example and [schemas/plugin.json.schema](./schemas/plugin.json.schema) for the JSON schema.
+See [schemas/plugin.json.example](./schemas/plugin.json.example) for a complete example and [schemas/plugin.json.schema](./schemas/plugin.json.schema) for the JSON schema. The `faction` property accepts `"alliance"`, `"horde"`, or `"both"` (default `"both"`).
 
 ## Example usages
 

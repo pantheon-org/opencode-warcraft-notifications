@@ -1,18 +1,25 @@
-import { test, expect, describe, jest } from 'bun:test';
-import { join } from 'path';
+import { test, expect, describe } from 'bun:test';
 import {
   sounds,
+  allianceSounds,
+  hordeSounds,
   getAllSounds,
   getRandomSound,
   getRandomSoundFromCategory,
   soundExists,
   getSoundPath,
   getRandomSoundPath,
+  getAllianceSoundCategories,
+  getHordeSoundCategories,
+  getSoundsByFaction,
+  getRandomSoundFromFaction,
+  getRandomSoundPathFromFaction,
 } from './sounds.ts';
 
 describe('sounds data structure', () => {
   test('should have all expected categories', () => {
     const expectedCategories = [
+      // Alliance sounds
       'humanSelected',
       'humanAcknowledge',
       'dwarfSelected',
@@ -27,6 +34,24 @@ describe('sounds data structure', () => {
       'peasantAcknowledge',
       'shipSelected',
       'shipAcknowledge',
+      // Horde sounds
+      'orcSelected',
+      'orcAcknowledge',
+      'deathKnightSelected',
+      'deathKnightAcknowledge',
+      'dragonSelected',
+      'dragonAcknowledge',
+      'goblinSapperSelected',
+      'goblinSapperAcknowledge',
+      'ogreSelected',
+      'ogreAcknowledge',
+      'ogreMageSelected',
+      'ogreMageAcknowledge',
+      'trollSelected',
+      'trollAcknowledge',
+      'hordeShipSelected',
+      'hordeShipAcknowledge',
+      // Special sounds
       'special',
     ];
 
@@ -127,19 +152,23 @@ describe('getRandomSoundFromCategory()', () => {
 describe('getSoundPath()', () => {
   test('should return correct path structure', () => {
     const testFile = 'test.wav';
-    const path = getSoundPath(testFile);
+    const faction = 'alliance';
+    const path = getSoundPath(testFile, faction);
 
     expect(typeof path).toBe('string');
     expect(path).toContain('opencode');
+    expect(path).toContain(faction);
     expect(path).toMatch(new RegExp(testFile + '$'));
   });
 
   test('should use correct base directory', () => {
     const testFile = 'human_selected1.wav' as const;
-    const path = getSoundPath(testFile);
+    const faction = 'alliance';
+    const path = getSoundPath(testFile, faction);
 
     // Should use ~/.config/opencode/sounds by default
     expect(path).toContain('.config/opencode/sounds');
+    expect(path).toContain(faction);
     expect(path).toContain(testFile);
   });
 });
@@ -160,39 +189,155 @@ describe('getRandomSoundPath()', () => {
 
 describe('soundExists()', () => {
   test('should return boolean', async () => {
-    const mockExists = jest.fn(() => Promise.resolve(true));
+    let calledCount = 0;
+    const fakeExists = async (_p: string) => {
+      calledCount++;
+      return true;
+    };
 
-    const fsPromises = await import('fs/promises');
-    type FsPromisesWithExists = { exists(path: string): Promise<boolean> };
-    const fsWithExists = fsPromises as unknown as FsPromisesWithExists;
-    const spyExists = jest.spyOn(fsWithExists, 'exists').mockImplementation(mockExists);
-
-    try {
-      const result = await soundExists('test.wav');
-      expect(typeof result).toBe('boolean');
-      expect(mockExists).toHaveBeenCalledTimes(1);
-    } finally {
-      spyExists.mockRestore();
-    }
+    const result = await soundExists('test.wav', 'alliance', undefined, fakeExists);
+    expect(typeof result).toBe('boolean');
+    expect(calledCount).toBe(1);
   });
 
   test('should call exists with correct path', async () => {
-    const mockExists = jest.fn(() => Promise.resolve(false));
+    let calledCount = 0;
+    let lastArg: string | undefined;
+    const fakeExists = async (p: string) => {
+      calledCount++;
+      lastArg = p;
+      return false;
+    };
 
-    const fsPromises = await import('fs/promises');
-    type FsPromisesWithExists = { exists(path: string): Promise<boolean> };
-    const fsWithExists = fsPromises as unknown as FsPromisesWithExists;
-    const spyExists = jest.spyOn(fsWithExists, 'exists').mockImplementation(mockExists);
+    const testFile = 'human_selected1.wav' as const;
+    await soundExists(testFile, 'alliance', undefined, fakeExists);
 
+    const expectedPath = getSoundPath(testFile, 'alliance');
+    expect(calledCount).toBe(1);
+    expect(lastArg).toBe(expectedPath);
+  });
+
+  test('defaults to real fs when no existsFn supplied', async () => {
+    const { createTempDir, removeTempDir, writeTempFileForFaction } = await import('./test-utils');
+    const tmp = createTempDir();
     try {
-      const testFile = 'human_selected1.wav' as const;
-      await soundExists(testFile);
+      const filename = 'human_selected1.wav';
+      writeTempFileForFaction(tmp, 'alliance', filename, 'data');
 
-      const expectedPath = getSoundPath(testFile);
-      expect(mockExists).toHaveBeenCalledTimes(1);
-      expect(mockExists).toHaveBeenCalledWith(expectedPath);
+      // Now call soundExists with the real fs (no existsFn)
+      const result = await soundExists(filename, 'alliance', tmp);
+      expect(result).toBe(true);
+
+      const missing = await soundExists('no-such-file.wav', 'alliance', tmp);
+      expect(missing).toBe(false);
     } finally {
-      spyExists.mockRestore();
+      removeTempDir(tmp);
     }
+  });
+});
+
+describe('faction-aware functions', () => {
+  test('getAllianceSoundCategories returns correct categories', () => {
+    const allianceCategories = getAllianceSoundCategories();
+    const expectedAlliance = [
+      'humanSelected',
+      'humanAcknowledge',
+      'dwarfSelected',
+      'dwarfAcknowledge',
+      'elfSelected',
+      'elfAcknowledge',
+      'knightSelected',
+      'knightAcknowledge',
+      'mageSelected',
+      'mageAcknowledge',
+      'peasantSelected',
+      'peasantAcknowledge',
+      'shipSelected',
+      'shipAcknowledge',
+      'special',
+    ] as (keyof typeof allianceSounds)[];
+
+    expect(allianceCategories.sort()).toEqual(expectedAlliance.sort());
+  });
+
+  test('getHordeSoundCategories returns correct categories', () => {
+    const hordeCategories = getHordeSoundCategories();
+    const expectedHorde = [
+      'orcSelected',
+      'orcAcknowledge',
+      'deathKnightSelected',
+      'deathKnightAcknowledge',
+      'dragonSelected',
+      'dragonAcknowledge',
+      'goblinSapperSelected',
+      'goblinSapperAcknowledge',
+      'ogreSelected',
+      'ogreAcknowledge',
+      'ogreMageSelected',
+      'ogreMageAcknowledge',
+      'trollSelected',
+      'trollAcknowledge',
+      'hordeShipSelected',
+      'hordeShipAcknowledge',
+      'special',
+    ] as (keyof typeof hordeSounds)[];
+
+    expect(hordeCategories.sort()).toEqual(expectedHorde.sort());
+  });
+
+  test('getSoundsByFaction returns correct sounds for each faction', () => {
+    const allianceSounds = getSoundsByFaction('alliance');
+    const hordeSounds = getSoundsByFaction('horde');
+    const bothSounds = getSoundsByFaction('both');
+    const specialSounds = sounds.special;
+
+    expect(allianceSounds.length).toBeGreaterThan(0);
+    expect(hordeSounds.length).toBeGreaterThan(0);
+    expect(bothSounds.length).toBeGreaterThan(allianceSounds.length);
+    expect(bothSounds.length).toBeGreaterThan(hordeSounds.length);
+
+    // Both should equal alliance + horde (no deduplication since special sounds are different)
+    expect(bothSounds.length).toBe(allianceSounds.length + hordeSounds.length);
+
+    // Check that alliance sounds don't contain horde-specific unit sounds (excluding special sounds)
+    const allianceNonSpecialSounds = allianceSounds.filter(
+      (s) => !(specialSounds as readonly string[]).includes(s),
+    );
+    expect(allianceNonSpecialSounds.some((s) => s.startsWith('orc_'))).toBe(false);
+
+    // Check that horde sounds contain horde-specific sounds
+    expect(hordeSounds.some((s) => s.startsWith('orc_'))).toBe(true);
+  });
+
+  test('getRandomSoundFromFaction returns valid sounds', () => {
+    const allianceSound = getRandomSoundFromFaction('alliance');
+    const hordeSound = getRandomSoundFromFaction('horde');
+    const bothSound = getRandomSoundFromFaction('both');
+
+    const allianceSounds = getSoundsByFaction('alliance');
+    const hordeSounds = getSoundsByFaction('horde');
+    const bothSounds = getSoundsByFaction('both');
+
+    expect(allianceSounds).toContain(allianceSound);
+    expect(hordeSounds).toContain(hordeSound);
+    expect(bothSounds).toContain(bothSound);
+  });
+
+  test('getRandomSoundPathFromFaction returns valid paths', () => {
+    const alliancePath = getRandomSoundPathFromFaction('alliance');
+    const hordePath = getRandomSoundPathFromFaction('horde');
+    const bothPath = getRandomSoundPathFromFaction('both');
+
+    expect(typeof alliancePath).toBe('string');
+    expect(typeof hordePath).toBe('string');
+    expect(typeof bothPath).toBe('string');
+
+    expect(alliancePath).toMatch(/\.wav$/);
+    expect(hordePath).toMatch(/\.wav$/);
+    expect(bothPath).toMatch(/\.wav$/);
+
+    expect(alliancePath).toContain('opencode');
+    expect(hordePath).toContain('opencode');
+    expect(bothPath).toContain('opencode');
   });
 });

@@ -39,16 +39,19 @@ v1.15.2                                                                         
 The workflow runs in three scenarios:
 
 ### 1. Scheduled Execution
+
 - **When**: Every Sunday at 2:00 AM UTC
 - **Purpose**: Regular maintenance to keep releases within limits
 - **Mode**: Live execution (actually deletes releases)
 
 ### 2. After New Releases
-- **When**: Automatically triggered when new tags are pushed (v* pattern)
+
+- **When**: Automatically triggered when new tags are pushed (v\* pattern)
 - **Purpose**: Immediate cleanup after publishing new releases
 - **Mode**: Live execution (actually deletes releases)
 
 ### 3. Manual Execution
+
 - **When**: On-demand via GitHub Actions UI or CLI
 - **Purpose**: Testing, emergency cleanup, or maintenance
 - **Mode**: Dry-run by default (shows what would be deleted)
@@ -57,9 +60,9 @@ The workflow runs in three scenarios:
 
 ### Input Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `dry_run` | boolean | `true` | When `true`, shows what would be deleted without actually deleting |
+| Parameter | Type    | Default | Description                                                        |
+| --------- | ------- | ------- | ------------------------------------------------------------------ |
+| `dry_run` | boolean | `true`  | When `true`, shows what would be deleted without actually deleting |
 
 ## Jobs and Steps
 
@@ -91,11 +94,12 @@ The workflow runs in three scenarios:
 The main cleanup step performs the following operations:
 
 1. **Fetch All Releases**
+
    ```javascript
    const { data: releases } = await github.rest.repos.listReleases({
      owner: context.repo.owner,
      repo: context.repo.repo,
-     per_page: 100
+     per_page: 100,
    });
    ```
 
@@ -140,12 +144,14 @@ gh workflow run "Cleanup Old Releases" -f dry_run=true
 ```
 
 **Behavior**:
+
 - ✅ Analyzes all releases and shows detailed report
 - ✅ Displays exactly what would be deleted
 - ✅ No actual deletions performed
 - ✅ Safe to run anytime
 
 **Sample Output**:
+
 ```
 🧹 Starting release cleanup (dry run: true)
 📦 Found 25 total releases
@@ -179,12 +185,14 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 ```
 
 **Behavior**:
+
 - 🗑️ Actually deletes old releases and associated Git tags
 - ⚠️ **Irreversible** - deleted releases cannot be recovered
 - 📊 Reports deletion success/failure statistics
 - ⏱️ Includes delays between API calls to avoid rate limiting
 
 **Sample Output**:
+
 ```
 [... same analysis as dry run ...]
 
@@ -203,11 +211,13 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 ### Automatic Execution
 
 **Scheduled** (Weekly):
+
 - Runs every Sunday at 2:00 AM UTC
 - Uses live execution mode (`dry_run=false`)
 - Provides consistent maintenance without manual intervention
 
 **After Releases** (Triggered):
+
 - Runs automatically when new version tags are pushed
 - Uses live execution mode (`dry_run=false`)
 - Keeps release history current immediately after new releases
@@ -224,27 +234,30 @@ gh workflow run "Cleanup Old Releases" -f dry_run=false
 
 ### Error Scenarios
 
-| Error | Cause | Behavior |
-|-------|-------|----------|
-| **Permission Denied** | Insufficient GitHub token permissions | Workflow fails with clear error message |
-| **Invalid Version Format** | Release tag doesn't follow semantic versioning | Skips the release, continues with others |
-| **Individual Deletion Failure** | API error for specific release | Logs error, continues with remaining deletions |
-| **Rate Limiting** | Too many API calls | Built-in delays prevent this; retry later if needed |
-| **No Releases Found** | Repository has no releases | Exits gracefully with informational message |
+| Error                           | Cause                                          | Behavior                                            |
+| ------------------------------- | ---------------------------------------------- | --------------------------------------------------- |
+| **Permission Denied**           | Insufficient GitHub token permissions          | Workflow fails with clear error message             |
+| **Invalid Version Format**      | Release tag doesn't follow semantic versioning | Skips the release, continues with others            |
+| **Individual Deletion Failure** | API error for specific release                 | Logs error, continues with remaining deletions      |
+| **Rate Limiting**               | Too many API calls                             | Built-in delays prevent this; retry later if needed |
+| **No Releases Found**           | Repository has no releases                     | Exits gracefully with informational message         |
 
 ## Use Cases
 
 ### Regular Maintenance
+
 - **Automated**: Weekly cleanup keeps release history manageable
 - **Post-Release**: Immediate cleanup after new releases maintains current limits
 - **Storage**: Reduces repository storage used by old release artifacts
 
 ### Repository Health
+
 - **Performance**: Fewer releases improve GitHub UI performance
 - **Organization**: Clean release history makes navigation easier
 - **Compliance**: Meet organizational data retention policies
 
 ### Development Workflow
+
 - **CI/CD Integration**: Automatically triggered after release publishing
 - **Testing**: Dry-run mode allows safe testing before live execution
 - **Emergency**: Manual execution for immediate cleanup when needed
@@ -264,28 +277,32 @@ gh run view <run-id> --log
 gh release list --limit 20
 
 # Count releases by major version
-gh release list --json tagName --jq '.[].tagName' | 
+gh release list --json tagName --jq '.[].tagName' |
   grep -E '^v[0-9]+\.' | cut -d. -f1 | sort | uniq -c
 ```
 
 ### Common Issues and Solutions
 
 #### No Releases Deleted
+
 - **Cause**: All releases are within retention limits
 - **Solution**: Normal operation, no action needed
 - **Check**: Verify current release count vs. limits
 
 #### Permission Errors
+
 - **Cause**: `GITHUB_TOKEN` lacks `contents: write` permission
 - **Solution**: Check repository workflow permissions
 - **Verify**: Ensure workflow has proper permissions block
 
 #### Workflow Not Triggering
+
 - **Cause**: Branch protection or workflow permissions
 - **Solution**: Check repository settings and workflow file syntax
 - **Debug**: Use manual execution to test functionality
 
 #### Rate Limiting Errors
+
 - **Cause**: Too many API calls in short period
 - **Solution**: Workflow includes built-in delays; retry later
 - **Prevention**: Don't run multiple instances simultaneously
@@ -309,16 +326,19 @@ gh api repos/:owner/:repo --jq '.permissions'
 ## Best Practices
 
 ### Before Implementation
+
 1. **Test First**: Always run in dry-run mode before live execution
 2. **Backup Important**: Consider backing up important release artifacts externally
 3. **Review Policy**: Ensure retention numbers match project needs
 
 ### During Operation
+
 1. **Monitor Logs**: Review weekly cleanup logs for unexpected behavior
 2. **Track Storage**: Monitor repository storage usage trends
 3. **Version Strategy**: Maintain consistent semantic versioning
 
 ### Maintenance
+
 1. **Regular Review**: Periodically review retention policy effectiveness
 2. **Adjust Numbers**: Modify retention counts based on project evolution
 3. **Documentation**: Keep usage documentation current with any changes
@@ -326,10 +346,12 @@ gh api repos/:owner/:repo --jq '.permissions'
 ## Integration with Other Workflows
 
 ### Upstream Dependencies
+
 - **Smart Version Bump**: Creates new tags that trigger this workflow
 - **Release & Publish**: Creates releases that may be subject to cleanup
 
 ### Downstream Effects
+
 - **Storage Reduction**: Reduces repository storage usage
 - **API Performance**: Fewer releases improve GitHub API response times
 - **User Experience**: Cleaner release history improves navigation
@@ -337,15 +359,18 @@ gh api repos/:owner/:repo --jq '.permissions'
 ## Security Considerations
 
 ### Permissions Required
+
 - `contents: write` - Required to delete releases and Git tags
 - Repository access - Workflow must have access to target repository
 
 ### Data Protection
+
 - **Irreversible**: Deleted releases cannot be recovered
 - **Git Tags**: Associated tags are also deleted from Git history
 - **Artifacts**: Release artifacts (binaries, etc.) are permanently removed
 
 ### Access Control
+
 - **Branch Protection**: Workflow file changes subject to normal PR process
 - **Manual Execution**: Requires repository write access
 - **Scheduled Execution**: Runs with repository-level permissions
@@ -380,14 +405,16 @@ schedule:
 on:
   push:
     tags:
-      - 'v*'        # Trigger on version tags
+      - 'v*' # Trigger on version tags
       # - 'release-*' # Alternative trigger pattern
 ```
 
 ## Emergency Recovery
 
 ### Tag Recreation
+
 If tags are accidentally deleted:
+
 ```bash
 # Find commit hash for version
 git log --oneline --grep="v1.2.3"
@@ -398,7 +425,9 @@ git push origin v1.2.3
 ```
 
 ### Release Recreation
+
 If releases are accidentally deleted:
+
 ```bash
 # Recreate release from existing tag
 gh release create v1.2.3 --title "Release v1.2.3" --notes "Recreated release"
@@ -408,4 +437,4 @@ gh release create v1.2.3 --title "Release v1.2.3" --notes "Recreated release"
 
 ---
 
-*This documentation covers the complete functionality of the Cleanup Old Releases workflow. For questions or issues, refer to the troubleshooting section or repository maintainers.*
+_This documentation covers the complete functionality of the Cleanup Old Releases workflow. For questions or issues, refer to the troubleshooting section or repository maintainers._

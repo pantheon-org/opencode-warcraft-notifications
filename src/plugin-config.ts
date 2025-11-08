@@ -3,11 +3,18 @@ import { exists } from 'fs/promises';
 import { homedir } from 'os';
 
 /**
+ * Faction type for Warcraft II sounds
+ */
+export type Faction = 'alliance' | 'horde' | 'both';
+
+/**
  * Configuration interface for the warcraft notifications plugin
  */
 export interface WarcraftNotificationConfig {
   /** Directory where sound files should be stored and cached */
   soundsDir?: string;
+  /** Which faction sounds to use: 'alliance', 'horde', or 'both' (default: 'both') */
+  faction?: Faction;
 }
 
 /**
@@ -81,7 +88,10 @@ export const loadPluginConfig = async (pluginName: string): Promise<WarcraftNoti
         }
       }
     } catch (error) {
-      console.warn(`Failed to load plugin config from ${configPath}:`, error);
+      // Only warn when explicit debug flag is set to avoid noisy logs during tests
+      if (process.env.DEBUG_OPENCODE) {
+        console.warn(`Failed to load plugin config from ${configPath}:`, error);
+      }
     }
   }
 

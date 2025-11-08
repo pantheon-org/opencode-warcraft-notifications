@@ -6,7 +6,7 @@
   "properties": {
     "@pantheon-ai/opencode-warcraft-notifications": {
       "type": "object",
-      "description": "Configuration for Warcraft II Alliance notifications plugin",
+      "description": "Configuration for Warcraft II notifications plugin (Alliance and Horde sounds)",
       "properties": {
         "soundsDir": {
           "type": "string",
@@ -16,6 +16,13 @@
             "/path/to/custom/sounds",
             "C:\\Users\\Username\\AppData\\Local\\OpenCode\\Sounds"
           ]
+        },
+        "faction": {
+          "type": "string",
+          "enum": ["alliance", "horde", "both"],
+          "default": "both",
+          "description": "Which faction sounds to use: 'alliance' for Alliance sounds only, 'horde' for Horde sounds only, or 'both' for random sounds from both factions",
+          "examples": ["alliance", "horde", "both"]
         }
       },
       "additionalProperties": false
@@ -25,7 +32,18 @@
   "examples": [
     {
       "@pantheon-ai/opencode-warcraft-notifications": {
-        "soundsDir": "~/.cache/opencode-warcraft-sounds"
+        "soundsDir": "~/.cache/opencode-warcraft-sounds",
+        "faction": "both"
+      }
+    },
+    {
+      "@pantheon-ai/opencode-warcraft-notifications": {
+        "faction": "alliance"
+      }
+    },
+    {
+      "@pantheon-ai/opencode-warcraft-notifications": {
+        "faction": "horde"
       }
     }
   ]

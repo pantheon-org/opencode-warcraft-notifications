@@ -1,12 +1,10 @@
-import { DEFAULT_DATA_DIR, DEFAULT_BASE_URL } from './plugin-config.js';
+import { type SoundEntry } from './types.js';
 
-export interface SoundFile {
-  filename: string;
-  url: string;
-  description: string;
-}
-
-export const soundEntries: Array<{ filename: string; path: string; description: string }> = [
+/**
+ * Alliance sound entries with their download paths
+ */
+export const allianceSoundEntries: SoundEntry[] = [
+  // Basic Human Voices
   {
     filename: 'human_selected1.wav',
     path: 'basic-human-voices/selected1.wav',
@@ -37,7 +35,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'basic-human-voices/selected6.wav',
     description: 'At your service',
   },
-
   {
     filename: 'human_acknowledge1.wav',
     path: 'basic-human-voices/acknowledge1.wav',
@@ -59,6 +56,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'At once, sire',
   },
 
+  // Dwarven Demolition Squad
   {
     filename: 'dwarf_selected1.wav',
     path: 'dwarven-demolition-squad/selected1.wav',
@@ -69,7 +67,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     path: 'dwarven-demolition-squad/selected2.wav',
     description: 'Auch',
   },
-
   {
     filename: 'dwarf_acknowledge1.wav',
     path: 'dwarven-demolition-squad/acknowledge1.wav',
@@ -96,6 +93,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Yes sir',
   },
 
+  // Elven Archer
   {
     filename: 'elf_selected1.wav',
     path: 'elven-archer/selected1.wav',
@@ -112,7 +110,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'My sovereign?',
   },
   { filename: 'elf_selected4.wav', path: 'elven-archer/selected4.wav', description: 'Your wish?' },
-
   { filename: 'elf_acknowledge1.wav', path: 'elven-archer/acknowledge1.wav', description: 'Yes' },
   {
     filename: 'elf_acknowledge2.wav',
@@ -130,6 +127,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Move out',
   },
 
+  // Knight
   { filename: 'knight_selected1.wav', path: 'knight/selected1.wav', description: 'Your majesty?' },
   {
     filename: 'knight_selected2.wav',
@@ -138,7 +136,6 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
   },
   { filename: 'knight_selected3.wav', path: 'knight/selected3.wav', description: 'Sire?' },
   { filename: 'knight_selected4.wav', path: 'knight/selected4.wav', description: 'What ho?' },
-
   { filename: 'knight_acknowledge1.wav', path: 'knight/acknowledge1.wav', description: 'We move' },
   {
     filename: 'knight_acknowledge2.wav',
@@ -156,6 +153,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Defending your honor',
   },
 
+  // Mage
   { filename: 'mage_selected1.wav', path: 'mage/selected1.wav', description: 'What is it?' },
   {
     filename: 'mage_selected2.wav',
@@ -163,16 +161,15 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Do you need assistance?',
   },
   { filename: 'mage_selected3.wav', path: 'mage/selected3.wav', description: 'Your request?' },
-
   { filename: 'mage_acknowledge1.wav', path: 'mage/acknowledge1.wav', description: 'As you wish' },
   { filename: 'mage_acknowledge2.wav', path: 'mage/acknowledge2.wav', description: 'Very well' },
   { filename: 'mage_acknowledge3.wav', path: 'mage/acknowledge3.wav', description: 'Alright' },
 
+  // Peasant
   { filename: 'peasant_selected1.wav', path: 'peasant/selected1.wav', description: 'Yes?' },
   { filename: 'peasant_selected2.wav', path: 'peasant/selected2.wav', description: 'My lord?' },
   { filename: 'peasant_selected3.wav', path: 'peasant/selected3.wav', description: 'What is it?' },
   { filename: 'peasant_selected4.wav', path: 'peasant/selected4.wav', description: 'Hello' },
-
   { filename: 'peasant_acknowledge1.wav', path: 'peasant/acknowledge1.wav', description: 'Okay' },
   {
     filename: 'peasant_acknowledge2.wav',
@@ -190,6 +187,7 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
     description: 'Yes, my lord',
   },
 
+  // Ships
   {
     filename: 'ship_selected1.wav',
     path: 'ships/human1.wav',
@@ -198,11 +196,11 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
   { filename: 'ship_selected2.wav', path: 'ships/human2.wav', description: 'Aye captain?' },
   { filename: 'ship_selected3.wav', path: 'ships/human3.wav', description: 'Skipper?' },
   { filename: 'ship_selected4.wav', path: 'ships/human4.wav', description: 'Set sail?' },
-
   { filename: 'ship_acknowledge1.wav', path: 'ships/acknowledge1.wav', description: 'Aye aye sir' },
   { filename: 'ship_acknowledge2.wav', path: 'ships/acknowledge2.wav', description: 'Aye captain' },
   { filename: 'ship_acknowledge3.wav', path: 'ships/acknowledge3.wav', description: 'Under way' },
 
+  // Special sounds
   {
     filename: 'work_completed.wav',
     path: 'basic-human-voices/work-completed.wav',
@@ -210,24 +208,3 @@ export const soundEntries: Array<{ filename: string; path: string; description: 
   },
   { filename: 'jobs_done.wav', path: 'peasant/work-complete.wav', description: 'Jobs done' },
 ];
-
-/**
- * Build the list of `SoundFile` objects with absolute URLs based on the given base URL.
- * @param baseUrl - Base URL to prepend to each entry's path
- * @returns Array of `SoundFile` objects ready for download
- */
-export const buildSoundsToDownload = (baseUrl: string): SoundFile[] => {
-  return soundEntries.map((e) => ({
-    filename: e.filename,
-    url: `${baseUrl}/${e.path}`,
-    description: e.description,
-  }));
-};
-
-/**
- * Return the list of expected sound filenames included in the package.
- * @returns Array of sound filenames
- */
-export const getSoundFileList = (): string[] => {
-  return soundEntries.map((e) => e.filename);
-};
