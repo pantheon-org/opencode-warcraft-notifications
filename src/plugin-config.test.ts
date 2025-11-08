@@ -166,3 +166,91 @@ it('loadPluginConfig handles invalid JSON gracefully', async () => {
     await rm(cwdTemp, { recursive: true, force: true });
   }
 });
+
+// Additional targeted tests to exercise uncovered branches
+it('getConfigDir returns darwin path when platform is darwin', () => {
+  const origPlatform = process.platform;
+  try {
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: 'darwin' });
+    const dir = getConfigDir();
+    // Should be a path containing .config on darwin
+    expect(typeof dir).toBe('string');
+    expect(dir).toContain('.config');
+  } finally {
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: origPlatform });
+  }
+});
+
+it('getConfigDir falls back to ~/.config when XDG_CONFIG_HOME is unset', () => {
+  const origPlatform = process.platform;
+  const origXdg = process.env.XDG_CONFIG_HOME;
+  try {
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: 'linux' });
+    delete process.env.XDG_CONFIG_HOME;
+    const dir = getConfigDir();
+    expect(typeof dir).toBe('string');
+    expect(dir).toContain('.config');
+  } finally {
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: origPlatform });
+    if (origXdg === undefined) delete process.env.XDG_CONFIG_HOME;
+    else process.env.XDG_CONFIG_HOME = origXdg;
+  }
+});
+
+it('getConfigDir falls back to AppData\\Roaming when APPDATA is unset on win32', () => {
+  const origPlatform = process.platform;
+  const origAppData = process.env.APPDATA;
+  try {
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: 'win32' });
+    delete process.env.APPDATA;
+    const dir = getConfigDir();
+    expect(typeof dir).toBe('string');
+    expect(dir).toContain('AppData');
+  } finally {
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: origPlatform });
+    if (origAppData === undefined) delete process.env.APPDATA;
+    else process.env.APPDATA = origAppData;
+  }
+});
+
+it('loadPluginConfig reads from XDG_CONFIG_HOME when present', async () => {
+  const cwdTemp = join('/tmp', 'opencode-xdg-config');
+  await rm(cwdTemp, { recursive: true, force: true });
+  await mkdir(join(cwdTemp, 'opencode'), { recursive: true });
+
+  const pluginConfig = {
+    '@pantheon-ai/opencode-warcraft-notifications': {
+      soundsDir: '/xdg/sounds/path',
+      faction: 'alliance' as const,
+    },
+  };
+
+  const configPath = join(cwdTemp, 'opencode', 'plugin.json');
+  await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
+
+  const origXdg = process.env.XDG_CONFIG_HOME;
+  const origPlatform = process.platform;
+  try {
+    // Ensure linux behavior so XDG_CONFIG_HOME is honored
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: 'linux' });
+    process.env.XDG_CONFIG_HOME = cwdTemp;
+    const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
+    expect(loaded).toBeDefined();
+    expect(loaded.soundsDir).toBe('/xdg/sounds/path');
+    expect(loaded.faction).toBe('alliance');
+  } finally {
+    // restore platform and env
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: origPlatform });
+    if (origXdg === undefined) delete process.env.XDG_CONFIG_HOME;
+    else process.env.XDG_CONFIG_HOME = origXdg;
+    await rm(cwdTemp, { recursive: true, force: true });
+  }
+});

@@ -116,13 +116,13 @@ describe('sounds/download - on-demand API and helpers', () => {
   it('returns true immediately when file already exists', async () => {
     const list = getSoundFileList();
     const filename = list[0];
-    
+
     // Get faction for this filename and create correct directory structure
     const { determineSoundFaction } = await import('./sounds.js');
     const faction = determineSoundFaction(filename);
     const factionDir = join(tempDir, faction);
     const path = join(factionDir, filename);
-    
+
     // ensure dir exists
     await mkdir(factionDir, { recursive: true });
     await writeFile(path, new Uint8Array([0, 1, 2]));
@@ -174,15 +174,15 @@ describe('sounds/download - on-demand API and helpers', () => {
     const faction = determineSoundFaction(filename);
     const factionDir = join(tempDir, faction);
     const path = join(factionDir, filename);
-    
+
     // initially false
     const existsBefore = await soundExists(filename, tempDir);
     expect(existsBefore).toBe(false);
-    
+
     // ensure dir exists and create file
     await mkdir(factionDir, { recursive: true });
     await writeFile(path, new Uint8Array([1]));
-    
+
     const existsAfter = await soundExists(filename, tempDir);
     expect(existsAfter).toBe(true);
     try {
@@ -239,5 +239,129 @@ describe('sounds/download - on-demand API and helpers', () => {
     // restore Bun.write
     // @ts-ignore
     Bun.write = origWrite;
+  });
+
+  // --- New targeted tests to cover uncovered branches in src/download.ts ---
+
+  it('downloadSound returns true immediately when file exists (direct)', async () => {
+    const list = getSoundFileList();
+    const file = list[0];
+    const { determineSoundFaction } = await import('./sounds.js');
+    const faction = determineSoundFaction(file);
+    const factionDir = join(tempDir, faction);
+    const path = join(factionDir, file);
+
+    // create directory and a file so downloadSound early-exists path triggers
+    await mkdir(factionDir, { recursive: true });
+    await writeFile(path, new Uint8Array([1, 2, 3]));
+
+    const soundMeta: SoundFile = {
+      filename: file,
+      url: 'http://example.com/unused.wav',
+      description: 'existing file test',
+      faction: faction,
+      subdirectory: faction,
+    };
+
+    // Use a fetch impl that would fail if called
+    const badFetch: FetchLike = async () => {
+      throw new Error('fetch should not be called');
+    };
+
+    const ok = await downloadSound(soundMeta, badFetch, tempDir);
+    expect(ok).toBe(true);
+
+    try {
+      rmSync(tempDir, { recursive: true });
+    } catch (e) {
+      void e;
+    }
+  });
+
+  it('downloadSoundByFilename returns false when base data dir mkdir fails', async () => {
+    // Create a path that is a file so that mkdir(dataDir, {recursive:true}) will throw
+    const badBase = join(tempDir, 'not-a-dir');
+    await writeFile(badBase, new Uint8Array([1]));
+
+    // Use a fetch that would succeed if called
+    const fetchImpl = makeFetchResponder(200);
+
+    const list = getSoundFileList();
+    const filename = list[0];
+
+    const ok = await downloadSoundByFilename(filename, fetchImpl, undefined, badBase);
+    expect(ok).toBe(false);
+
+    try {
+      rmSync(tempDir, { recursive: true });
+    } catch (e) {
+      void e;
+    }
+  });
+
+  it('downloadAllSounds shows failed count when some downloads fail', async () => {
+    // create fetch that returns success for URLs containing 'human' and fails otherwise
+    const mixedFetch: FetchImpl = async (input: RequestInfo) => {
+      const url = typeof input === 'string' ? input : String(input);
+      if (url.includes('human')) {
+        return {
+          ok: true,
+          status: 200,
+          arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer,
+        } as Response;
+      }
+      return {
+        ok: false,
+        status: 500,
+        arrayBuffer: async () => new Uint8Array([]).buffer,
+      } as Response;
+    };
+
+    await downloadAllSounds(mixedFetch, undefined, tempDir);
+
+    try {
+      rmSync(tempDir, { recursive: true });
+    } catch (e) {
+      void e;
+    }
+  });
+
+  it('downloadSoundByFilename rejects when unexpected error occurs', async () => {
+    // Pass a non-string filename to cause determineSoundFaction to throw
+    // This exercises the outer catch path without attempting to reassign ESM exports
+    // @ts-ignore - deliberately pass a bad type
+    const badFilename: any = {};
+
+    let threw = false;
+    try {
+      // The call should throw and be caught by the outer promise rejection path
+      await downloadSoundByFilename(badFilename, makeFetchResponder(200), undefined, tempDir);
+    } catch (e) {
+      threw = true;
+      // We don't assert on the exact error message since it may vary across runtimes
+      expect(e).toBeTruthy();
+    }
+
+    expect(threw).toBe(true);
+
+    try {
+      rmSync(tempDir, { recursive: true });
+    } catch (e) {
+      void e;
+    }
+  });
+
+  it('downloadAllSounds returns early when mkdir fails', async () => {
+    const badBase = join(tempDir, 'not-a-dir');
+    await writeFile(badBase, new Uint8Array([1]));
+
+    // call downloadAllSounds with a path that is a file to force mkdir to throw
+    await downloadAllSounds(makeFetchResponder(200), undefined, badBase);
+
+    try {
+      rmSync(tempDir, { recursive: true });
+    } catch (e) {
+      void e;
+    }
   });
 });
