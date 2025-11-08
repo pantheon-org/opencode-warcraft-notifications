@@ -112,8 +112,31 @@ export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<v
         for (const file of files) {
           if (!file.toLowerCase().endsWith('.wav')) continue;
           const targetDir = join(effectiveDataDir, subdir);
-          const source = join(subdirPath, file);
-          await copyIfMissing(source, targetDir, file);
+          const targetPath = join(targetDir, file);
+          try {
+            // Ensure target directory exists before checking/copying
+            try {
+              await mkdir(targetDir, { recursive: true });
+            } catch (err) {
+              if (process.env.DEBUG_OPENCODE)
+                console.warn('Failed to create target directory:', targetDir, err);
+              // If unable to create the directory, skip this file
+              continue;
+            }
+
+            if (await exists(targetPath)) continue;
+          } catch {
+            // proceed to copy (best-effort)
+          }
+          try {
+            const source = join(subdirPath, file);
+            await copyFile(source, targetPath);
+            if (process.env.DEBUG_OPENCODE)
+              console.log(`Installed bundled sound: ${file} -> ${targetPath}`);
+          } catch (err) {
+            if (process.env.DEBUG_OPENCODE)
+              console.error(`Failed to install bundled sound ${file}:`, err);
+          }
         }
       } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.wav')) {
         // file at repo data/ root: determine faction and copy into faction dir
