@@ -76,12 +76,21 @@ export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<v
           const targetDir = join(effectiveDataDir, subdir);
           const targetPath = join(targetDir, file);
           try {
+            // Ensure target directory exists before checking/copying
+            try {
+              await mkdir(targetDir, { recursive: true });
+            } catch (err) {
+              if (process.env.DEBUG_OPENCODE)
+                console.warn('Failed to create target directory:', targetDir, err);
+              // If unable to create the directory, skip this file
+              continue;
+            }
+
             if (await exists(targetPath)) continue;
           } catch {
-            // proceed to copy
+            // proceed to copy (best-effort)
           }
           try {
-            await mkdir(targetDir, { recursive: true });
             const source = join(subdirPath, file);
             await copyFile(source, targetPath);
             if (process.env.DEBUG_OPENCODE)
@@ -98,12 +107,21 @@ export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<v
         const targetDir = join(effectiveDataDir, faction);
         const targetPath = join(targetDir, filename);
         try {
+          // Ensure target directory exists before checking/copying
+          try {
+            await mkdir(targetDir, { recursive: true });
+          } catch (err) {
+            if (process.env.DEBUG_OPENCODE)
+              console.warn('Failed to create target directory:', targetDir, err);
+            // If unable to create the directory, skip this file
+            continue;
+          }
+
           if (await exists(targetPath)) continue;
         } catch {
-          // proceed to copy
+          // proceed to copy (best-effort)
         }
         try {
-          await mkdir(targetDir, { recursive: true });
           const source = join(bundledDataDir, filename);
           await copyFile(source, targetPath);
           if (process.env.DEBUG_OPENCODE)

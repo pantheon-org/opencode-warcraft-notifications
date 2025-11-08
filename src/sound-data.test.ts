@@ -9,7 +9,8 @@ import {
 } from './sound-data/index.js';
 import { DEFAULT_BASE_URL } from './plugin-config.js';
 
-describe('sound-data module', () => {
+// Unit tests: pure data utilities (no IO)
+describe('sound-data module [unit] - pure data utilities', () => {
   it('getSoundFileList returns all sounds when no faction specified', () => {
     const list = getSoundFileList();
     expect(Array.isArray(list)).toBe(true);

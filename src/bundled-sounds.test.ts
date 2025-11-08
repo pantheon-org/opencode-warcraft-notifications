@@ -10,7 +10,8 @@ import { unlink, writeFile, mkdir } from 'fs/promises';
 
 import { createTempDir, removeTempDir, silenceConsole } from './test-utils';
 
-describe('sounds/bundled-sounds - minimal API (bundled-only)', () => {
+// Integration tests: installer and filesystem behavior
+describe('sounds/bundled-sounds [integration] - installer and filesystem behavior', () => {
   let tempDir: string;
   let restoreConsole: (() => void) | undefined;
 
