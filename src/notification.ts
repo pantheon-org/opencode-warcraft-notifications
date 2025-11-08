@@ -1,6 +1,6 @@
 import type { Plugin } from '@opencode-ai/plugin';
 import { getRandomSoundPathFromFaction, soundExists, determineSoundFaction } from './sounds.js';
-import { ensureSoundAvailable, installBundledSoundsIfMissing } from './download.js';
+import { ensureSoundAvailable, installBundledSoundsIfMissing } from './bundled-sounds.js';
 import { loadPluginConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */
 
