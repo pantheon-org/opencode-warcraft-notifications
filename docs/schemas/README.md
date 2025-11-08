@@ -1,6 +1,6 @@
 # Plugin Configuration Schemas
 
-This directory contains configuration schemas and examples for the Warcraft II Alliance notifications plugin.
+This directory contains configuration schemas and examples for the Warcraft II Alliance and Horde notifications plugin.
 
 ## Files
 
@@ -17,7 +17,8 @@ You can use the JSON schema for validation and IDE autocompletion by adding a `$
 {
   "$schema": "https://raw.githubusercontent.com/pantheon-org/opencode-warcraft-notifications/main/docs/schemas/plugin.json.schema",
   "@pantheon-ai/opencode-warcraft-notifications": {
-    "soundsDir": "/path/to/custom/sounds"
+    "soundsDir": "/path/to/custom/sounds",
+    "faction": "both"
   }
 }
 ```
@@ -34,3 +35,8 @@ The plugin looks for `plugin.json` files in:
 - **`soundsDir`** (optional): Custom directory path where sound files will be stored and cached
   - If not specified, defaults to `~/.config/opencode/sounds`
   - Can be overridden by the `SOUNDS_DATA_DIR` environment variable
+
+- **`faction`** (optional): Which faction sounds to use
+  - Allowed values: `"alliance"`, `"horde"`, `"both"`
+  - Default: `"both"` (random selection from both factions)
+  - Use `"alliance"` to play only Alliance sounds, `"horde"` to play only Horde sounds
