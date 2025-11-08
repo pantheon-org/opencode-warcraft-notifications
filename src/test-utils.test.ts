@@ -23,15 +23,21 @@ describe('test-utils helpers', () => {
   });
 
   it('setGlobalFetch restores original fetch', async () => {
-    const orig = typeof globalThis !== 'undefined' ? (globalThis as any).fetch : undefined;
+    type FetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+    const orig =
+      typeof globalThis !== 'undefined'
+        ? (globalThis as unknown as { fetch?: FetchFn }).fetch
+        : undefined;
     const restore = setGlobalFetch(makeFetchResponder(201));
     try {
-      const res = await (globalThis as any).fetch('http://x');
+      const gf = globalThis as unknown as { fetch?: FetchFn };
+      const res = await gf.fetch!('http://x');
       expect(res.status).toBe(201);
     } finally {
       restore();
     }
-    expect((globalThis as any).fetch === orig).toBe(true);
+    const finalFetch = (globalThis as unknown as { fetch?: FetchFn }).fetch;
+    expect(finalFetch === orig).toBe(true);
   });
 
   it('withEnv sets and restores environment variables', async () => {
