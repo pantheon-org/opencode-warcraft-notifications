@@ -216,6 +216,24 @@ describe('soundExists()', () => {
     expect(calledCount).toBe(1);
     expect(lastArg).toBe(expectedPath);
   });
+
+  test('defaults to real fs when no existsFn supplied', async () => {
+    const { createTempDir, removeTempDir, writeTempFileForFaction } = await import('./test-utils');
+    const tmp = createTempDir();
+    try {
+      const filename = 'human_selected1.wav';
+      writeTempFileForFaction(tmp, 'alliance', filename, 'data');
+
+      // Now call soundExists with the real fs (no existsFn)
+      const result = await soundExists(filename, 'alliance', tmp);
+      expect(result).toBe(true);
+
+      const missing = await soundExists('no-such-file.wav', 'alliance', tmp);
+      expect(missing).toBe(false);
+    } finally {
+      removeTempDir(tmp);
+    }
+  });
 });
 
 describe('faction-aware functions', () => {
