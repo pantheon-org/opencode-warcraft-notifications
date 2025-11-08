@@ -10,48 +10,32 @@ import {
 } from './download';
 import { join } from 'path';
 import { unlink, writeFile, mkdir } from 'fs/promises';
-import { mkdtempSync, rmSync } from 'fs';
-import os from 'os';
-
-// Mock fetch implementation helper (typed)
-import type { FetchLike } from './download';
 import type { SoundFile } from './sound-data/index.js';
 
-type FetchImpl = FetchLike;
-const makeFetchResponder = (status = 200, body = new Uint8Array([1, 2, 3])): FetchImpl => {
-  return (async (_input: RequestInfo) => {
-    void _input;
-    return {
-      ok: status >= 200 && status < 300,
-      status,
-      arrayBuffer: async () => body.buffer,
-    } as Response;
-  }) as FetchImpl;
-};
+import {
+  makeFetchResponder,
+  createTempDir,
+  removeTempDir,
+  silenceConsole,
+  setGlobalFetch,
+} from './test-utils';
+import type { FetchImpl } from './test-utils';
 
 describe('sounds/download - on-demand API and helpers', () => {
   let tempDir: string;
-  let origConsoleLog: typeof console.log;
-  let origConsoleError: typeof console.error;
-  let origFetch: any;
+  let restoreConsole: (() => void) | undefined;
+  let restoreFetch: (() => void) | undefined;
 
   beforeEach(() => {
     // Create an isolated temp directory per test
-    tempDir = mkdtempSync(join(os.tmpdir(), 'wc-sounds-'));
+    tempDir = createTempDir();
 
     // Silence console output to keep tests quiet and deterministic
-    origConsoleLog = console.log;
-    origConsoleError = console.error;
-    console.log = () => {};
-    console.error = () => {};
+    restoreConsole = silenceConsole();
 
-    // Save and replace global fetch with a deterministic responder to avoid network
+    // Replace global fetch with a deterministic responder to avoid network
     try {
-      // @ts-ignore
-      origFetch = typeof globalThis !== 'undefined' ? (globalThis as any).fetch : undefined;
-      // Use a default 200 responder; individual tests can pass their own fetchImpl
-      // @ts-ignore
-      (globalThis as any).fetch = makeFetchResponder(200);
+      restoreFetch = setGlobalFetch(makeFetchResponder(200));
     } catch (e) {
       void e;
     }
@@ -60,8 +44,7 @@ describe('sounds/download - on-demand API and helpers', () => {
   afterEach(() => {
     // Restore console
     try {
-      console.log = origConsoleLog;
-      console.error = origConsoleError;
+      if (restoreConsole) restoreConsole();
     } catch (e) {
       void e;
     }
@@ -75,18 +58,14 @@ describe('sounds/download - on-demand API and helpers', () => {
 
     // Restore global fetch
     try {
-      // @ts-ignore
-      if (typeof globalThis !== 'undefined') {
-        // @ts-ignore
-        (globalThis as any).fetch = origFetch;
-      }
+      if (restoreFetch) restoreFetch();
     } catch (e) {
       void e;
     }
 
     // Cleanup tempDir
     try {
-      rmSync(tempDir, { recursive: true, force: true });
+      removeTempDir(tempDir);
     } catch (e) {
       void e;
     }
@@ -165,7 +144,7 @@ describe('sounds/download - on-demand API and helpers', () => {
     await writeFile(path, new Uint8Array([0, 1, 2]));
 
     // Use a fetch impl that would fail if called; we expect it NOT to be called
-    const badFetch: FetchLike = async () => {
+    const badFetch: FetchImpl = async () => {
       throw new Error('should not be called');
     };
 
@@ -182,7 +161,7 @@ describe('sounds/download - on-demand API and helpers', () => {
 
   it('returns false when fetch throws', async () => {
     const filename = 'work_completed.wav';
-    const throwingFetch: FetchLike = async () => {
+    const throwingFetch: FetchImpl = async () => {
       throw new Error('network down');
     };
     const ok = await downloadSoundByFilename(filename, throwingFetch, undefined, tempDir);
@@ -217,7 +196,7 @@ describe('sounds/download - on-demand API and helpers', () => {
 
   it('downloadSound handles write failures gracefully', async () => {
     // Simulate a Response that returns an ArrayBuffer but will fail when Bun.write is called
-    const fakeFetch: FetchLike = async () =>
+    const fakeFetch: FetchImpl = async () =>
       ({
         ok: true,
         status: 200,
@@ -274,7 +253,7 @@ describe('sounds/download - on-demand API and helpers', () => {
     };
 
     // Use a fetch impl that would fail if called
-    const badFetch: FetchLike = async () => {
+    const badFetch: FetchImpl = async () => {
       throw new Error('fetch should not be called');
     };
 

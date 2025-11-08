@@ -1,4 +1,4 @@
-import { test, expect, describe, jest } from 'bun:test';
+import { test, expect, describe } from 'bun:test';
 import {
   sounds,
   allianceSounds,
@@ -189,40 +189,32 @@ describe('getRandomSoundPath()', () => {
 
 describe('soundExists()', () => {
   test('should return boolean', async () => {
-    const mockExists = jest.fn(() => Promise.resolve(true));
+    let calledCount = 0;
+    const fakeExists = async (_p: string) => {
+      calledCount++;
+      return true;
+    };
 
-    const fsPromises = await import('fs/promises');
-    type FsPromisesWithExists = { exists(path: string): Promise<boolean> };
-    const fsWithExists = fsPromises as unknown as FsPromisesWithExists;
-    const spyExists = jest.spyOn(fsWithExists, 'exists').mockImplementation(mockExists);
-
-    try {
-      const result = await soundExists('test.wav', 'alliance');
-      expect(typeof result).toBe('boolean');
-      expect(mockExists).toHaveBeenCalledTimes(1);
-    } finally {
-      spyExists.mockRestore();
-    }
+    const result = await soundExists('test.wav', 'alliance', undefined, fakeExists);
+    expect(typeof result).toBe('boolean');
+    expect(calledCount).toBe(1);
   });
 
   test('should call exists with correct path', async () => {
-    const mockExists = jest.fn(() => Promise.resolve(false));
+    let calledCount = 0;
+    let lastArg: string | undefined;
+    const fakeExists = async (p: string) => {
+      calledCount++;
+      lastArg = p;
+      return false;
+    };
 
-    const fsPromises = await import('fs/promises');
-    type FsPromisesWithExists = { exists(path: string): Promise<boolean> };
-    const fsWithExists = fsPromises as unknown as FsPromisesWithExists;
-    const spyExists = jest.spyOn(fsWithExists, 'exists').mockImplementation(mockExists);
+    const testFile = 'human_selected1.wav' as const;
+    await soundExists(testFile, 'alliance', undefined, fakeExists);
 
-    try {
-      const testFile = 'human_selected1.wav' as const;
-      await soundExists(testFile, 'alliance');
-
-      const expectedPath = getSoundPath(testFile, 'alliance');
-      expect(mockExists).toHaveBeenCalledTimes(1);
-      expect(mockExists).toHaveBeenCalledWith(expectedPath);
-    } finally {
-      spyExists.mockRestore();
-    }
+    const expectedPath = getSoundPath(testFile, 'alliance');
+    expect(calledCount).toBe(1);
+    expect(lastArg).toBe(expectedPath);
   });
 });
 

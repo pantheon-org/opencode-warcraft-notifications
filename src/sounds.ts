@@ -178,9 +178,11 @@ export const soundExists = async (
   filename: string,
   faction: 'alliance' | 'horde',
   dataDir?: string,
+  existsFn?: (path: string) => Promise<boolean>,
 ): Promise<boolean> => {
   const filePath = getSoundPath(filename, faction, dataDir);
-  return await exists(filePath);
+  const checker = existsFn ?? exists;
+  return await checker(filePath);
 };
 
 /**

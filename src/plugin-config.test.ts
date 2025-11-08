@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { join } from 'path';
-import { mkdir, writeFile, rm } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import {
   getConfigDir,
   getDefaultSoundsDir,
@@ -9,23 +9,33 @@ import {
   loadPluginConfig,
   type WarcraftNotificationConfig,
 } from './plugin-config';
+import { createTempDir, removeTempDir } from './test-utils';
 
 describe('Plugin configuration module', () => {
-  const tempDir = '/tmp/opencode-plugin-test';
-
-  // Clean up helper
-  const cleanup = async () => {
+  it('should load configuration from plugin.json (direct file read)', async () => {
+    const tempDir = createTempDir('opencode-plugin-test-');
     try {
-      await rm(tempDir, { recursive: true, force: true });
-    } catch {
-      // Ignore cleanup errors
-    }
-  };
+      // Create a test plugin.json
+      const pluginConfig = {
+        '@pantheon-ai/opencode-warcraft-notifications': {
+          soundsDir: '/custom/sounds/path',
+        },
+      };
 
-  it('should return proper config directory paths', () => {
-    const configDir = getConfigDir();
-    expect(typeof configDir).toBe('string');
-    expect(configDir.length).toBeGreaterThan(0);
+      const configPath = join(tempDir, 'plugin.json');
+      await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
+
+      // Test that we can read the config file directly
+      const configFile = Bun.file(configPath);
+      const loadedConfig = await configFile.json();
+
+      expect(loadedConfig['@pantheon-ai/opencode-warcraft-notifications']).toBeDefined();
+      expect(loadedConfig['@pantheon-ai/opencode-warcraft-notifications'].soundsDir).toBe(
+        '/custom/sounds/path',
+      );
+    } finally {
+      removeTempDir(tempDir);
+    }
   });
 
   it('should return proper default sounds directory', () => {
@@ -41,58 +51,32 @@ describe('Plugin configuration module', () => {
     expect(DEFAULT_BASE_URL).toContain('http');
   });
 
-  it('should load configuration from plugin.json (direct file read)', async () => {
-    await cleanup();
-    await mkdir(tempDir, { recursive: true });
-
-    // Create a test plugin.json
-    const pluginConfig = {
-      '@pantheon-ai/opencode-warcraft-notifications': {
-        soundsDir: '/custom/sounds/path',
-      },
-    };
-
-    const configPath = join(tempDir, 'plugin.json');
-    await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
-
-    // Test that we can read the config file directly
-    const configFile = Bun.file(configPath);
-    const loadedConfig = await configFile.json();
-
-    expect(loadedConfig['@pantheon-ai/opencode-warcraft-notifications']).toBeDefined();
-    expect(loadedConfig['@pantheon-ai/opencode-warcraft-notifications'].soundsDir).toBe(
-      '/custom/sounds/path',
-    );
-
-    await cleanup();
-  });
-
   it('should load configuration from CWD/.opencode/plugin.json via loadPluginConfig', async () => {
-    // Create a temp working directory and write .opencode/plugin.json
-    const cwdTemp = join('/tmp', 'opencode-plugin-cwd');
-    await rm(cwdTemp, { recursive: true, force: true });
-    await mkdir(join(cwdTemp, '.opencode'), { recursive: true });
-
-    const pluginConfig = {
-      '@pantheon-ai/opencode-warcraft-notifications': {
-        soundsDir: '/cwd/sounds/path',
-        faction: 'horde' as const,
-      },
-    };
-    const configPath = join(cwdTemp, '.opencode', 'plugin.json');
-    await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
-
-    // Save original cwd and change to temp dir
-    const origCwd = process.cwd();
+    const cwdTemp = createTempDir('opencode-plugin-cwd-');
     try {
-      process.chdir(cwdTemp);
-      const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
-      expect(loaded).toBeDefined();
-      expect(loaded.soundsDir).toBe('/cwd/sounds/path');
-      expect(loaded.faction).toBe('horde');
+      await mkdir(join(cwdTemp, '.opencode'), { recursive: true });
+
+      const pluginConfig = {
+        '@pantheon-ai/opencode-warcraft-notifications': {
+          soundsDir: '/cwd/sounds/path',
+          faction: 'horde' as const,
+        },
+      };
+      const configPath = join(cwdTemp, '.opencode', 'plugin.json');
+      await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
+
+      const origCwd = process.cwd();
+      try {
+        process.chdir(cwdTemp);
+        const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
+        expect(loaded).toBeDefined();
+        expect(loaded.soundsDir).toBe('/cwd/sounds/path');
+        expect(loaded.faction).toBe('horde');
+      } finally {
+        process.chdir(origCwd);
+      }
     } finally {
-      process.chdir(origCwd);
-      await rm(cwdTemp, { recursive: true, force: true });
+      removeTempDir(cwdTemp);
     }
   });
 
@@ -126,15 +110,20 @@ it('getConfigDir handles win32 and XDG overrides', () => {
     Object.defineProperty(process, 'platform', { value: 'win32' });
     const winDir = getConfigDir();
     expect(typeof winDir).toBe('string');
-    // On windows we expect AppData or AppData\Roaming
+    // On windows we expect AppData or AppData\\Roaming
     expect(winDir.toLowerCase()).toContain('appdata');
 
     // Simulate linux-like with XDG_CONFIG_HOME
     // @ts-ignore
     Object.defineProperty(process, 'platform', { value: 'linux' });
-    process.env.XDG_CONFIG_HOME = '/tmp/xdg-config-test';
-    const xdgDir = getConfigDir();
-    expect(xdgDir).toBe('/tmp/xdg-config-test');
+    const xdgTemp = createTempDir('opencode-xdg-config-');
+    try {
+      process.env.XDG_CONFIG_HOME = xdgTemp;
+      const xdgDir = getConfigDir();
+      expect(xdgDir).toBe(xdgTemp);
+    } finally {
+      removeTempDir(xdgTemp);
+    }
   } finally {
     // restore
     // @ts-ignore
@@ -147,27 +136,28 @@ it('getConfigDir handles win32 and XDG overrides', () => {
 });
 
 it('loadPluginConfig handles invalid JSON gracefully', async () => {
-  const cwdTemp = join('/tmp', 'opencode-invalid-json');
-  await rm(cwdTemp, { recursive: true, force: true });
-  await mkdir(join(cwdTemp, '.opencode'), { recursive: true });
-
-  const configPath = join(cwdTemp, '.opencode', 'plugin.json');
-  // Write invalid JSON
-  await writeFile(configPath, '{ invalid: , }');
-
-  const origCwd = process.cwd();
+  const cwdTemp = createTempDir('opencode-invalid-json-');
   try {
-    process.chdir(cwdTemp);
-    const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
-    // Invalid JSON should be handled and result in empty config
-    expect(loaded).toEqual({});
+    await mkdir(join(cwdTemp, '.opencode'), { recursive: true });
+
+    const configPath = join(cwdTemp, '.opencode', 'plugin.json');
+    // Write invalid JSON
+    await writeFile(configPath, '{ invalid: , }');
+
+    const origCwd = process.cwd();
+    try {
+      process.chdir(cwdTemp);
+      const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
+      // Invalid JSON should be handled and result in empty config
+      expect(loaded).toEqual({});
+    } finally {
+      process.chdir(origCwd);
+    }
   } finally {
-    process.chdir(origCwd);
-    await rm(cwdTemp, { recursive: true, force: true });
+    removeTempDir(cwdTemp);
   }
 });
 
-// Additional targeted tests to exercise uncovered branches
 it('getConfigDir returns darwin path when platform is darwin', () => {
   const origPlatform = process.platform;
   try {
@@ -220,37 +210,39 @@ it('getConfigDir falls back to AppData\\Roaming when APPDATA is unset on win32',
 });
 
 it('loadPluginConfig reads from XDG_CONFIG_HOME when present', async () => {
-  const cwdTemp = join('/tmp', 'opencode-xdg-config');
-  await rm(cwdTemp, { recursive: true, force: true });
-  await mkdir(join(cwdTemp, 'opencode'), { recursive: true });
-
-  const pluginConfig = {
-    '@pantheon-ai/opencode-warcraft-notifications': {
-      soundsDir: '/xdg/sounds/path',
-      faction: 'alliance' as const,
-    },
-  };
-
-  const configPath = join(cwdTemp, 'opencode', 'plugin.json');
-  await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
-
-  const origXdg = process.env.XDG_CONFIG_HOME;
-  const origPlatform = process.platform;
+  const cwdTemp = createTempDir('opencode-xdg-config-');
   try {
-    // Ensure linux behavior so XDG_CONFIG_HOME is honored
-    // @ts-ignore
-    Object.defineProperty(process, 'platform', { value: 'linux' });
-    process.env.XDG_CONFIG_HOME = cwdTemp;
-    const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
-    expect(loaded).toBeDefined();
-    expect(loaded.soundsDir).toBe('/xdg/sounds/path');
-    expect(loaded.faction).toBe('alliance');
+    await mkdir(join(cwdTemp, 'opencode'), { recursive: true });
+
+    const pluginConfig = {
+      '@pantheon-ai/opencode-warcraft-notifications': {
+        soundsDir: '/xdg/sounds/path',
+        faction: 'alliance' as const,
+      },
+    };
+
+    const configPath = join(cwdTemp, 'opencode', 'plugin.json');
+    await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
+
+    const origXdg = process.env.XDG_CONFIG_HOME;
+    const origPlatform = process.platform;
+    try {
+      // Ensure linux behavior so XDG_CONFIG_HOME is honored
+      // @ts-ignore
+      Object.defineProperty(process, 'platform', { value: 'linux' });
+      process.env.XDG_CONFIG_HOME = cwdTemp;
+      const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
+      expect(loaded).toBeDefined();
+      expect(loaded.soundsDir).toBe('/xdg/sounds/path');
+      expect(loaded.faction).toBe('alliance');
+    } finally {
+      // restore platform and env
+      // @ts-ignore
+      Object.defineProperty(process, 'platform', { value: origPlatform });
+      if (origXdg === undefined) delete process.env.XDG_CONFIG_HOME;
+      else process.env.XDG_CONFIG_HOME = origXdg;
+    }
   } finally {
-    // restore platform and env
-    // @ts-ignore
-    Object.defineProperty(process, 'platform', { value: origPlatform });
-    if (origXdg === undefined) delete process.env.XDG_CONFIG_HOME;
-    else process.env.XDG_CONFIG_HOME = origXdg;
-    await rm(cwdTemp, { recursive: true, force: true });
+    removeTempDir(cwdTemp);
   }
 });
