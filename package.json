@@ -36,6 +36,7 @@
     "test:coverage": "bun test --coverage src/",
     "test:watch": "bun test --watch src/",
     "test:verbose": "bun test src/ --reporter tap",
+    "check:docs": "node ./scripts/check-docs.cjs",
     "type-check": "bun tsc --noEmit --project tsconfig.test.json",
     "lint": "eslint src/",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,cjs,css}\"",

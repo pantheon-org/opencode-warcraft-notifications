@@ -166,8 +166,8 @@ describe('getSoundPath()', () => {
     const faction = 'alliance';
     const path = getSoundPath(testFile, faction);
 
-    // Should use ~/.config/opencode/sounds by default
-    expect(path).toContain('.config/opencode/sounds');
+    // Should use the default plugin storage path by default
+    expect(path).toContain('.local/share/opencode/storage/plugin');
     expect(path).toContain(faction);
     expect(path).toContain(testFile);
   });

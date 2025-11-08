@@ -1,6 +1,7 @@
 import { join } from 'path';
 import { exists } from 'fs/promises';
 import { homedir } from 'os';
+import { readFileSync } from 'fs';
 
 /**
  * Faction type for Warcraft II sounds
@@ -46,7 +47,33 @@ export const getConfigDir = (): string => {
  * @returns Default sounds directory path
  */
 export const getDefaultSoundsDir = (): string => {
-  return join(getConfigDir(), 'opencode', 'sounds');
+  // Determine platform-specific base data dir
+  let baseDataDir: string;
+  if (process.platform === 'win32') {
+    // Use APPDATA on Windows, fallback to %USERPROFILE%/AppData/Roaming
+    baseDataDir = process.env.APPDATA ?? join(homedir(), 'AppData', 'Roaming');
+  } else {
+    // Use XDG_DATA_HOME when available, otherwise fall back to ~/.local/share
+    baseDataDir = process.env.XDG_DATA_HOME ?? join(homedir(), '.local', 'share');
+  }
+
+  // Derive a plugin-specific storage folder name from package.json `name`
+  let pluginName = 'opencode-plugin';
+  try {
+    const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8')) as {
+      name?: string;
+    };
+    if (pkg && typeof pkg.name === 'string') {
+      const raw = pkg.name;
+      pluginName = raw.includes('/') ? raw.split('/').pop()! : raw;
+      // sanitize to a filesystem-friendly token
+      pluginName = pluginName.replace(/[^a-zA-Z0-9._-]/g, '-');
+    }
+  } catch {
+    // If package.json can't be read, fall back to a generic name
+  }
+
+  return join(baseDataDir, 'opencode', 'storage', 'plugin', pluginName);
 };
 
 /**
@@ -56,10 +83,21 @@ export const getDefaultSoundsDir = (): string => {
 export const DEFAULT_DATA_DIR = process.env.SOUNDS_DATA_DIR ?? getDefaultSoundsDir();
 
 /**
+ * Default data dir computed at call time (honors env overrides)
+ */
+export const getDefaultDataDir = (): string => process.env.SOUNDS_DATA_DIR ?? getDefaultSoundsDir();
+
+/**
  * Default base URL for downloading sound files
  * Can be overridden by SOUNDS_BASE_URL environment variable
  */
 export const DEFAULT_BASE_URL =
+  process.env.SOUNDS_BASE_URL ?? 'https://www.thanatosrealms.com/war2/sounds/humans';
+
+/**
+ * Return the default base URL computed at call time (honors env overrides)
+ */
+export const getDefaultBaseUrl = (): string =>
   process.env.SOUNDS_BASE_URL ?? 'https://www.thanatosrealms.com/war2/sounds/humans';
 
 /**
