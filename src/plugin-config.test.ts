@@ -13,7 +13,7 @@ import {
 describe('Plugin configuration module', () => {
   const tempDir = '/tmp/opencode-plugin-test';
 
-  // Clean up before and after tests
+  // Clean up helper
   const cleanup = async () => {
     try {
       await rm(tempDir, { recursive: true, force: true });
@@ -41,7 +41,7 @@ describe('Plugin configuration module', () => {
     expect(DEFAULT_BASE_URL).toContain('http');
   });
 
-  it('should load configuration from plugin.json', async () => {
+  it('should load configuration from plugin.json (direct file read)', async () => {
     await cleanup();
     await mkdir(tempDir, { recursive: true });
 
@@ -55,7 +55,7 @@ describe('Plugin configuration module', () => {
     const configPath = join(tempDir, 'plugin.json');
     await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
 
-    // Test that we can read the config
+    // Test that we can read the config file directly
     const configFile = Bun.file(configPath);
     const loadedConfig = await configFile.json();
 
@@ -65,6 +65,35 @@ describe('Plugin configuration module', () => {
     );
 
     await cleanup();
+  });
+
+  it('should load configuration from CWD/.opencode/plugin.json via loadPluginConfig', async () => {
+    // Create a temp working directory and write .opencode/plugin.json
+    const cwdTemp = join('/tmp', 'opencode-plugin-cwd');
+    await rm(cwdTemp, { recursive: true, force: true });
+    await mkdir(join(cwdTemp, '.opencode'), { recursive: true });
+
+    const pluginConfig = {
+      '@pantheon-ai/opencode-warcraft-notifications': {
+        soundsDir: '/cwd/sounds/path',
+        faction: 'horde' as const,
+      },
+    };
+    const configPath = join(cwdTemp, '.opencode', 'plugin.json');
+    await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
+
+    // Save original cwd and change to temp dir
+    const origCwd = process.cwd();
+    try {
+      process.chdir(cwdTemp);
+      const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
+      expect(loaded).toBeDefined();
+      expect(loaded.soundsDir).toBe('/cwd/sounds/path');
+      expect(loaded.faction).toBe('horde');
+    } finally {
+      process.chdir(origCwd);
+      await rm(cwdTemp, { recursive: true, force: true });
+    }
   });
 
   it('should handle missing plugin.json gracefully', async () => {
@@ -84,4 +113,56 @@ describe('Plugin configuration module', () => {
     const emptyConfig: WarcraftNotificationConfig = {};
     expect(emptyConfig.soundsDir).toBeUndefined();
   });
+});
+
+it('getConfigDir handles win32 and XDG overrides', () => {
+  const origPlatform = process.platform;
+  const origXdg = process.env.XDG_CONFIG_HOME;
+  const origAppData = process.env.APPDATA;
+
+  try {
+    // Simulate win32
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: 'win32' });
+    const winDir = getConfigDir();
+    expect(typeof winDir).toBe('string');
+    // On windows we expect AppData or AppData\Roaming
+    expect(winDir.toLowerCase()).toContain('appdata');
+
+    // Simulate linux-like with XDG_CONFIG_HOME
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: 'linux' });
+    process.env.XDG_CONFIG_HOME = '/tmp/xdg-config-test';
+    const xdgDir = getConfigDir();
+    expect(xdgDir).toBe('/tmp/xdg-config-test');
+  } finally {
+    // restore
+    // @ts-ignore
+    Object.defineProperty(process, 'platform', { value: origPlatform });
+    if (origXdg === undefined) delete process.env.XDG_CONFIG_HOME;
+    else process.env.XDG_CONFIG_HOME = origXdg;
+    if (origAppData === undefined) delete process.env.APPDATA;
+    else process.env.APPDATA = origAppData;
+  }
+});
+
+it('loadPluginConfig handles invalid JSON gracefully', async () => {
+  const cwdTemp = join('/tmp', 'opencode-invalid-json');
+  await rm(cwdTemp, { recursive: true, force: true });
+  await mkdir(join(cwdTemp, '.opencode'), { recursive: true });
+
+  const configPath = join(cwdTemp, '.opencode', 'plugin.json');
+  // Write invalid JSON
+  await writeFile(configPath, '{ invalid: , }');
+
+  const origCwd = process.cwd();
+  try {
+    process.chdir(cwdTemp);
+    const loaded = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
+    // Invalid JSON should be handled and result in empty config
+    expect(loaded).toEqual({});
+  } finally {
+    process.chdir(origCwd);
+    await rm(cwdTemp, { recursive: true, force: true });
+  }
 });
