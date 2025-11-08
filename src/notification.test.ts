@@ -1,5 +1,4 @@
 import { soundExists, getRandomSoundPath, getAllSounds } from './sounds.ts';
-import { downloadAllSounds } from './download.ts';
 
 const testPlugin = async () => {
   console.log('Testing Warcraft II Alliance sounds plugin...\n');
@@ -11,16 +10,11 @@ const testPlugin = async () => {
   console.log(`   ${testSound} exists: ${exists}\n`);
 
   if (!exists) {
-    console.log('2. Downloading sounds...');
-    try {
-      await downloadAllSounds();
-      console.log('   Download completed!\n');
-    } catch (error) {
-      console.error('   Download failed:', error);
-      return;
-    }
+    console.log(
+      '2. Bundled sounds are not present. Please run the installer to copy bundled assets.\n',
+    );
   } else {
-    console.log('2. Sounds already exist, skipping download.\n');
+    console.log('2. Sounds already exist, skipping install.\n');
   }
 
   // Test 3: Verify sounds are available

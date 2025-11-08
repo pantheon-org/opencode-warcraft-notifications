@@ -10,14 +10,13 @@ import { loadPluginConfig } from './plugin-config.js';
  * This plugin plays a random Warcraft II sound (Alliance and/or Horde) when the session becomes idle
  * and displays a notification with a short summary of the last message.
  *
- * The plugin downloads sounds on demand into:
- * 1. `SOUNDS_DATA_DIR` environment variable if set
- * 2. Configured sounds directory from plugin.json (soundsDir property) if available
- * 3. `~/.config/opencode/sounds` (default machine-wide location)
+ * The plugin ensures bundled sounds are installed during first run and checks
+ * for the presence of files on every subsequent call. It no longer attempts
+ * to download wave files from the network.
  */
 export const NotificationPlugin: Plugin = async (ctx) => {
   const { project: _project, client: _client, $, worktree: _worktree } = ctx;
-  // We'll download sounds on demand. Keep a simple cache flag to avoid repeated checks.
+  // Keep a simple cache flag to avoid repeated checks.
   const checkedSoundCache = new Map<string, boolean>();
   void _project;
   void _client;
@@ -60,14 +59,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
         return soundPath;
       }
 
-      // Otherwise attempt on-demand download via ensureSoundAvailable
-      const ok = await ensureSoundAvailable(filename, undefined, undefined, explicitDataDir);
-      if (ok) {
-        checkedSoundCache.set(filename, true);
-        return soundPath;
-      }
-
-      // If download failed, fall through to return original path (which may not exist)
+      // No network downloads — just report availability
       return soundPath;
     } catch (error) {
       console.error('Error ensuring sound available:', error);
@@ -92,13 +84,16 @@ export const NotificationPlugin: Plugin = async (ctx) => {
         const summary = getIdleSummary(lastMessage?.text) ?? 'Idle';
 
         if (process.platform === 'darwin') {
-          // Ensure the randomly chosen sound is available (download on demand)
           const soundPath = await ensureAndGetSoundPath();
           const filename = soundPath.split('/').pop() as string;
 
-          // Determine the faction for soundExists call
+          // Determine the faction for soundExists call and pass explicit data dir
           const fileSoundFaction = determineSoundFaction(filename);
-          const existsLocally = await soundExists(filename, fileSoundFaction);
+          const existsLocally = await soundExists(
+            filename,
+            fileSoundFaction,
+            pluginConfig.soundsDir,
+          );
 
           if (existsLocally) {
             await $`osascript -e 'do shell script "afplay ${soundPath}"'`;
