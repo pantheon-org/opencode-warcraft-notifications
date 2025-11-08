@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'bun:test';
+import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import {
   downloadSoundByFilename,
   ensureSoundAvailable,
@@ -30,10 +30,70 @@ const makeFetchResponder = (status = 200, body = new Uint8Array([1, 2, 3])): Fet
 
 describe('sounds/download - on-demand API and helpers', () => {
   let tempDir: string;
+  let origConsoleLog: typeof console.log;
+  let origConsoleError: typeof console.error;
+  let origBunWrite: any;
+  let origFetch: any;
 
   beforeEach(() => {
     // Create an isolated temp directory per test
     tempDir = mkdtempSync(join(os.tmpdir(), 'wc-sounds-'));
+
+    // Silence console output to keep tests quiet and deterministic
+    origConsoleLog = console.log;
+    origConsoleError = console.error;
+    console.log = () => {};
+    console.error = () => {};
+
+    // Save and replace global fetch with a deterministic responder to avoid network
+    try {
+      // @ts-ignore
+      origFetch = typeof globalThis !== 'undefined' ? (globalThis as any).fetch : undefined;
+      // Use a default 200 responder; individual tests can pass their own fetchImpl
+      // @ts-ignore
+      (globalThis as any).fetch = makeFetchResponder(200);
+    } catch (e) {
+      void e;
+    }
+  });
+
+  afterEach(() => {
+    // Restore console
+    try {
+      console.log = origConsoleLog;
+      console.error = origConsoleError;
+    } catch (e) {
+      void e;
+    }
+
+    // Restore Bun.write if a test replaced it
+    try {
+      // @ts-ignore
+      if (typeof Bun !== 'undefined' && origBunWrite) {
+        // @ts-ignore
+        Bun.write = origBunWrite;
+      }
+    } catch (e) {
+      void e;
+    }
+
+    // Restore global fetch
+    try {
+      // @ts-ignore
+      if (typeof globalThis !== 'undefined') {
+        // @ts-ignore
+        (globalThis as any).fetch = origFetch;
+      }
+    } catch (e) {
+      void e;
+    }
+
+    // Cleanup tempDir
+    try {
+      rmSync(tempDir, { recursive: true, force: true });
+    } catch (e) {
+      void e;
+    }
   });
 
   it('downloads a single missing file successfully', async () => {
@@ -56,13 +116,6 @@ describe('sounds/download - on-demand API and helpers', () => {
       tempDir,
     );
     expect(ok).toBe(true);
-
-    // Cleanup
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('returns false for unknown filename', async () => {
@@ -73,12 +126,6 @@ describe('sounds/download - on-demand API and helpers', () => {
       tempDir,
     );
     expect(ok).toBe(false);
-
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('dedupes concurrent downloads for same filename', async () => {
@@ -105,12 +152,6 @@ describe('sounds/download - on-demand API and helpers', () => {
     expect(r1).toBe(true);
     expect(r2).toBe(true);
     expect(calls).toBe(1);
-
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('returns true immediately when file already exists', async () => {
@@ -134,12 +175,6 @@ describe('sounds/download - on-demand API and helpers', () => {
 
     const ok = await downloadSoundByFilename(filename, badFetch, undefined, tempDir);
     expect(ok).toBe(true);
-
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('returns false when HTTP response is not ok', async () => {
@@ -147,11 +182,6 @@ describe('sounds/download - on-demand API and helpers', () => {
     const fetchImpl = makeFetchResponder(404);
     const ok = await downloadSoundByFilename(filename, fetchImpl, undefined, tempDir);
     expect(ok).toBe(false);
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('returns false when fetch throws', async () => {
@@ -161,11 +191,6 @@ describe('sounds/download - on-demand API and helpers', () => {
     };
     const ok = await downloadSoundByFilename(filename, throwingFetch, undefined, tempDir);
     expect(ok).toBe(false);
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('soundExists reports presence and absence', async () => {
@@ -185,11 +210,6 @@ describe('sounds/download - on-demand API and helpers', () => {
 
     const existsAfter = await soundExists(filename, tempDir);
     expect(existsAfter).toBe(true);
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('downloadAllSounds reports failures when fetch returns errors', async () => {
@@ -197,11 +217,6 @@ describe('sounds/download - on-demand API and helpers', () => {
     const badFetch = makeFetchResponder(500);
     // Should complete without throwing
     await downloadAllSounds(badFetch, undefined, tempDir);
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('downloadSound handles write failures gracefully', async () => {
@@ -213,13 +228,17 @@ describe('sounds/download - on-demand API and helpers', () => {
         arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer,
       }) as Response;
 
-    // Monkeypatch Bun.write to throw
-    // @ts-ignore
-    const origWrite = Bun.write;
-    // @ts-ignore
-    Bun.write = async () => {
-      throw new Error('disk full');
-    };
+    // Monkeypatch Bun.write to throw and save global orig
+    try {
+      // @ts-ignore
+      origBunWrite = typeof Bun !== 'undefined' ? Bun.write : undefined;
+      // @ts-ignore
+      Bun.write = async () => {
+        throw new Error('disk full');
+      };
+    } catch (e) {
+      void e;
+    }
 
     const list = getSoundFileList();
     const file = list[0];
@@ -236,9 +255,7 @@ describe('sounds/download - on-demand API and helpers', () => {
     const ok = await downloadSound(soundMeta, fakeFetch, tempDir);
     expect(ok).toBe(false);
 
-    // restore Bun.write
-    // @ts-ignore
-    Bun.write = origWrite;
+    // Bun.write will be restored in afterEach
   });
 
   // --- New targeted tests to cover uncovered branches in src/download.ts ---
@@ -270,12 +287,6 @@ describe('sounds/download - on-demand API and helpers', () => {
 
     const ok = await downloadSound(soundMeta, badFetch, tempDir);
     expect(ok).toBe(true);
-
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('downloadSoundByFilename returns false when base data dir mkdir fails', async () => {
@@ -291,12 +302,6 @@ describe('sounds/download - on-demand API and helpers', () => {
 
     const ok = await downloadSoundByFilename(filename, fetchImpl, undefined, badBase);
     expect(ok).toBe(false);
-
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('downloadAllSounds shows failed count when some downloads fail', async () => {
@@ -318,12 +323,6 @@ describe('sounds/download - on-demand API and helpers', () => {
     };
 
     await downloadAllSounds(mixedFetch, undefined, tempDir);
-
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('downloadSoundByFilename rejects when unexpected error occurs', async () => {
@@ -343,12 +342,6 @@ describe('sounds/download - on-demand API and helpers', () => {
     }
 
     expect(threw).toBe(true);
-
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 
   it('downloadAllSounds returns early when mkdir fails', async () => {
@@ -357,11 +350,5 @@ describe('sounds/download - on-demand API and helpers', () => {
 
     // call downloadAllSounds with a path that is a file to force mkdir to throw
     await downloadAllSounds(makeFetchResponder(200), undefined, badBase);
-
-    try {
-      rmSync(tempDir, { recursive: true });
-    } catch (e) {
-      void e;
-    }
   });
 });
