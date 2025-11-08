@@ -83,10 +83,21 @@ export const getDefaultSoundsDir = (): string => {
 export const DEFAULT_DATA_DIR = process.env.SOUNDS_DATA_DIR ?? getDefaultSoundsDir();
 
 /**
+ * Default data dir computed at call time (honors env overrides)
+ */
+export const getDefaultDataDir = (): string => process.env.SOUNDS_DATA_DIR ?? getDefaultSoundsDir();
+
+/**
  * Default base URL for downloading sound files
  * Can be overridden by SOUNDS_BASE_URL environment variable
  */
 export const DEFAULT_BASE_URL =
+  process.env.SOUNDS_BASE_URL ?? 'https://www.thanatosrealms.com/war2/sounds/humans';
+
+/**
+ * Return the default base URL computed at call time (honors env overrides)
+ */
+export const getDefaultBaseUrl = (): string =>
   process.env.SOUNDS_BASE_URL ?? 'https://www.thanatosrealms.com/war2/sounds/humans';
 
 /**

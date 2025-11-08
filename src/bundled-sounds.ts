@@ -6,6 +6,11 @@ import { determineSoundFaction } from './sounds.js';
 
 const DEBUG = Boolean(process.env.DEBUG_OPENCODE);
 
+/**
+ * Ensure a directory exists by creating it recursively.
+ * @param dir - Path to the directory
+ * @returns `true` when the directory exists or was created successfully, otherwise `false`
+ */
 const ensureDirExists = async (dir: string): Promise<boolean> => {
   try {
     await mkdir(dir, { recursive: true });
@@ -44,6 +49,12 @@ const copyIfMissing = async (
   }
 };
 
+/**
+ * Check whether a bundled sound file exists in the plugin data directory.
+ * @param filename - Sound filename
+ * @param dataDir - Optional override for the base data directory
+ * @returns `true` when the file exists
+ */
 export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const faction = determineSoundFaction(filename);
@@ -52,6 +63,14 @@ export const soundExists = async (filename: string, dataDir?: string): Promise<b
   return await fileExists(filePath);
 };
 
+/**
+ * Ensure the given bundled sound is available in the data directory.
+ * Currently this simply checks if the file exists; future implementations may
+ * attempt installation from bundled data when missing.
+ * @param filename - Sound filename
+ * @param dataDir - Optional override for the base data directory
+ * @returns `true` when the sound is available
+ */
 export const ensureSoundAvailable = async (
   filename: string,
   dataDir?: string,
@@ -92,6 +111,12 @@ const processBundledRootFile = async (
   await copyIfMissing(source, targetDir, filename);
 };
 
+/**
+ * Install bundled sounds from the repository `data/` directory into the
+ * user's plugin data directory when missing. Non-.wav files are skipped and
+ * existing files are not overwritten.
+ * @param dataDir - Optional override for the base data directory
+ */
 export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<void> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const bundledDataDir = join(process.cwd(), 'data');
@@ -117,6 +142,10 @@ export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<v
   }
 };
 
+/**
+ * Return the list of known bundled sound filenames.
+ * @returns Array of bundled sound filenames
+ */
 export const getSoundFileList = (): string[] => {
   return dataGetSoundFileList();
 };
