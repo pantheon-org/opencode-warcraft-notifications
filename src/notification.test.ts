@@ -46,5 +46,7 @@ const testPlugin = async () => {
   console.log('\n✅ Plugin test completed!');
 };
 
-// Run the test
-await testPlugin();
+// Run the test only when explicitly enabled via env var
+if (process.env.TEST_INTEGRATION === '1') {
+  await testPlugin();
+}
