@@ -4,7 +4,7 @@ This document explains how the plugin stores and downloads Warcraft II sound ass
 
 ## Where sounds are stored (actual behavior)
 
-- **Machine-wide cache (default)**: `~/.config/opencode/sounds` (or OS-specific config directory equivalent) when no overrides are provided (see `src/sound-data.ts`).
+- **Computed default (platform-specific)**: the plugin computes a default data dir (see `src/plugin-config.ts`) — e.g. Linux: `~/.local/share/opencode/storage/plugin/<package-name>`, macOS: `~/Library/Application Support/opencode/storage/plugin/<package-name>`. This is used when no overrides are provided.
 - **Plugin configuration override**: set the `soundsDir` property in your `plugin.json` file (see configuration section below).
 - **Environment override**: set the `SOUNDS_DATA_DIR` environment variable to an absolute path to control where sounds are read from or cached.
 
@@ -17,7 +17,7 @@ Why this is configurable
 ## Environment variables (what the code actually supports)
 
 - `SOUNDS_DATA_DIR` — Supported. Absolute path where sound files are read from and cached. When set it overrides the default bundled `data/` location.
-- `SOUNDS_BASE_URL` — Supported. Base URL for downloading remote sound assets when downloads occur.
+- `SOUNDS_BASE_URL` — Present in configuration and used as a base URL by download helpers; the runtime does not perform network downloads by default.
 - `SOUNDS_DOWNLOAD_ON_INIT` — Not implemented by runtime code. There is no automatic init-time bulk download; `downloadAllSounds()` must be called explicitly to prefetch everything.
 - `SOUNDS_DOWNLOAD_COOLDOWN_MS` — Not implemented. The current implementation does not persist or honor a cooldown after failed downloads.
 
