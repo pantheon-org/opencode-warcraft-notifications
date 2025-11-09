@@ -12,8 +12,8 @@ Bundling avoids issues with remote availability, reduces complexity, and provide
 
 ## Current behavior (reference)
 
-- The runtime defaults to the machine-wide cache directory `~/.config/opencode/sounds` (or OS-specific config directory equivalent) when no overrides are provided (see `src/sound-data.ts`).
-- The plugin uses lazy, on-demand downloads rather than downloading everything at init. When a sound is required the code will:
+- The runtime uses the bundled `data/` assets by default and copies them into the effective data directory on first use. When no overrides are provided the code computes a platform-specific default data dir (see `src/plugin-config.ts`) and stores copied files there.
+- The plugin prefers bundled assets. As a fallback, lazy on-demand downloads are available for missing files rather than downloading everything at init. When a sound is required the code will:
   - Resolve the local data directory (see "Data directory precedence" below).
   - Check for the file locally via `soundExists(...)`.
   - If missing, call `ensureSoundAvailable(...)` / `downloadSoundByFilename(...)` to download just that file.
@@ -39,7 +39,7 @@ This means that by default, all opencode instances on the same machine will shar
 ## Environment variables and what is implemented
 
 - `SOUNDS_DATA_DIR` — Supported. When set, it overrides the default machine-wide cache location.
-- `SOUNDS_BASE_URL` — Supported. Used as the base URL for downloads when the code performs network fetches.
+- `SOUNDS_BASE_URL` — Present and used by download helpers as a base URL; network downloads are only performed if download helpers are called explicitly (the runtime does not fetch remote files by default).
 - `SOUNDS_DOWNLOAD_ON_INIT` — Not implemented in runtime code. There is no automatic init-time bulk download; `downloadAllSounds()` must be invoked explicitly.
 - `SOUNDS_DOWNLOAD_COOLDOWN_MS` — Not implemented. The current implementation does not persist or honor a cooldown after failed download attempts.
 

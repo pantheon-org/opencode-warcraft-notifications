@@ -5,7 +5,7 @@ Enhance your OpenCode experience with nostalgic Warcraft II unit sounds! This pl
 ## Features
 
 - 🎵 **100+ Authentic Sounds**: Complete collection of Warcraft II Alliance and Horde unit voices
-- 🔄 **Auto-Download**: Automatically downloads sound files on first use with secure caching
+- 📦 **Bundled Sounds**: Includes pre-bundled WAV assets copied into a per-user data directory on first use (no runtime network dependency by default)
 - 🎲 **Random Selection**: Plays a different sound each time for variety
 - ⚔️ **Faction Choice**: Choose Alliance, Horde, or both factions
 - 💻 **Cross-Platform**: Works on macOS and Linux
@@ -29,7 +29,7 @@ Enhance your OpenCode experience with nostalgic Warcraft II unit sounds! This pl
 
 2. Restart OpenCode or reload your configuration.
 
-3. The plugin will automatically download Warcraft II sounds on first idle event.
+3. On first run the plugin copies bundled WAV files from the repo's `data/` directory into your local plugin data directory; the runtime does not perform network downloads by default.
 
 ## Configuration
 
@@ -71,10 +71,13 @@ See [docs/schemas/plugin.json.example](./docs/schemas/plugin.json.example) for a
 
 ### Default Locations
 
-If no configuration is provided, sounds are stored in:
+If no configuration is provided, the plugin computes a default per-platform data directory and stores sounds there. Precedence for the effective sounds directory is:
 
-- **Default**: `~/.config/opencode/sounds` (or OS-specific config directory)
-- **Environment Override**: Set `SOUNDS_DATA_DIR` environment variable
+1. Project-specific `plugin.json` `soundsDir` setting
+2. `SOUNDS_DATA_DIR` environment variable (absolute path)
+3. Computed default data directory (platform-specific; e.g. Linux: `~/.local/share/opencode/storage/plugin/<package-name>`, macOS: `~/Library/Application Support/opencode/storage/plugin/<package-name>`, Windows: `%APPDATA%\opencode\storage\plugin\<package-name>`)
+
+You can override storage by providing `soundsDir` in your project or global `plugin.json`, or by setting `SOUNDS_DATA_DIR`.
 
 ## How It Works
 
@@ -112,12 +115,9 @@ If no configuration is provided, sounds are stored in:
 
 ## Sound Sources
 
-Sounds are downloaded from the Warcraft II sound archives at thanatosrealms.com:
+The repository includes bundled WAV assets sourced from the Warcraft II archives (original sources include thanatosrealms.com). The runtime uses the bundled files by default and does not fetch from the network unless you explicitly implement or call download helpers.
 
-- Alliance sounds from the humans section
-- Horde sounds from the orcs section
-
-This ensures authentic game audio quality for both factions.
+This ensures authentic game audio quality while avoiding runtime network dependencies.
 
 ## Updating
 
@@ -144,7 +144,7 @@ Test the plugin functionality:
 bun run src/notification.test.ts
 ```
 
-This will verify sound downloads and test random sound selection.
+This will verify sound selection and playback behavior using the test harness (tests use the bundled `data/` assets by default).
 
 ---
 

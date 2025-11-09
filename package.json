@@ -44,7 +44,8 @@
     "clean": "rm -rf dist/ .bun-cache/ coverage/",
     "build": "bun tsc",
     "dev": "bun tsc --watch",
-    "check:repo-config": "node .github/scripts/check-repo-config.cjs"
+    "check:repo-config": "node .github/scripts/check-repo-config.cjs",
+    "validate:schema": "node scripts/validate-schema.cjs docs/schemas/plugin.json.schema docs/schemas/plugin.json.example"
   },
   "dependencies": {
     "csstype": "^3.1.3",
@@ -56,6 +57,7 @@
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "ajv": "^8.17.1",
     "bun-types": "^1.2.0",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^10.1.8",
