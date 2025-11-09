@@ -12,7 +12,7 @@
           "type": "string",
           "description": "Directory where sound files should be stored and cached",
           "examples": [
-            "~/.cache/opencode-warcraft-sounds",
+            "/home/user/.cache/opencode-warcraft-sounds",
             "/path/to/custom/sounds",
             "C:\\Users\\Username\\AppData\\Local\\OpenCode\\Sounds"
           ]
