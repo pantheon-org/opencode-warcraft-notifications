@@ -1,8 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "OpenCode Plugin Configuration",
-  "description": "Configuration file for OpenCode plugins",
+  "description": "Configuration file for OpenCode plugins. Precedence for the effective sounds directory: (1) project-specific plugin.json `soundsDir`, (2) `SOUNDS_DATA_DIR` environment variable, (3) computed platform default data directory.",
   "type": "object",
+  "x-precedence": [
+    "plugin.json (project-specific)",
+    "SOUNDS_DATA_DIR environment variable",
+    "Computed platform-specific default data directory"
+  ],
   "properties": {
     "@pantheon-ai/opencode-warcraft-notifications": {
       "type": "object",
