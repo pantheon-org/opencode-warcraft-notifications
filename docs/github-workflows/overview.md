@@ -4,7 +4,7 @@ This document provides comprehensive documentation for all GitHub Actions workfl
 
 > **🔧 AUTOMATION REQUIREMENT:** For full automation, you MUST set up a Personal Access Token (PAT) as `WORKFLOW_PAT` secret. Without it, the Smart Version Bump workflow cannot trigger follow-up workflows automatically. See [PAT Setup Guide](#personal-access-token-pat-setup) for details.
 
-## 📋 Workflow Overview
+## Workflow Overview
 
 The repository uses 5 streamlined GitHub Actions workflows that provide comprehensive CI/CD automation:
 
@@ -16,7 +16,7 @@ The repository uses 5 streamlined GitHub Actions workflows that provide comprehe
 | [Release & Publish](#release--publish)        | `release-publish.yml`      | Tag creation, Manual           | Build, test, and publish to npm         |
 | [Cleanup Old Releases](#cleanup-old-releases) | `cleanup-old-releases.yml` | Schedule, Tag creation, Manual | Maintain limited release history        |
 
-## 🔄 Workflow Flow
+## Workflow Flow
 
 ```mermaid
 graph TD
@@ -630,7 +630,7 @@ gh release list --json tagName --jq '.[].tagName' | grep -E '^v[0-9]+\.' | cut -
 
 ---
 
-## 🔧 Setup Requirements
+## Setup Requirements
 
 ### Repository Secrets
 
@@ -1000,7 +1000,7 @@ gh workflow run "Release & Publish" -f tag=v1.2.3
 
 ---
 
-## 🚀 Best Practices
+## Best Practices
 
 ### Development Workflow
 

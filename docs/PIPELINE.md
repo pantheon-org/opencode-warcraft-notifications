@@ -890,7 +890,7 @@ const updatedBody = `${release.body}
 - **Status:** ${publishedStatus}
 - **Installation:** \`npm install ${npmPackageName}@${version}\`
 
-## 🔧 Build Information
+## Build Information
 
 - **Node.js:** 20.x
 - **Runtime:** Bun
@@ -2440,8 +2440,8 @@ npm login
 - [Squash Merge Configuration](./github-workflows/squash-merge-configuration.md) - Repository setup guide
 - [Cleanup Old Releases](./github-workflows/cleanup-old-releases.md) - Release retention policy
 - [Cycle Prevention Fix](./github-workflows/cycle-prevention-fix.md) - Version bump cycle prevention
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Deployment and installation guide
-- [DEVELOPMENT.md](./DEVELOPMENT.md) - Development setup and guidelines
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Deployment and installation guide
+- [DEVELOPMENT.md](DEVELOPMENT.md) - Development setup and guidelines
 
 ---
 

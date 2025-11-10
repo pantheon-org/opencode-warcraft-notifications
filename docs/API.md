@@ -191,6 +191,8 @@ export interface WarcraftNotificationConfig {
 - `soundsDir?: string` - Custom directory for sound file storage
 - `faction?: Faction` - Which faction sounds to play (default: 'both')
 
+For schema validation and IDE autocomplete support, see the [Schema Validation Guide](VALIDATE_SCHEMA.md).
+
 #### Functions
 
 ##### `getConfigDir()`
@@ -238,8 +240,8 @@ export const getDefaultSoundsDir = (): string
 
 ```typescript
 const soundsDir = getDefaultSoundsDir();
-// macOS: '/Users/username/Library/Application Support/opencode/storage/plugin/opencode-warcraft-notifications'
-// Linux: '/home/username/.local/share/opencode/storage/plugin/opencode-warcraft-notifications'
+// macOS: '/Users/username/Library/Application Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications'
+// Linux: '/home/username/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications'
 ```
 
 ##### `getDefaultDataDir()`
@@ -460,7 +462,7 @@ export const getSoundPath = (
 
 ```typescript
 const path = getSoundPath('human_selected1.wav', 'alliance');
-// Returns: '/home/user/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/alliance/human_selected1.wav'
+// Returns: '/home/user/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/human_selected1.wav'
 
 const customPath = getSoundPath('orc_selected1.wav', 'horde', '/custom/sounds');
 // Returns: '/custom/sounds/horde/orc_selected1.wav'
@@ -1245,6 +1247,15 @@ export DEBUG_OPENCODE=1
 
 ---
 
+## Related Documentation
+
+- [Architecture Documentation](ARCHITECTURE.md) - System design and components
+- [Development Guide](DEVELOPMENT.md) - Development setup and workflow
+- [User Guide](USER_GUIDE.md) - End-user documentation
+- [Schema Validation Guide](VALIDATE_SCHEMA.md) - Configuration validation
+
+---
+
 **Document Version**: 1.0  
-**Last Updated**: November 10, 2025  
+**Last Updated**: 2025-11-10  
 **Maintained By**: Pantheon AI Team

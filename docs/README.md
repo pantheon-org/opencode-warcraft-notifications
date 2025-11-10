@@ -4,11 +4,11 @@ Welcome to the comprehensive documentation for the Warcraft II Notifications Plu
 
 **Live Documentation**: This documentation is also available online at [https://pantheon-org.github.io/opencode-warcraft-notifications/](https://pantheon-org.github.io/opencode-warcraft-notifications/)
 
-## 📚 Documentation Structure
+## Documentation Structure
 
 ### For Users
 
-#### [User Guide](./USER_GUIDE.md) 👥
+#### [User Guide](USER_GUIDE.md)
 
 **Start here if you're using the plugin**
 
@@ -26,7 +26,7 @@ Complete guide for end users covering:
 
 ---
 
-#### [README](../README.md) 📖
+#### [README](../README.md)
 
 **Quick overview and setup**
 
@@ -44,9 +44,44 @@ Main project documentation with:
 
 ### For Developers
 
-#### [Development Guide](./DEVELOPMENT.md) 💻
+#### [Onboarding Guide](ONBOARDING.md)
 
-**Start here if you're contributing**
+**Start here if you're new to the project**
+
+Complete onboarding guide for new contributors:
+
+- First day setup and exercises
+- First week deep dive
+- First month contribution goals
+- Key resources and tools
+- Team structure and communication
+- Getting help
+
+**Best for**: New contributors, team members, onboarding
+
+---
+
+#### [Contributing Guide](../CONTRIBUTING.md)
+
+**Guidelines for contributing**
+
+Comprehensive contribution guidelines:
+
+- Code of conduct
+- How to contribute
+- Development workflow
+- Coding standards
+- Testing guidelines
+- Pull request process
+- Release process
+
+**Best for**: Contributors, code reviewers, maintainers
+
+---
+
+#### [Development Guide](DEVELOPMENT.md)
+
+**Technical development documentation**
 
 Comprehensive development documentation:
 
@@ -56,14 +91,13 @@ Comprehensive development documentation:
 - Testing strategies
 - Code quality standards
 - Debugging techniques
-- Contributing guidelines
 - Release process
 
-**Best for**: Contributors, developers, maintainers
+**Best for**: Active developers, maintainers
 
 ---
 
-#### [API Documentation](./API.md) 🔧
+#### [API Documentation](API.md)
 
 **Technical API reference**
 
@@ -82,7 +116,7 @@ Complete API documentation covering:
 
 ---
 
-#### [Architecture Documentation](./ARCHITECTURE.md) 🏗️
+#### [Architecture Documentation](ARCHITECTURE.md)
 
 **System design and components**
 
@@ -104,7 +138,7 @@ Detailed architecture documentation:
 
 ### For Operations
 
-#### [Deployment Guide](./DEPLOYMENT.md) 🚀
+#### [Deployment Guide](DEPLOYMENT.md)
 
 **Installation and operations**
 
@@ -124,7 +158,7 @@ Complete deployment documentation:
 
 ---
 
-#### [CI/CD Pipeline Documentation](./PIPELINE.md) 🔄
+#### [CI/CD Pipeline Documentation](PIPELINE.md)
 
 **Complete pipeline technical reference**
 
@@ -144,9 +178,44 @@ Comprehensive CI/CD pipeline documentation:
 
 ---
 
+### Project Documentation
+
+#### [Changelog](../CHANGELOG.md)
+
+**Version history and release notes**
+
+Complete changelog following Keep a Changelog format:
+
+- Version history
+- Release notes
+- Breaking changes
+- Migration guides
+- Security updates
+
+**Best for**: Tracking changes, upgrade planning
+
+---
+
+#### [Security Policy](../SECURITY.md)
+
+**Security policy and vulnerability reporting**
+
+Security documentation and procedures:
+
+- Supported versions
+- Reporting vulnerabilities
+- Security considerations
+- Best practices
+- Security audit results
+- Dependency security
+
+**Best for**: Security researchers, security-conscious users
+
+---
+
 ### Specialized Documentation
 
-#### [GitHub Workflows](./github-workflows/README.md) ⚙️
+#### [GitHub Workflows](github-workflows/README.md)
 
 **CI/CD automation guides**
 
@@ -165,7 +234,7 @@ Documentation for GitHub Actions workflows:
 
 ---
 
-#### [Schemas](./schemas/README.md) 📋
+#### [Schemas](schemas/README.md)
 
 **JSON schema definitions**
 
@@ -179,7 +248,7 @@ Schema documentation and examples:
 
 ---
 
-## 🗺️ Documentation Map
+## Documentation Map
 
 ```mermaid
 graph TB
@@ -222,88 +291,90 @@ graph TB
     style API fill:#9c27b0
 ```
 
-## 🎯 Quick Navigation
+## Quick Navigation
 
 ### I want to...
 
 #### Use the Plugin
 
 1. Start with [README](../README.md) for quick setup
-2. Read [User Guide](./USER_GUIDE.md) for detailed usage
-3. Check [Troubleshooting](./USER_GUIDE.md#troubleshooting) if you have issues
+2. Read [User Guide](USER_GUIDE.md) for detailed usage
+3. Check [Troubleshooting](USER_GUIDE.md#troubleshooting) if you have issues
 
 #### Contribute to the Project
 
-1. Read [Development Guide](./DEVELOPMENT.md) for setup
-2. Review [Architecture](./ARCHITECTURE.md) to understand the system
-3. Check [API Documentation](./API.md) for technical details
+1. Start with [Onboarding Guide](ONBOARDING.md) for getting started
+2. Read [Contributing Guide](../CONTRIBUTING.md) for guidelines
+3. Read [Development Guide](DEVELOPMENT.md) for setup
+4. Review [Architecture](ARCHITECTURE.md) to understand the system
+5. Check [API Documentation](API.md) for technical details
 
 #### Deploy or Maintain
 
-1. Follow [Deployment Guide](./DEPLOYMENT.md) for installation
-2. Review [CI/CD Pipeline](./PIPELINE.md) for complete technical reference
-3. Review [GitHub Workflows](./github-workflows/README.md) for setup guides
-4. Check [Monitoring](./DEPLOYMENT.md#monitoring) for health checks
+1. Follow [Deployment Guide](DEPLOYMENT.md) for installation
+2. Review [CI/CD Pipeline](PIPELINE.md) for complete technical reference
+3. Review [GitHub Workflows](github-workflows/README.md) for setup guides
+4. Check [Monitoring](DEPLOYMENT.md#monitoring) for health checks
 
 #### Understand the System
 
-1. Start with [Architecture](./ARCHITECTURE.md) for system design
-2. Review [API Documentation](./API.md) for component details
-3. Check [Development Guide](./DEVELOPMENT.md) for code organization
+1. Start with [Architecture](ARCHITECTURE.md) for system design
+2. Review [API Documentation](API.md) for component details
+3. Check [Development Guide](DEVELOPMENT.md) for code organization
 
-## 📖 Documentation by Topic
+## Documentation by Topic
 
 ### Installation & Setup
 
 - [Quick Start](../README.md#setup)
-- [Installation Guide](./USER_GUIDE.md#installation)
-- [Platform-Specific Setup](./DEPLOYMENT.md#platform-specific-setup)
+- [Installation Guide](USER_GUIDE.md#installation)
+- [Platform-Specific Setup](DEPLOYMENT.md#platform-specific-setup)
 
 ### Configuration
 
-- [Basic Configuration](./USER_GUIDE.md#configuration)
-- [Configuration Options](./API.md#plugin-configuration-module)
-- [Configuration Precedence](./ARCHITECTURE.md#configuration-precedence)
+- [Basic Configuration](USER_GUIDE.md#configuration)
+- [Configuration Options](API.md#plugin-configuration-module)
+- [Configuration Precedence](ARCHITECTURE.md#configuration-precedence)
 
 ### Usage
 
-- [Using the Plugin](./USER_GUIDE.md#using-the-plugin)
-- [Sound Factions](./USER_GUIDE.md#sound-factions)
-- [Customization](./USER_GUIDE.md#customization)
+- [Using the Plugin](USER_GUIDE.md#using-the-plugin)
+- [Sound Factions](USER_GUIDE.md#sound-factions)
+- [Customization](USER_GUIDE.md#customization)
 
 ### Development
 
-- [Development Workflow](./DEVELOPMENT.md#development-workflow)
-- [Testing](./DEVELOPMENT.md#testing)
-- [Code Quality](./DEVELOPMENT.md#code-quality)
+- [Development Workflow](DEVELOPMENT.md#development-workflow)
+- [Testing](DEVELOPMENT.md#testing)
+- [Code Quality](DEVELOPMENT.md#code-quality)
 
 ### Architecture
 
-- [System Architecture](./ARCHITECTURE.md#system-architecture)
-- [Component Architecture](./ARCHITECTURE.md#component-architecture)
-- [Data Flow](./ARCHITECTURE.md#data-flow)
+- [System Architecture](ARCHITECTURE.md#system-architecture)
+- [Component Architecture](ARCHITECTURE.md#component-architecture)
+- [Data Flow](ARCHITECTURE.md#data-flow)
 
 ### API Reference
 
-- [Plugin Entry Point](./API.md#plugin-entry-point)
-- [Notification Module](./API.md#notification-module)
-- [Sound Manager](./API.md#sound-manager-module)
+- [Plugin Entry Point](API.md#plugin-entry-point)
+- [Notification Module](API.md#notification-module)
+- [Sound Manager](API.md#sound-manager-module)
 
 ### Operations
 
-- [Deployment](./DEPLOYMENT.md#deployment-architecture)
-- [CI/CD Pipeline Overview](./DEPLOYMENT.md#cicd-pipeline)
-- [CI/CD Pipeline Details](./PIPELINE.md)
-- [Workflow Setup](./github-workflows/README.md)
-- [Monitoring](./DEPLOYMENT.md#monitoring)
+- [Deployment](DEPLOYMENT.md#deployment-architecture)
+- [CI/CD Pipeline Overview](DEPLOYMENT.md#cicd-pipeline)
+- [CI/CD Pipeline Details](PIPELINE.md)
+- [Workflow Setup](github-workflows/README.md)
+- [Monitoring](DEPLOYMENT.md#monitoring)
 
 ### Troubleshooting
 
-- [User Troubleshooting](./USER_GUIDE.md#troubleshooting)
-- [Deployment Troubleshooting](./DEPLOYMENT.md#troubleshooting)
-- [Debug Mode](./DEVELOPMENT.md#debugging)
+- [User Troubleshooting](USER_GUIDE.md#troubleshooting)
+- [Deployment Troubleshooting](DEPLOYMENT.md#troubleshooting)
+- [Debug Mode](DEVELOPMENT.md#debugging)
 
-## 🔍 Search by Role
+## Search by Role
 
 ### End User
 
@@ -312,8 +383,8 @@ graph TB
 **Recommended Reading**:
 
 1. [README](../README.md) - Quick start
-2. [User Guide](./USER_GUIDE.md) - Complete usage guide
-3. [FAQ](./USER_GUIDE.md#faq) - Common questions
+2. [User Guide](USER_GUIDE.md) - Complete usage guide
+3. [FAQ](USER_GUIDE.md#faq) - Common questions
 
 **Key Topics**:
 
@@ -330,16 +401,19 @@ graph TB
 
 **Recommended Reading**:
 
-1. [Development Guide](./DEVELOPMENT.md) - Development setup
-2. [Architecture](./ARCHITECTURE.md) - System design
-3. [API Documentation](./API.md) - Technical reference
+1. [Onboarding Guide](ONBOARDING.md) - Getting started
+2. [Contributing Guide](../CONTRIBUTING.md) - Contribution guidelines
+3. [Development Guide](DEVELOPMENT.md) - Development setup
+4. [Architecture](ARCHITECTURE.md) - System design
+5. [API Documentation](API.md) - Technical reference
 
 **Key Topics**:
 
+- Onboarding process
 - Development workflow
 - Testing
 - Code quality
-- Contributing
+- Contributing guidelines
 
 ---
 
@@ -349,10 +423,10 @@ graph TB
 
 **Recommended Reading**:
 
-1. [Deployment Guide](./DEPLOYMENT.md) - Installation & operations
-2. [CI/CD Pipeline](./PIPELINE.md) - Complete technical reference
-3. [GitHub Workflows](./github-workflows/README.md) - Setup guides
-4. [Monitoring](./DEPLOYMENT.md#monitoring) - Health checks
+1. [Deployment Guide](DEPLOYMENT.md) - Installation & operations
+2. [CI/CD Pipeline](PIPELINE.md) - Complete technical reference
+3. [GitHub Workflows](github-workflows/README.md) - Setup guides
+4. [Monitoring](DEPLOYMENT.md#monitoring) - Health checks
 
 **Key Topics**:
 
@@ -370,9 +444,9 @@ graph TB
 
 **Recommended Reading**:
 
-1. [Architecture](./ARCHITECTURE.md) - System architecture
-2. [API Documentation](./API.md) - Component details
-3. [Development Guide](./DEVELOPMENT.md) - Code organization
+1. [Architecture](ARCHITECTURE.md) - System architecture
+2. [API Documentation](API.md) - Component details
+3. [Development Guide](DEVELOPMENT.md) - Code organization
 
 **Key Topics**:
 
@@ -383,7 +457,14 @@ graph TB
 
 ---
 
-## 📝 Additional Resources
+## Additional Resources
+
+### Project Resources
+
+- [Changelog](../CHANGELOG.md) - Version history and release notes
+- [Security Policy](../SECURITY.md) - Security policy and vulnerability reporting
+- [Contributing Guide](../CONTRIBUTING.md) - How to contribute
+- [License](../LICENSE) - MIT License
 
 ### External Documentation
 
@@ -401,12 +482,13 @@ graph TB
 
 - **Email**: support@pantheon-ai.com
 - **GitHub**: [@pantheon-org](https://github.com/pantheon-org)
+- **Security**: security@pantheon-ai.com
 
 ---
 
-## 🆕 Recent Updates
+## Recent Updates
 
-### November 10, 2025
+### 2025-11-10
 
 - ✅ Complete documentation suite created
 - ✅ User Guide added
@@ -419,7 +501,7 @@ graph TB
 
 ---
 
-## 📋 Documentation Checklist
+## Documentation Checklist
 
 ### For Users
 
@@ -431,11 +513,12 @@ graph TB
 
 ### For Developers
 
+- [x] Onboarding guide
+- [x] Contributing guidelines
 - [x] Development setup
 - [x] API reference
 - [x] Architecture documentation
 - [x] Testing guide
-- [x] Contributing guidelines
 
 ### For Operations
 
@@ -446,20 +529,27 @@ graph TB
 - [x] Troubleshooting procedures
 - [x] Security considerations
 
+### Project Documentation
+
+- [x] Changelog
+- [x] Security policy
+- [x] License
+- [x] Code of conduct (in Contributing)
+
 ---
 
-## 🤝 Contributing to Documentation
+## Contributing to Documentation
 
 Found an issue or want to improve the documentation?
 
 1. **Report issues**: [GitHub Issues](https://github.com/pantheon-org/opencode-warcraft-notifications/issues)
 2. **Suggest improvements**: [GitHub Discussions](https://github.com/pantheon-org/opencode-warcraft-notifications/discussions)
-3. **Submit changes**: Follow the [Contributing Guidelines](./DEVELOPMENT.md#contributing)
+3. **Submit changes**: Follow the [Contributing Guidelines](DEVELOPMENT.md#contributing)
 
 ---
 
 **Document Version**: 1.0  
-**Last Updated**: November 10, 2025  
+**Last Updated**: 2025-11-10  
 **Maintained By**: Pantheon AI Team
 
 ---

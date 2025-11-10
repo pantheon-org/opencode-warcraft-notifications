@@ -536,13 +536,13 @@ bun --inspect test src/sounds.test.ts
 
    ```bash
    # Check default data directory
-   ls -la ~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/
+   ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
 
    # Check alliance sounds
-   ls -la ~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/alliance/
+   ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/
 
    # Check horde sounds
-   ls -la ~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/horde/
+   ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/horde/
    ```
 
 ### Common Issues
@@ -814,6 +814,15 @@ export const getSoundPath = (
 
 ---
 
+## Related Documentation
+
+- [API Documentation](API.md) - Complete technical API reference
+- [Architecture Documentation](ARCHITECTURE.md) - System design and components
+- [Deployment Guide](DEPLOYMENT.md) - Installation and operations
+- [CI/CD Pipeline](PIPELINE.md) - Pipeline technical reference
+
+---
+
 **Document Version**: 1.0  
-**Last Updated**: November 10, 2025  
+**Last Updated**: 2025-11-10  
 **Maintained By**: Pantheon AI Team
