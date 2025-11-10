@@ -2,3 +2,15 @@ theme: jekyll-theme-cayman
 title: Warcraft II Notifications Plugin
 description: OpenCode plugin for Warcraft II notification sounds
 show_downloads: false
+
+# Markdown processing
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  hard_wrap: false
+
+# Exclude files from processing
+exclude:
+  - README.md.backup
+  - vendor/
