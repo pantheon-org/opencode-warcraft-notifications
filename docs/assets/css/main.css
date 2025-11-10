@@ -93,34 +93,38 @@ layout: null
 /* Light Theme */
 [data-theme='light'] {
   --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f6f8fa;
-  --color-bg-tertiary: #eaeef2;
-  --color-bg-overlay: #d0d7de;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #f0f2f5;
+  --color-bg-overlay: #e4e6eb;
   --color-bg-elevated: #ffffff;
 
-  --color-text-primary: #1f2328;
-  --color-text-secondary: #57606a;
-  --color-text-tertiary: #6e7781;
+  --color-text-primary: #1c1e21;
+  --color-text-secondary: #65676b;
+  --color-text-tertiary: #8a8d91;
   --color-text-link: #0969da;
 
-  --color-accent-primary: #6e40c9;
-  --color-accent-hover: #8250df;
-  --color-accent-active: #5c35b3;
-  --color-accent-low: rgba(110, 64, 201, 0.1);
-  --color-accent-subtle: rgba(110, 64, 201, 0.15);
+  --color-accent-primary: #7c3aed;
+  --color-accent-hover: #9333ea;
+  --color-accent-active: #6d28d9;
+  --color-accent-low: rgba(124, 58, 237, 0.1);
+  --color-accent-subtle: rgba(124, 58, 237, 0.15);
 
-  --color-border-default: #d0d7de;
-  --color-border-muted: #d8dee4;
-  --color-border-subtle: #c5cdd5;
+  --color-border-default: #dcdfe4;
+  --color-border-muted: #e5e7eb;
+  --color-border-subtle: #d0d3d9;
 
-  --color-success-bg: rgba(26, 127, 55, 0.1);
-  --color-warning-bg: rgba(154, 103, 0, 0.1);
-  --color-danger-bg: rgba(207, 34, 46, 0.1);
-  --color-info-bg: rgba(9, 105, 218, 0.1);
+  --color-success: #16a34a;
+  --color-success-bg: rgba(22, 163, 74, 0.1);
+  --color-warning: #ea580c;
+  --color-warning-bg: rgba(234, 88, 12, 0.1);
+  --color-danger: #dc2626;
+  --color-danger-bg: rgba(220, 38, 38, 0.1);
+  --color-info: #0284c7;
+  --color-info-bg: rgba(2, 132, 199, 0.1);
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 20px -8px rgba(0, 0, 0, 0.15);
 }
 
 /* ==========================================================================
@@ -144,6 +148,12 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  overflow-x: hidden;
+}
+
+/* Dark theme gradient background */
+[data-theme='dark'] body {
   background: linear-gradient(
     180deg,
     var(--color-bg-primary) 0%,
@@ -151,7 +161,12 @@ body {
     var(--color-bg-primary) 100%
   );
   background-attachment: fixed;
-  overflow-x: hidden;
+}
+
+/* Light theme clean background */
+[data-theme='light'] body {
+  background: linear-gradient(180deg, #ffffff 0%, #fafbfc 50%, #ffffff 100%);
+  background-attachment: fixed;
 }
 
 /* Skip Link for Accessibility */
