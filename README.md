@@ -11,113 +11,169 @@ Enhance your OpenCode experience with nostalgic Warcraft II unit sounds! This pl
 - 💻 **Cross-Platform**: Works on macOS and Linux
 - 📱 **Smart Notifications**: Shows session summary with the sound notification
 - 🚀 **Automated Releases**: Fully automated CI/CD pipeline with AI-powered version management
+- 📚 **Comprehensive Documentation**: Complete documentation suite for users, developers, and operators
 - 🎮 **Unit Variety**: Includes voices from:
   - **Alliance**: Human Units (peasants, knights, mages), Elven Archers, Dwarven Demolition Squad, Naval Units
   - **Horde**: Orcs, Death Knights, Dragons, Goblin Sappers, Ogres, Ogre-Mages, Troll Axethrowers, Naval Units
   - Special completion sounds
 
-## Setup
+## Documentation
 
-1. Add the plugin to your [OpenCode config](https://opencode.ai/docs/config/):
+This project includes comprehensive documentation for all users:
 
-   ```json
-   {
-     "$schema": "https://opencode.ai/config.json",
-     "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
-   }
-   ```
+### For Users
 
-2. Restart OpenCode or reload your configuration.
+- **[User Guide](./docs/USER_GUIDE.md)** - Installation, configuration, and usage
+- **[FAQ](./docs/USER_GUIDE.md#faq)** - Common questions and answers
 
-3. On first run the plugin copies bundled WAV files from the repo's `data/` directory into your local plugin data directory; the runtime does not perform network downloads by default.
+### For Developers
+
+- **[Development Guide](./docs/DEVELOPMENT.md)** - Setup, workflow, and contributing
+- **[API Documentation](./docs/API.md)** - Complete technical reference
+- **[Architecture](./docs/ARCHITECTURE.md)** - System design and components
+
+### For Operations
+
+- **[Deployment Guide](./docs/DEPLOYMENT.md)** - Installation and operations
+- **[GitHub Workflows](./docs/github-workflows/README.md)** - CI/CD automation
+
+### Complete Documentation
+
+- **[Documentation Index](./docs/README.md)** - Complete documentation map and navigation
+
+## Quick Start
+
+### 1. Installation
+
+Add the plugin to your [OpenCode config](https://opencode.ai/docs/config/):
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
+}
+```
+
+### 2. Restart OpenCode
+
+```bash
+opencode
+```
+
+### 3. Enjoy!
+
+When your OpenCode session goes idle, you'll hear Warcraft II sounds and see a notification.
+
+On first run, the plugin automatically copies bundled WAV files to your local plugin data directory (no network downloads required).
+
+### Next Steps
+
+- **Configure factions**: See [Configuration](#configuration) below
+- **Customize sounds**: See [User Guide - Customization](./docs/USER_GUIDE.md#customization)
+- **Troubleshoot**: See [User Guide - Troubleshooting](./docs/USER_GUIDE.md#troubleshooting)
 
 ## Configuration
 
-### Custom Sound Directory
-
-You can customize where sound files are stored by creating a `plugin.json` file:
-
 ### Faction Selection
 
-Choose which faction sounds to play using the `faction` configuration option:
+Choose which faction sounds to play:
 
 - `"alliance"` - Play only Alliance unit sounds
 - `"horde"` - Play only Horde unit sounds
 - `"both"` - Play random sounds from both factions (default)
 
-**Project-specific configuration** (`.opencode/plugin.json` in your project root):
+**Project-specific** (`.opencode/plugin.json`):
 
 ```json
 {
   "@pantheon-ai/opencode-warcraft-notifications": {
-    "soundsDir": "/path/to/project/sounds",
-    "faction": "both"
+    "faction": "alliance"
   }
 }
 ```
 
-**Global configuration** (`~/.config/opencode/plugin.json`):
+**Global** (`~/.config/opencode/plugin.json`):
 
 ```json
 {
   "@pantheon-ai/opencode-warcraft-notifications": {
-    "soundsDir": "/home/user/.cache/warcraft-sounds",
     "faction": "horde"
   }
 }
 ```
 
-See [docs/schemas/plugin.json.example](./docs/schemas/plugin.json.example) for a complete example and [docs/schemas/plugin.json.schema](./docs/schemas/plugin.json.schema) for the JSON schema.
+### Custom Sound Directory
 
-### Default Locations
+You can customize where sound files are stored:
 
-If no configuration is provided, the plugin computes a default per-platform data directory and stores sounds there. Precedence for the effective sounds directory is:
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "soundsDir": "/path/to/custom/sounds",
+    "faction": "both"
+  }
+}
+```
+
+### Configuration Precedence
 
 1. Project-specific `plugin.json` `soundsDir` setting
-2. `SOUNDS_DATA_DIR` environment variable (absolute path)
-3. Computed default data directory (platform-specific; e.g. Linux: `~/.local/share/opencode/storage/plugin/<package-name>`, macOS: `~/Library/Application Support/opencode/storage/plugin/<package-name>`, Windows: `%APPDATA%\opencode\storage\plugin\<package-name>`)
+2. `SOUNDS_DATA_DIR` environment variable
+3. Platform-specific default directory
 
-You can override storage by providing `soundsDir` in your project or global `plugin.json`, or by setting `SOUNDS_DATA_DIR`.
+For complete configuration options and examples, see:
+
+- **[User Guide - Configuration](./docs/USER_GUIDE.md#configuration)**
+- **[API Documentation - Configuration](./docs/API.md#plugin-configuration-module)**
+- **[Schemas Documentation](./docs/schemas/README.md)**
 
 ## How It Works
 
-- **Idle Detection**: When your OpenCode session goes idle, the plugin triggers
-- **Sound Playback**: Plays a random Warcraft II unit sound from your selected faction(s)
-- **Notification**: Shows a system notification with your session summary
-- **Sound Categories**: Includes unit selection sounds ("Yes, my lord?" / "Zug zug!") and acknowledgment sounds ("For the Alliance!" / "Lok tar!")
+1. **Idle Detection**: When your OpenCode session goes idle, the plugin triggers
+2. **Sound Selection**: Randomly selects a Warcraft II unit sound from your configured faction(s)
+3. **Sound Playback**: Plays the sound using platform-specific audio tools
+4. **Notification**: Shows a system notification with your session summary
 
-### Example Sounds
+The plugin includes 100+ authentic sounds from both factions, including:
 
-**Alliance Units:**
+- Unit selection sounds ("Yes, my lord?" / "Zug zug!")
+- Acknowledgment sounds ("For the Alliance!" / "Lok tar!")
+- Work completion sounds ("Work complete!" / "Jobs done!")
 
-- **Human Units**: "Your command?", "Yes, sire?", "At your service"
-- **Knights**: "Your majesty?", "For the king!", "Defending your honor"
-- **Elven Archers**: "Your eminence?", "For the alliance!", "By your command"
-- **Dwarven Squad**: "Aye, laddie!", "What do you want?", "Move out!"
-- **Mages**: "What is it?", "Do you need assistance?", "Very well"
-- **Ships**: "Captain on the bridge!", "Aye aye sir!", "Under way"
+### Sound Factions
 
-**Horde Units:**
+**Alliance Units**: Peasants, Knights, Mages, Elven Archers, Dwarven Demolition Squad, Naval Units
 
-- **Orcs**: "Zug zug!", "Lok tar!", "Dah boo!"
-- **Death Knights**: "Yes?", "Make it quick", "Of course, master"
-- **Ogres**: "Huh what?", "Yes master", "Okay"
-- **Ogre-Mages**: "Yes master?", "Of course", "Right away"
-- **Troll Axethrowers**: "D'you call me?", "Who d'you want to kill?", "You the boss"
-- **Goblin Sappers**: "What?", "Yes boss", "Certainly"
-- **Dragons**: Dragon roars and acknowledgments
-- **Horde Ships**: "Done building ship", "Argh?", "Aye matey?"
+**Horde Units**: Orcs, Death Knights, Dragons, Goblin Sappers, Ogres, Ogre-Mages, Troll Axethrowers, Naval Units
+
+For the complete list of sounds and examples, see:
+
+- **[User Guide - Sound Factions](./docs/USER_GUIDE.md#sound-factions)**
+- **[Architecture - Sound Data](./docs/ARCHITECTURE.md#sound-data-module)**
 
 ## Platform Support
 
 - **macOS**: Uses `afplay` for audio and `osascript` for notifications
 - **Linux**: Uses `canberra-gtk-play` for audio and `notify-send` for notifications
 
+For detailed platform-specific setup and troubleshooting, see:
+
+- [User Guide - Installation](./docs/USER_GUIDE.md#installation)
+- [Deployment Guide - Platform-Specific Setup](./docs/DEPLOYMENT.md#platform-specific-setup)
+
 ## Sound Sources
 
-The repository includes bundled WAV assets sourced from the Warcraft II archives (original sources include thanatosrealms.com). The runtime uses the bundled files by default and does not fetch from the network unless you explicitly implement or call download helpers.
+All sound files are bundled with the plugin from Warcraft II archives. The plugin:
 
-This ensures authentic game audio quality while avoiding runtime network dependencies.
+- Includes 100+ pre-bundled WAV files in the `data/` directory
+- Copies files to local storage on first use
+- No network downloads required during runtime
+- Ensures authentic game audio quality
+
+For technical details, see:
+
+- **[Architecture - Bundled Sounds](./docs/ARCHITECTURE.md#bundled-sounds-module)**
+- **[Deployment - Sound Management](./docs/DEPLOYMENT.md#sound-file-management)**
 
 ## Updating
 
@@ -136,19 +192,58 @@ echo "Plugin update script finished successfully.")
 opencode  # Reinstalls latest
 ```
 
+For more details, see the [User Guide - Updating](./docs/USER_GUIDE.md#updating-the-plugin).
+
 ## Development
 
-Test the plugin functionality:
+For development instructions, see the [Development Guide](./docs/DEVELOPMENT.md).
+
+Quick start:
 
 ```bash
-bun run src/notification.test.ts
+# Run tests
+bun test
+
+# Run type checking
+bun run type-check
+
+# Run linting
+bun run lint
 ```
 
-This will verify sound selection and playback behavior using the test harness (tests use the bundled `data/` assets by default).
+See the [Development Guide](./docs/DEVELOPMENT.md) for complete development workflow, testing strategies, and contributing guidelines.
+
+---
+
+## Troubleshooting
+
+Having issues? Check these resources:
+
+- **[User Guide - Troubleshooting](./docs/USER_GUIDE.md#troubleshooting)** - Common issues and solutions
+- **[User Guide - FAQ](./docs/USER_GUIDE.md#faq)** - Frequently asked questions
+- **[Deployment Guide - Troubleshooting](./docs/DEPLOYMENT.md#troubleshooting)** - Deployment and configuration issues
+
+## Contributing
+
+We welcome contributions! Please see:
+
+- **[Development Guide](./docs/DEVELOPMENT.md)** - Development setup and workflow
+- **[Architecture Documentation](./docs/ARCHITECTURE.md)** - System design
+- **[API Documentation](./docs/API.md)** - Technical reference
+
+## License
+
+MIT License - see [LICENSE](./LICENSE) file for details.
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/pantheon-org/opencode-warcraft-notifications/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/pantheon-org/opencode-warcraft-notifications/discussions)
+- **Documentation**: [Documentation Index](./docs/README.md)
 
 ---
 
 _"Work complete!"_ - Warcraft II Peasant  
 _"Zug zug!"_ - Warcraft II Orc
 
-> **Note:** This plugin now uses an advanced AI-powered workflow system for automated versioning, publishing, and auto-merging of version sync PRs.
+> **Note:** This plugin uses an advanced AI-powered workflow system for automated versioning, publishing, and auto-merging. See [GitHub Workflows Documentation](./docs/github-workflows/README.md) for details.
