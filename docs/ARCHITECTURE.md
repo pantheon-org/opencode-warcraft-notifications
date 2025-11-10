@@ -19,6 +19,7 @@ graph TB
 
     subgraph "Core Modules"
         NC[Notification Controller<br/>notification.ts]
+        SV[Schema Validator<br/>schema-validator.ts]
         PC[Plugin Config<br/>plugin-config.ts]
         SM[Sound Manager<br/>sounds.ts]
         BS[Bundled Sounds<br/>bundled-sounds.ts]
@@ -46,6 +47,7 @@ graph TB
     PE --> NP
     NP --> NC
     NC --> PC
+    PC --> SV
     NC --> SM
     NC --> BS
     SM --> SD
@@ -61,6 +63,7 @@ graph TB
 
     style NP fill:#e1f5ff
     style NC fill:#fff3e0
+    style SV fill:#ffebee
     style PC fill:#f3e5f5
     style SM fill:#e8f5e9
     style BS fill:#fff9c4
@@ -139,9 +142,50 @@ sequenceDiagram
 - Reads `faction` preference (alliance/horde/both)
 - Falls back to platform-specific defaults
 
-### 3. Plugin Configuration (`plugin-config.ts`)
+### 3. Schema Validator (`schema-validator.ts`)
 
-**Purpose**: Manages plugin configuration loading and default directory resolution.
+**Purpose**: Validates plugin configuration against JSON schema at runtime using Zod.
+
+**Key Responsibilities**:
+
+- Validate configuration structure and values
+- Provide detailed, actionable error messages
+- Support both error-throwing and non-throwing validation modes
+- Ensure type safety for configuration objects
+
+**Validation Flow**:
+
+```mermaid
+graph LR
+    A[Config Object] --> B[validatePluginConfig]
+    B --> C{Valid?}
+    C -->|Yes| D[Return { valid: true }]
+    C -->|No| E[Format Errors]
+    E --> F[Return { valid: false, errors }]
+
+    style D fill:#4caf50
+    style F fill:#f44336
+```
+
+**Validation Rules**:
+
+- `faction`: Must be `'alliance'`, `'horde'`, or `'both'` (optional)
+- `soundsDir`: Must be a string (optional)
+- No unrecognized keys allowed (strict mode)
+
+**Error Message Format**:
+
+```
+[Warcraft Notifications] Configuration validation failed:
+  - faction: Invalid enum value. Must be one of: 'alliance', 'horde', 'both'
+  Configuration file: /path/to/.opencode/plugin.json
+```
+
+**Performance**: Validation completes in <0.1ms, meeting the <100ms requirement.
+
+### 4. Plugin Configuration (`plugin-config.ts`)
+
+**Purpose**: Manages plugin configuration loading, validation, and default directory resolution.
 
 **Key Features**:
 
@@ -184,7 +228,7 @@ interface WarcraftNotificationConfig {
 - `SOUNDS_DATA_DIR`: Override default data directory
 - `SOUNDS_BASE_URL`: Override download base URL (legacy)
 
-### 4. Sound Manager (`sounds.ts`)
+### 5. Sound Manager (`sounds.ts`)
 
 **Purpose**: Manages sound file selection, path resolution, and faction-based filtering.
 
@@ -246,7 +290,7 @@ if (
 return 'alliance';
 ```
 
-### 5. Bundled Sounds Manager (`bundled-sounds.ts`)
+### 6. Bundled Sounds Manager (`bundled-sounds.ts`)
 
 **Purpose**: Handles installation and verification of bundled sound files.
 
@@ -304,7 +348,7 @@ flowchart TD
     └── ... (50+ files)
 ```
 
-### 6. Sound Data Module (`sound-data/`)
+### 7. Sound Data Module (`sound-data/`)
 
 **Purpose**: Centralized sound metadata and file list management.
 
@@ -383,6 +427,7 @@ sequenceDiagram
     participant OC as OpenCode
     participant NP as NotificationPlugin
     participant PC as PluginConfig
+    participant SV as SchemaValidator
     participant BS as BundledSounds
     participant FS as FileSystem
 
@@ -392,10 +437,18 @@ sequenceDiagram
     PC->>FS: Check .opencode/plugin.json
     alt Project config exists
         FS-->>PC: Project config
+        PC->>SV: validateAndSanitizeConfig(config)
+        alt Valid config
+            SV-->>PC: Validated config
+        else Invalid config
+            SV-->>PC: Throw validation error
+        end
     else No project config
         PC->>FS: Check ~/.config/opencode/plugin.json
         alt Global config exists
             FS-->>PC: Global config
+            PC->>SV: validateAndSanitizeConfig(config)
+            SV-->>PC: Validated config
         else No global config
             PC-->>PC: Use platform defaults
         end

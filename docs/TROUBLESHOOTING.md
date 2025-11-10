@@ -95,6 +95,121 @@ For deployment issues, see [DEPLOYMENT.md - Troubleshooting](DEPLOYMENT.md#troub
 - **Config file not found**: Check file location, verify file name, check permissions
 - **Invalid JSON**: Validate JSON syntax, check for trailing commas, verify quotes
 - **Config precedence issues**: Check project vs global config, verify environment variables
+- **Configuration validation errors**: See [Configuration Validation Errors](#configuration-validation-errors) below
+
+### Configuration Validation Errors
+
+Starting with version 1.0.156+, the plugin validates configuration against a JSON schema at runtime. Invalid configurations will cause the plugin to fail with detailed error messages.
+
+#### Common Validation Errors
+
+##### Invalid Faction Value
+
+**Error**:
+
+```
+[Warcraft Notifications] Configuration validation failed:
+  - faction: Invalid enum value. Must be one of: 'alliance', 'horde', 'both'
+  Configuration file: /path/to/.opencode/plugin.json
+```
+
+**Solution**: Update your `plugin.json` to use a valid faction value:
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "faction": "alliance"
+  }
+}
+```
+
+Valid faction values are: `"alliance"`, `"horde"`, or `"both"`.
+
+##### Wrong Type for soundsDir
+
+**Error**:
+
+```
+[Warcraft Notifications] Configuration validation failed:
+  - soundsDir: Expected string, received undefined
+  Configuration file: /path/to/.opencode/plugin.json
+```
+
+**Solution**: Ensure `soundsDir` is a string:
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "soundsDir": "/path/to/sounds"
+  }
+}
+```
+
+##### Unrecognized Configuration Keys
+
+**Error**:
+
+```
+[Warcraft Notifications] Configuration validation failed:
+  - Unrecognized configuration key(s): dataDir. Only 'soundsDir' and 'faction' are allowed.
+  Configuration file: /path/to/.opencode/plugin.json
+```
+
+**Solution**: Remove unrecognized keys. Only `faction` and `soundsDir` are allowed:
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "faction": "horde",
+    "soundsDir": "/custom/path"
+  }
+}
+```
+
+Common mistakes:
+
+- Using `dataDir` instead of `soundsDir` (correct is `soundsDir`)
+- Adding custom keys that aren't part of the schema
+- Typos in configuration keys
+
+#### Testing Your Configuration
+
+You can verify your configuration by:
+
+1. **Check the JSON syntax**:
+
+   ```bash
+   cat .opencode/plugin.json | jq .
+   ```
+
+2. **Validate against the schema**:
+
+   ```bash
+   bun run validate:schema docs/schemas/plugin.json.schema .opencode/plugin.json
+   ```
+
+3. **Enable debug mode** to see configuration loading:
+   ```bash
+   DEBUG_OPENCODE=1 opencode
+   ```
+
+#### Configuration Schema Reference
+
+The complete schema is defined in `docs/schemas/plugin.json.schema`. Valid configuration:
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "faction": "alliance" | "horde" | "both",  // optional, default: "both"
+    "soundsDir": "string"                       // optional, platform-specific default
+  }
+}
+```
+
+Both fields are optional. If not specified, defaults will be used:
+
+- `faction`: `"both"` (plays sounds from both factions)
+- `soundsDir`: Platform-specific default location
 
 ## CI/CD Troubleshooting
 

@@ -13,6 +13,15 @@ Schema validation ensures that your `plugin.json` configuration file:
 - Follows the expected structure
 - Prevents configuration errors before runtime
 
+### Two Types of Validation
+
+This guide covers **build-time and IDE validation** using the JSON schema file. The plugin also performs **runtime validation** when it loads:
+
+- **Build-time/IDE validation** (this guide): Validates syntax while editing with tools like VS Code
+- **Runtime validation**: Automatic validation when the plugin loads (see [Troubleshooting Guide](TROUBLESHOOTING.md#configuration-validation-errors) for runtime errors)
+
+Both types use the same schema definition, ensuring consistency.
+
 ## Quick Start
 
 ### Validate the Example Configuration

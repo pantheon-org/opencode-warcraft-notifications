@@ -243,7 +243,16 @@ export DEBUG_OPENCODE=1
 
 ### Configuration Validation
 
-For schema validation and IDE autocomplete support, see the [Schema Validation Guide](VALIDATE_SCHEMA.md).
+The plugin automatically validates your configuration when it loads. If your configuration has errors, you'll see a detailed error message explaining what needs to be fixed.
+
+**Valid configuration values**:
+
+- `faction`: Must be `"alliance"`, `"horde"`, or `"both"`
+- `soundsDir`: Must be a string path (if provided)
+
+If you encounter validation errors, see the [Troubleshooting Guide](TROUBLESHOOTING.md#configuration-validation-errors) for solutions.
+
+For IDE autocomplete support and schema details, see the [Schema Validation Guide](VALIDATE_SCHEMA.md).
 
 ---
 

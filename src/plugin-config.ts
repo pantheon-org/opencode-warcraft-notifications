@@ -2,6 +2,7 @@ import { join } from 'path';
 import { exists } from 'fs/promises';
 import { homedir } from 'os';
 import { readFileSync } from 'fs';
+import { validateAndSanitizeConfig } from './schema-validator.js';
 
 /**
  * Faction type for Warcraft II sounds
@@ -106,8 +107,12 @@ export const getDefaultBaseUrl = (): string =>
  * 1. CWD/.opencode/plugin.json
  * 2. ~/.config/opencode/plugin.json
  *
+ * Configuration is validated against the JSON schema. Invalid configurations
+ * will throw an error with detailed validation messages.
+ *
  * @param pluginName - Name of the plugin to load configuration for
- * @returns Plugin configuration object
+ * @returns Plugin configuration object (validated and typed)
+ * @throws Error If configuration validation fails
  */
 export const loadPluginConfig = async (pluginName: string): Promise<WarcraftNotificationConfig> => {
   const configPaths = [
@@ -122,16 +127,33 @@ export const loadPluginConfig = async (pluginName: string): Promise<WarcraftNoti
         const configData: PluginConfig = await configFile.json();
 
         if (configData[pluginName]) {
-          return configData[pluginName] as WarcraftNotificationConfig;
+          // Validate the configuration before returning
+          const rawConfig = configData[pluginName];
+          try {
+            const validatedConfig = validateAndSanitizeConfig(rawConfig);
+            return validatedConfig;
+          } catch (validationError) {
+            // Re-throw validation errors with context about the config file location
+            if (validationError instanceof Error) {
+              throw new Error(`${validationError.message}\n  Configuration file: ${configPath}`);
+            }
+            throw validationError;
+          }
         }
       }
-    } catch (error) {
-      // Only warn when explicit debug flag is set to avoid noisy logs during tests
+    } catch (error: unknown) {
+      // For validation errors, re-throw to notify the user immediately
+      if (error instanceof Error && error.message.includes('Configuration validation failed')) {
+        throw error;
+      }
+
+      // Only warn for other errors when explicit debug flag is set to avoid noisy logs during tests
       if (process.env.DEBUG_OPENCODE) {
         console.warn(`Failed to load plugin config from ${configPath}:`, error);
       }
     }
   }
 
-  return {}; // Return empty config if no valid config found
+  // Return empty config if no valid config found (empty config is valid)
+  return validateAndSanitizeConfig({});
 };
