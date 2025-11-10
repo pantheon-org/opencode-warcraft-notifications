@@ -1,3 +1,9 @@
+---
+layout: home
+title: Warcraft II Notifications Plugin
+description: OpenCode plugin for Warcraft II notification sounds
+---
+
 <div align="center" markdown="1">
 
 # 🎮 Warcraft II Notifications Plugin for OpenCode
