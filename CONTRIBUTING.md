@@ -672,7 +672,6 @@ Describe manual testing performed:
 - [ ] API documentation updated
 - [ ] User Guide updated
 - [ ] Architecture documentation updated
-- [ ] CHANGELOG updated (for releases)
 
 ## Screenshots/Recordings
 
