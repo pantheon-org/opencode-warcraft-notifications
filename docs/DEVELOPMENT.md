@@ -131,7 +131,7 @@ opencode-warcraft-notifications/
 
 Contains all source code:
 
-- **Core modules**: `notification.ts`, `plugin-config.ts`, `sounds.ts`, `bundled-sounds.ts`
+- **Core modules**: `notification.ts`, `plugin-config.ts`, `sounds.ts`, `bundled-sounds.ts`, `schema-validator.ts`
 - **Sound data**: `sound-data/` directory with faction-specific sound entries
 - **Tests**: `*.test.ts` files for unit and integration tests
 - **Utilities**: `test-utils.ts` for testing helpers
@@ -151,6 +151,111 @@ Documentation files:
 - **Architecture**: System design and component diagrams
 - **Workflows**: CI/CD pipeline documentation
 - **Schemas**: JSON schema definitions
+
+---
+
+## Configuration Validation
+
+The plugin implements runtime validation of `plugin.json` configuration using Zod schemas. Configuration is validated automatically when the plugin loads, ensuring that any configuration errors are caught early with clear, actionable error messages.
+
+### Validation Architecture
+
+```mermaid
+graph LR
+    A[plugin.json] --> B[loadPluginConfig]
+    B --> C[validateAndSanitizeConfig]
+    C --> D{Valid?}
+    D -->|Yes| E[Return Config]
+    D -->|No| F[Throw Error]
+    F --> G[Error Message to User]
+
+    style C fill:#4caf50
+    style F fill:#f44336
+    style E fill:#2196f3
+```
+
+### Schema Definition
+
+The validation schema is defined in `src/schema-validator.ts` and enforces:
+
+- **faction**: Must be one of `'alliance'`, `'horde'`, or `'both'` (optional)
+- **soundsDir**: Must be a string (optional)
+- **No extra keys**: Unknown configuration keys are rejected
+
+### Validation Behavior
+
+#### Valid Configuration
+
+```typescript
+// Valid: Only alliance sounds
+{ faction: 'alliance' }
+
+// Valid: Custom sounds directory
+{ soundsDir: '/custom/path/to/sounds' }
+
+// Valid: Both settings
+{ faction: 'horde', soundsDir: '~/.cache/sounds' }
+
+// Valid: Empty (uses defaults)
+{}
+```
+
+#### Invalid Configuration
+
+```typescript
+// Invalid: Unknown faction
+{ faction: 'night-elf' }
+// Error: faction: Invalid enum value. Must be one of: 'alliance', 'horde', 'both'
+
+// Invalid: Wrong type for soundsDir
+{ soundsDir: 123 }
+// Error: soundsDir: Expected string, received undefined
+
+// Invalid: Unrecognized keys
+{ faction: 'alliance', unknownKey: 'value' }
+// Error: Unrecognized configuration key(s): unknownKey. Only 'soundsDir' and 'faction' are allowed.
+```
+
+### Error Messages
+
+Validation errors provide specific, actionable feedback:
+
+```
+[Warcraft Notifications] Configuration validation failed:
+  - faction: Invalid enum value. Must be one of: 'alliance', 'horde', 'both'
+  - soundsDir: Expected string, received undefined
+  Configuration file: /path/to/.opencode/plugin.json
+```
+
+### Testing Validation
+
+When writing tests that involve configuration:
+
+```typescript
+import { validatePluginConfig } from './schema-validator';
+
+describe('My Feature', () => {
+  it('should handle valid config', () => {
+    const result = validatePluginConfig({ faction: 'alliance' });
+    expect(result.valid).toBe(true);
+  });
+
+  it('should reject invalid config', () => {
+    const result = validatePluginConfig({ faction: 'invalid' });
+    expect(result.valid).toBe(false);
+    expect(result.errors).toBeDefined();
+  });
+});
+```
+
+### Debugging Validation Issues
+
+If you encounter validation errors during development:
+
+1. **Check the error message**: It will specify exactly which field is invalid and why
+2. **Verify the schema**: Look at `docs/schemas/plugin.json.schema` for the expected structure
+3. **Enable debug mode**: Set `DEBUG_OPENCODE=1` to see validation warnings
+4. **Test your config**: Use `validatePluginConfig()` in tests to verify expected behavior
 
 ---
 
