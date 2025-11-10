@@ -156,15 +156,15 @@ sequenceDiagram
 **Validation Flow**:
 
 ```mermaid
-graph LR
+flowchart LR
     A[Config Object] --> B[validatePluginConfig]
     B --> C{Valid?}
-    C -->|Yes| D[Return { valid: true }]
+    C -->|Yes| D[Return valid: true]
     C -->|No| E[Format Errors]
-    E --> F[Return { valid: false, errors }]
+    E --> F[Return valid: false, errors]
 
-    style D fill:#4caf50
-    style F fill:#f44336
+    style D fill:#4caf50,color:#000
+    style F fill:#f44336,color:#fff
 ```
 
 **Validation Rules**:
