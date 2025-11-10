@@ -856,6 +856,108 @@ If a release has critical issues:
 
 ---
 
+## Documentation Deployment
+
+### GitHub Pages
+
+The project documentation is automatically deployed to GitHub Pages at:
+
+**URL**: https://pantheon-org.github.io/opencode-warcraft-notifications/
+
+#### Automatic Deployment
+
+Documentation is automatically deployed when:
+
+- Changes are pushed to `main` branch in the `docs/**` directory
+- Workflow file `.github/workflows/deploy-docs.yml` is modified
+- Manual workflow dispatch is triggered
+
+#### Workflow Overview
+
+```yaml
+Trigger: Push to main (docs/** changes) or manual dispatch
+Build: Jekyll processes markdown files from docs/
+Deploy: GitHub Pages hosts the built site
+```
+
+#### Manual Deployment
+
+To manually trigger documentation deployment:
+
+1. Navigate to [GitHub Actions](https://github.com/pantheon-org/opencode-warcraft-notifications/actions/workflows/deploy-docs.yml)
+2. Click "Run workflow"
+3. Select branch (usually `main`)
+4. Click "Run workflow" button
+
+#### Initial Setup
+
+**Required**: Repository administrator must enable GitHub Pages:
+
+1. Go to repository **Settings** → **Pages**
+2. Under **Source**, select:
+   - Source: **GitHub Actions**
+3. Save changes
+
+The workflow will automatically create the `github-pages` environment on first deployment.
+
+#### Verification
+
+After deployment completes (typically 2-5 minutes):
+
+```bash
+# Check site is live
+curl -I https://pantheon-org.github.io/opencode-warcraft-notifications/ | grep "200 OK"
+
+# Open in browser
+open https://pantheon-org.github.io/opencode-warcraft-notifications/
+```
+
+#### Troubleshooting
+
+**Site not accessible**:
+
+1. Verify GitHub Pages is enabled in repository settings
+2. Check workflow run status in Actions tab
+3. Ensure `GITHUB_TOKEN` has proper permissions (configured in workflow)
+4. Wait 5-10 minutes for DNS propagation
+
+**Build failures**:
+
+1. Check workflow logs in Actions tab
+2. Verify Jekyll configuration in `docs/_config.yml`
+3. Ensure all markdown files have valid syntax
+4. Check for broken internal links
+
+**Content not updating**:
+
+1. Clear browser cache
+2. Verify changes were committed to `docs/**`
+3. Check workflow was triggered (Actions tab)
+4. Wait for deployment to complete
+
+#### Jekyll Configuration
+
+Documentation uses Jekyll with the Cayman theme for enhanced formatting:
+
+**File**: `docs/_config.yml`
+
+```yaml
+theme: jekyll-theme-cayman
+title: Warcraft II Notifications Plugin
+description: OpenCode plugin for Warcraft II notification sounds
+show_downloads: false
+```
+
+#### Monitoring
+
+Monitor documentation deployment health:
+
+- **Workflow status**: [GitHub Actions](https://github.com/pantheon-org/opencode-warcraft-notifications/actions/workflows/deploy-docs.yml)
+- **Site availability**: Regular HTTP 200 checks
+- **Build time**: Typical deployment takes 2-5 minutes
+
+---
+
 ## Support
 
 ### Documentation
@@ -864,6 +966,7 @@ If a release has critical issues:
 - [API Documentation](./API.md) - API reference
 - [Architecture](./ARCHITECTURE.md) - System design
 - [Development Guide](./DEVELOPMENT.md) - Development workflows
+- [Live Documentation Site](https://pantheon-org.github.io/opencode-warcraft-notifications/) - GitHub Pages
 
 ### Community
 

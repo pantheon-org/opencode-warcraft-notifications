@@ -2,6 +2,8 @@
 
 Welcome to the comprehensive documentation for the Warcraft II Notifications Plugin for OpenCode!
 
+**Live Documentation**: This documentation is also available online at [https://pantheon-org.github.io/opencode-warcraft-notifications/](https://pantheon-org.github.io/opencode-warcraft-notifications/)
+
 ## 📚 Documentation Structure
 
 ### For Users
@@ -385,6 +387,7 @@ graph TB
 
 ### External Documentation
 
+- [Live Documentation Site](https://pantheon-org.github.io/opencode-warcraft-notifications/) - GitHub Pages hosted documentation
 - [OpenCode Plugin Documentation](https://opencode.ai/docs/plugins/)
 - [Bun Documentation](https://bun.sh/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
@@ -412,6 +415,7 @@ graph TB
 - ✅ Development Guide added
 - ✅ Deployment Guide added
 - ✅ Documentation Index created
+- ✅ GitHub Pages deployment configured
 
 ---
 
