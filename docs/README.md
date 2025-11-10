@@ -105,6 +105,7 @@ Complete API documentation covering:
 
 - Plugin entry point
 - Notification module
+- Schema validator module
 - Plugin configuration module
 - Sound manager module
 - Bundled sounds module

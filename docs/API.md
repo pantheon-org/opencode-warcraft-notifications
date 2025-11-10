@@ -8,6 +8,7 @@ This document provides comprehensive API documentation for the Warcraft II Notif
 
 - [Plugin Entry Point](#plugin-entry-point)
 - [Notification Module](#notification-module)
+- [Schema Validator Module](#schema-validator-module)
 - [Plugin Configuration Module](#plugin-configuration-module)
 - [Sound Manager Module](#sound-manager-module)
 - [Bundled Sounds Module](#bundled-sounds-module)
@@ -159,11 +160,123 @@ getIdleSummary(null);
 
 ---
 
+## Schema Validator Module
+
+### `schema-validator.ts`
+
+Provides runtime validation of plugin configuration against the JSON schema using Zod.
+
+#### Types
+
+##### `ValidationResult`
+
+```typescript
+export interface ValidationResult {
+  valid: boolean;
+  errors?: string[];
+  warnings?: string[];
+}
+```
+
+**Description**: Result object returned by validation functions.
+
+**Properties**:
+
+- `valid: boolean` - Whether the configuration is valid
+- `errors?: string[]` - Critical errors that must be fixed (if invalid)
+- `warnings?: string[]` - Non-critical warnings (if any)
+
+#### Functions
+
+##### `validatePluginConfig()`
+
+```typescript
+export const validatePluginConfig = (config: unknown): ValidationResult
+```
+
+**Description**: Validates plugin configuration against the schema without throwing errors.
+
+**Parameters**:
+
+- `config: unknown` - The configuration object to validate
+
+**Returns**: `ValidationResult` - Validation result with valid flag and any errors or warnings
+
+**Example**:
+
+```typescript
+const result = validatePluginConfig({ faction: 'alliance' });
+if (result.valid) {
+  console.log('Configuration is valid');
+} else {
+  console.error('Validation errors:', result.errors);
+}
+```
+
+**Validation Rules**:
+
+- `faction` must be one of: `'alliance'`, `'horde'`, `'both'` (if provided)
+- `soundsDir` must be a string (if provided)
+- No unrecognized configuration keys are allowed
+
+**Error Examples**:
+
+```typescript
+// Invalid faction
+validatePluginConfig({ faction: 'night-elf' });
+// Returns: { valid: false, errors: ['faction: Invalid enum value. Must be one of: \'alliance\', \'horde\', \'both\''] }
+
+// Wrong type for soundsDir
+validatePluginConfig({ soundsDir: 123 });
+// Returns: { valid: false, errors: ['soundsDir: Expected string, received undefined'] }
+
+// Unrecognized keys
+validatePluginConfig({ faction: 'alliance', unknownKey: 'value' });
+// Returns: { valid: false, errors: ['Unrecognized configuration key(s): unknownKey. Only \'soundsDir\' and \'faction\' are allowed.'] }
+```
+
+##### `validateAndSanitizeConfig()`
+
+```typescript
+export const validateAndSanitizeConfig = (config: unknown): WarcraftNotificationConfig
+```
+
+**Description**: Validates configuration and returns a typed, sanitized version. Throws error if invalid.
+
+**Parameters**:
+
+- `config: unknown` - The configuration object to validate
+
+**Returns**: `WarcraftNotificationConfig` - Validated and typed configuration object
+
+**Throws**: Error if validation fails with detailed error messages
+
+**Example**:
+
+```typescript
+try {
+  const config = validateAndSanitizeConfig({ faction: 'alliance' });
+  console.log('Using faction:', config.faction); // TypeScript knows config is typed
+} catch (error) {
+  console.error('Configuration invalid:', error.message);
+}
+```
+
+**Error Format**:
+
+```
+[Warcraft Notifications] Configuration validation failed:
+  - faction: Invalid enum value. Must be one of: 'alliance', 'horde', 'both'
+  Configuration file: /path/to/.opencode/plugin.json
+```
+
+---
+
 ## Plugin Configuration Module
 
 ### `plugin-config.ts`
 
-Manages plugin configuration loading and platform-specific directory resolution.
+Manages plugin configuration loading, validation, and platform-specific directory resolution.
 
 #### Types
 
@@ -277,19 +390,23 @@ const dataDir = getDefaultDataDir();
 export const loadPluginConfig = async (pluginName: string): Promise<WarcraftNotificationConfig>
 ```
 
-**Description**: Loads plugin configuration from plugin.json files with priority order.
+**Description**: Loads and validates plugin configuration from plugin.json files with priority order.
 
 **Parameters**:
 
 - `pluginName: string` - Name of the plugin (e.g., '@pantheon-ai/opencode-warcraft-notifications')
 
-**Returns**: `Promise<WarcraftNotificationConfig>` - Plugin configuration object
+**Returns**: `Promise<WarcraftNotificationConfig>` - Validated plugin configuration object
+
+**Throws**: Error if configuration validation fails
 
 **Configuration Priority** (highest to lowest):
 
 1. Project-specific: `<project>/.opencode/plugin.json`
 2. Global: `~/.config/opencode/plugin.json`
 3. Empty config (uses defaults)
+
+**Validation**: Configuration is automatically validated against the JSON schema. Invalid configurations will throw an error with detailed validation messages.
 
 **Example**:
 
@@ -306,6 +423,14 @@ const config = await loadPluginConfig('@pantheon-ai/opencode-warcraft-notificati
 //   }
 // }
 // Returns: { soundsDir: '/custom/sounds', faction: 'horde' }
+
+// With invalid config - throws error:
+// {
+//   "@pantheon-ai/opencode-warcraft-notifications": {
+//     "faction": "invalid"
+//   }
+// }
+// Throws: Error with validation details
 ```
 
 #### Constants
