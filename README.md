@@ -12,7 +12,7 @@
 
 This plugin plays authentic Warcraft II unit audio clips from both Alliance and Horde factions when your OpenCode session goes idle, bringing back memories of commanding orcs, knights, trolls, and mages in the classic RTS game.
 
-[Quick Start](#quick-start) • [Documentation](docs/README.md) • [Contributing](CONTRIBUTING.md) • [Changelog](CHANGELOG.md)
+[Quick Start](#quick-start) • [Documentation](docs/README.md) • [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -260,7 +260,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **Discussions**: [GitHub Discussions](https://github.com/pantheon-org/opencode-warcraft-notifications/discussions)
 - **Documentation**: [Documentation Index](docs/README.md)
 - **Live Docs**: [GitHub Pages](https://pantheon-org.github.io/opencode-warcraft-notifications/)
-- **Security**: [Security Policy](SECURITY.md)
 
 ---
 

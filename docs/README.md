@@ -178,41 +178,6 @@ Comprehensive CI/CD pipeline documentation:
 
 ---
 
-### Project Documentation
-
-#### [Changelog](../CHANGELOG.md)
-
-**Version history and release notes**
-
-Complete changelog following Keep a Changelog format:
-
-- Version history
-- Release notes
-- Breaking changes
-- Migration guides
-- Security updates
-
-**Best for**: Tracking changes, upgrade planning
-
----
-
-#### [Security Policy](../SECURITY.md)
-
-**Security policy and vulnerability reporting**
-
-Security documentation and procedures:
-
-- Supported versions
-- Reporting vulnerabilities
-- Security considerations
-- Best practices
-- Security audit results
-- Dependency security
-
-**Best for**: Security researchers, security-conscious users
-
----
-
 ### Specialized Documentation
 
 #### [GitHub Workflows](github-workflows/README.md)
@@ -461,8 +426,6 @@ graph TB
 
 ### Project Resources
 
-- [Changelog](../CHANGELOG.md) - Version history and release notes
-- [Security Policy](../SECURITY.md) - Security policy and vulnerability reporting
 - [Contributing Guide](../CONTRIBUTING.md) - How to contribute
 - [License](../LICENSE) - MIT License
 
