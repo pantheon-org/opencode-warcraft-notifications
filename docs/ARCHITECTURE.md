@@ -175,7 +175,9 @@ interface WarcraftNotificationConfig {
 
 - **macOS**: `~/Library/Application Support/opencode/storage/plugin/<package-name>`
 - **Linux**: `~/.local/share/opencode/storage/plugin/<package-name>`
-- **Windows**: `%APPDATA%\opencode\storage\plugin\<package-name>`
+- **Windows** (planned): `%APPDATA%\opencode\storage\plugin\<package-name>`
+
+> **Note**: Windows support is planned for a future release. Currently supported: macOS and Linux.
 
 **Environment Variable Overrides**:
 
@@ -828,6 +830,15 @@ graph TD
 
 ---
 
+## Related Documentation
+
+- [API Documentation](API.md) - Complete technical API reference
+- [Development Guide](DEVELOPMENT.md) - Development setup and workflow
+- [Deployment Guide](DEPLOYMENT.md) - Installation and operations
+- [User Guide](USER_GUIDE.md) - End-user documentation
+
+---
+
 **Document Version**: 1.0  
-**Last Updated**: November 10, 2025  
+**Last Updated**: 2025-11-10  
 **Maintained By**: Pantheon AI Team

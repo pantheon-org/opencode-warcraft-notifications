@@ -15,13 +15,13 @@ This directory contains all documentation related to GitHub Actions workflows, a
 - **[Cycle Prevention Fix](./cycle-prevention-fix.md)** - Solution for workflow cycle causing excessive releases
 - **[Squash Merge Configuration](./squash-merge-configuration.md)** - Repository merge strategy configuration
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **New to the project?** Start with the [Setup Guide](./setup-guide.md)
 2. **Need workflow details?** Check the [Overview](./overview.md)
 3. **Troubleshooting?** See specific fix documentation above
 
-## 🔧 Workflow Types
+## Workflow Types
 
 This repository uses several automated workflows:
 
@@ -31,7 +31,7 @@ This repository uses several automated workflows:
 - **Auto-Merge Bot** - Automated merging for version sync PRs
 - **Sync Package Version** - Legacy fallback for version synchronization
 
-## 📋 Key Features
+## Key Features
 
 - ✅ Automated semantic versioning with AI analysis
 - ✅ Comprehensive testing and validation
@@ -40,7 +40,7 @@ This repository uses several automated workflows:
 - ✅ Cycle prevention and race condition protection
 - ✅ Squash merge enforcement
 
-## 🔍 Recent Updates
+## Recent Updates
 
 - **Workflow Cycle Prevention** - Fixed excessive version releases (see [Cycle Prevention Fix](./cycle-prevention-fix.md))
 - **Architecture Refactoring** - Streamlined workflow architecture (see [Architecture Summary](./architecture-summary.md))

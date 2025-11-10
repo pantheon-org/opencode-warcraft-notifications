@@ -4,7 +4,7 @@ This document explains the streamlined GitHub Actions workflow setup for automat
 
 > 📖 **For detailed workflow documentation including step-by-step breakdowns, troubleshooting, and configuration details, see [GitHub Workflows Overview](./overview.md)**
 
-## 🎯 **Streamlined Architecture Overview**
+## Streamlined Architecture Overview
 
 The workflow system has been optimized from 7 legacy workflows down to **4 essential workflows** that provide comprehensive automation:
 
@@ -14,7 +14,7 @@ The workflow system has been optimized from 7 legacy workflows down to **4 essen
 - **Branch protection compliance** with automated PR creation
 - **Comprehensive automation** with intelligent decision-making
 
-## 🏗️ Workflow Architecture
+## Workflow Architecture
 
 ### 1. **PR Validation** (`pr-validation.yml`)
 
@@ -58,7 +58,7 @@ The workflow system has been optimized from 7 legacy workflows down to **4 essen
   - Detailed GitHub release creation
   - Post-publish validation
 
-## 🔧 Required Setup
+## Required Setup
 
 ### 1. GitHub Secrets
 
@@ -105,7 +105,7 @@ Set up branch protection for `main`:
      - **"pr-analysis"** (from PR Validation workflow)
    - "Require branches to be up to date before merging"
 
-## 📋 Workflow Behavior
+## Workflow Behavior
 
 ### Pull Request Flow
 
@@ -132,7 +132,7 @@ If you need to republish a version:
 2. Click "Run workflow"
 3. Enter the tag name (e.g., `v1.2.3`)
 
-## 🤖 AI Version Analysis
+## AI Version Analysis
 
 The smart versioning workflow uses AI to analyze:
 
@@ -158,7 +158,7 @@ docs: update README with new examples
 BREAKING CHANGE: remove deprecated API methods
 ```
 
-## 🔍 Monitoring & Debugging
+## Monitoring & Debugging
 
 ### Workflow Status
 
@@ -220,7 +220,7 @@ Ensure your `package.json` has:
 }
 ```
 
-## 🚀 Migration from Legacy Workflows
+## Migration from Legacy Workflows
 
 ### What Was Removed
 
@@ -271,7 +271,7 @@ If you encounter issues:
 
 ---
 
-## 📚 Additional Documentation
+## Additional Documentation
 
 - **[GitHub Workflows Overview](./overview.md)** - Comprehensive technical documentation for all workflows
 - **[Sounds Usage Guide](../sounds-usage.md)** - How to use the notification sounds

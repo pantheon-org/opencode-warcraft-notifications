@@ -432,10 +432,10 @@ Look for log messages showing:
 
 ## Related Documentation
 
-- **[Configuration Guide](./USER_GUIDE.md#configuration)** - Complete configuration reference
+- **[Configuration Guide](USER_GUIDE.md#configuration)** - Complete configuration reference
 - **[Schema README](./schemas/README.md)** - Schema documentation overview
-- **[API Documentation](./API.md#plugin-configuration-module)** - Configuration API details
-- **[Deployment Guide](./DEPLOYMENT.md#configuration)** - Configuration deployment
+- **[API Documentation](API.md#plugin-configuration-module)** - Configuration API details
+- **[Deployment Guide](DEPLOYMENT.md#configuration)** - Configuration deployment
 
 ## Resources
 
@@ -446,5 +446,5 @@ Look for log messages showing:
 ---
 
 **Document Version**: 1.0  
-**Last Updated**: November 10, 2025  
+**Last Updated**: 2025-11-10  
 **Maintained By**: Pantheon AI Team
