@@ -35,7 +35,8 @@ This project includes comprehensive documentation for all users:
 ### For Operations
 
 - **[Deployment Guide](./docs/DEPLOYMENT.md)** - Installation and operations
-- **[GitHub Workflows](./docs/github-workflows/README.md)** - CI/CD automation
+- **[CI/CD Pipeline](./docs/PIPELINE.md)** - Complete pipeline technical reference
+- **[GitHub Workflows](./docs/github-workflows/README.md)** - CI/CD setup guides
 
 ### Complete Documentation
 

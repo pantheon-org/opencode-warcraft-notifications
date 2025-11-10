@@ -112,7 +112,7 @@ Complete deployment documentation:
 - Configuration management
 - Platform-specific setup
 - Deployment architecture
-- CI/CD pipeline
+- CI/CD pipeline overview
 - Monitoring and health checks
 - Troubleshooting
 - Maintenance procedures
@@ -122,11 +122,31 @@ Complete deployment documentation:
 
 ---
 
+#### [CI/CD Pipeline Documentation](./PIPELINE.md) 🔄
+
+**Complete pipeline technical reference**
+
+Comprehensive CI/CD pipeline documentation:
+
+- Pipeline architecture and flow
+- Detailed workflow documentation (8 workflows)
+- AI-powered version management
+- Environment configuration
+- Secrets management
+- Monitoring and observability
+- Troubleshooting guide
+- Best practices
+- Maintenance procedures
+
+**Best for**: Understanding CI/CD details, pipeline configuration, workflow troubleshooting
+
+---
+
 ### Specialized Documentation
 
 #### [GitHub Workflows](./github-workflows/README.md) ⚙️
 
-**CI/CD automation**
+**CI/CD automation guides**
 
 Documentation for GitHub Actions workflows:
 
@@ -139,7 +159,7 @@ Documentation for GitHub Actions workflows:
 - Setup guide
 - Architecture summary
 
-**Best for**: Understanding automation, CI/CD configuration
+**Best for**: Quick workflow reference, setup guides
 
 ---
 
@@ -174,7 +194,8 @@ graph TB
 
     subgraph "Operations Documentation"
         DEPLOY[Deployment Guide<br/>Installation & Ops]
-        WORKFLOWS[GitHub Workflows<br/>CI/CD]
+        PIPELINE[Pipeline Docs<br/>CI/CD Technical Reference]
+        WORKFLOWS[GitHub Workflows<br/>Setup Guides]
     end
 
     subgraph "Reference Documentation"
@@ -189,7 +210,8 @@ graph TB
     DEV --> ARCH
     API --> ARCH
 
-    DEPLOY --> WORKFLOWS
+    DEPLOY --> PIPELINE
+    PIPELINE --> WORKFLOWS
     DEPLOY --> SCHEMAS
 
     style UG fill:#4caf50
@@ -217,8 +239,9 @@ graph TB
 #### Deploy or Maintain
 
 1. Follow [Deployment Guide](./DEPLOYMENT.md) for installation
-2. Review [GitHub Workflows](./github-workflows/README.md) for automation
-3. Check [Monitoring](./DEPLOYMENT.md#monitoring) for health checks
+2. Review [CI/CD Pipeline](./PIPELINE.md) for complete technical reference
+3. Review [GitHub Workflows](./github-workflows/README.md) for setup guides
+4. Check [Monitoring](./DEPLOYMENT.md#monitoring) for health checks
 
 #### Understand the System
 
@@ -267,7 +290,9 @@ graph TB
 ### Operations
 
 - [Deployment](./DEPLOYMENT.md#deployment-architecture)
-- [CI/CD Pipeline](./DEPLOYMENT.md#cicd-pipeline)
+- [CI/CD Pipeline Overview](./DEPLOYMENT.md#cicd-pipeline)
+- [CI/CD Pipeline Details](./PIPELINE.md)
+- [Workflow Setup](./github-workflows/README.md)
 - [Monitoring](./DEPLOYMENT.md#monitoring)
 
 ### Troubleshooting
@@ -323,15 +348,17 @@ graph TB
 **Recommended Reading**:
 
 1. [Deployment Guide](./DEPLOYMENT.md) - Installation & operations
-2. [GitHub Workflows](./github-workflows/README.md) - CI/CD automation
-3. [Monitoring](./DEPLOYMENT.md#monitoring) - Health checks
+2. [CI/CD Pipeline](./PIPELINE.md) - Complete technical reference
+3. [GitHub Workflows](./github-workflows/README.md) - Setup guides
+4. [Monitoring](./DEPLOYMENT.md#monitoring) - Health checks
 
 **Key Topics**:
 
 - Deployment
 - Configuration management
+- Pipeline architecture
+- Workflow troubleshooting
 - Monitoring
-- Troubleshooting
 
 ---
 
@@ -409,6 +436,7 @@ graph TB
 ### For Operations
 
 - [x] Deployment procedures
+- [x] CI/CD pipeline documentation
 - [x] Configuration management
 - [x] Monitoring guide
 - [x] Troubleshooting procedures
