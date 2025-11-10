@@ -722,7 +722,7 @@ You can add your own WAV files:
 
 #### Q: How do I update the plugin?
 
-**A**: See the [Updates section in the Deployment Guide](./DEPLOYMENT.md#updates) for update instructions.
+**A**: See the [Maintenance - Updates section in the Deployment Guide](./DEPLOYMENT.md#maintenance) for update instructions.
 
 ### Troubleshooting Questions
 
