@@ -1,0 +1,71 @@
+<!-- Search Modal -->
+<div
+  id="search-modal"
+  class="search-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="search-title"
+>
+  <div class="search-backdrop"></div>
+  <div class="search-container">
+    <div class="search-header">
+      <div class="search-input-wrapper">
+        <svg
+          class="search-icon"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Search documentation..."
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Search documentation"
+        />
+        <kbd class="search-shortcut">ESC</kbd>
+      </div>
+    </div>
+
+    <div class="search-results" id="search-results" role="listbox">
+      <div class="search-empty">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <p>Start typing to search...</p>
+      </div>
+    </div>
+
+    <div class="search-footer">
+      <div class="search-footer-item">
+        <kbd>↑</kbd>
+        <kbd>↓</kbd>
+        <span>Navigate</span>
+      </div>
+      <div class="search-footer-item">
+        <kbd>↵</kbd>
+        <span>Select</span>
+      </div>
+      <div class="search-footer-item">
+        <kbd>ESC</kbd>
+        <span>Close</span>
+      </div>
+    </div>
+  </div>
+</div>
