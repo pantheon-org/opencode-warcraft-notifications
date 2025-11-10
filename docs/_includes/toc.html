@@ -1,0 +1,32 @@
+{% if page.toc != false and content contains '<h2' or content contains '<h3' %}
+<nav class="toc" aria-label="Table of contents">
+  <h2 class="toc-title">On this page</h2>
+  <ul class="toc-list">
+    {% assign toc_min = 2 %}
+    {% assign toc_max = 3 %}
+    
+    <!-- Extract headings from content -->
+    {% assign headings = content | split: '<h' %}
+    {% for heading in headings %}
+      {% if heading contains '</h' %}
+        {% assign heading_level = heading | split: ' ' | first | remove: '>' %}
+        {% assign heading_level_num = heading_level | plus: 0 %}
+        
+        {% if heading_level_num >= toc_min and heading_level_num <= toc_max %}
+          {% assign heading_parts = heading | split: '>' %}
+          {% assign heading_id = heading_parts[0] | split: 'id="' | last | split: '"' | first %}
+          {% assign heading_text = heading_parts[1] | split: '</h' | first | strip_html %}
+          
+          {% if heading_id != '' and heading_text != '' %}
+          <li class="toc-item toc-item-{{ heading_level_num }}">
+            <a href="#{{ heading_id }}" class="toc-link">
+              {{ heading_text }}
+            </a>
+          </li>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}

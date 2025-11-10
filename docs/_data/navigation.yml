@@ -1,0 +1,67 @@
+# Navigation structure for the documentation site
+# This file defines the sidebar navigation menu
+
+docs:
+  - title: 'Home'
+    url: /
+
+  - title: 'User Guide'
+    url: /USER_GUIDE
+
+  - title: 'API Documentation'
+    url: /API
+
+  - title: 'Architecture'
+    url: /ARCHITECTURE
+    open: true
+    children:
+      - title: 'Overview'
+        url: /ARCHITECTURE#overview
+      - title: 'Core Modules'
+        url: /ARCHITECTURE#core-modules
+      - title: 'Sound Data'
+        url: /ARCHITECTURE#sound-data-module
+
+  - title: 'Development'
+    url: /DEVELOPMENT
+    open: true
+    children:
+      - title: 'Getting Started'
+        url: /DEVELOPMENT#getting-started
+      - title: 'Testing'
+        url: /DEVELOPMENT#testing
+      - title: 'Contributing'
+        url: /DEVELOPMENT#contributing
+
+  - title: 'Deployment'
+    url: /DEPLOYMENT
+
+  - title: 'Pipeline'
+    url: /PIPELINE
+    children:
+      - title: 'Overview'
+        url: /PIPELINE#overview
+      - title: 'Workflows'
+        url: /PIPELINE#workflows
+
+  - title: 'Troubleshooting'
+    url: /TROUBLESHOOTING
+
+  - title: 'Onboarding'
+    url: /ONBOARDING
+
+  - title: 'GitHub Workflows'
+    url: /github-workflows/
+    children:
+      - title: 'Setup Guide'
+        url: /github-workflows/setup-guide
+      - title: 'Architecture'
+        url: /github-workflows/architecture-summary
+
+  - title: 'Schemas'
+    url: /schemas/
+    children:
+      - title: 'Plugin Schema'
+        url: /schemas/#plugin-configuration-schema
+      - title: 'Validation'
+        url: /VALIDATE_SCHEMA
