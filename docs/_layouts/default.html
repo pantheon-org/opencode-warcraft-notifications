@@ -15,10 +15,32 @@
     <!-- Mermaid JS for diagram rendering -->
     <script type="module">
       import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      
+      // Initialize Mermaid
       mermaid.initialize({ 
-        startOnLoad: true,
+        startOnLoad: false,
         theme: 'default',
         securityLevel: 'loose'
+      });
+
+      // Convert code blocks with language-mermaid to proper mermaid divs
+      document.addEventListener('DOMContentLoaded', function() {
+        // Find all code blocks with class language-mermaid
+        const mermaidCodeBlocks = document.querySelectorAll('code.language-mermaid');
+        
+        mermaidCodeBlocks.forEach((codeBlock, index) => {
+          // Create a new div element with mermaid class
+          const mermaidDiv = document.createElement('div');
+          mermaidDiv.className = 'mermaid';
+          mermaidDiv.textContent = codeBlock.textContent;
+          
+          // Replace the pre > code structure with just the div
+          const preElement = codeBlock.parentElement;
+          preElement.parentElement.replaceChild(mermaidDiv, preElement);
+        });
+        
+        // Now render all mermaid diagrams
+        mermaid.run();
       });
     </script>
   </head>
