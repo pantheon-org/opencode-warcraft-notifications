@@ -1,6 +1,6 @@
 ---
-title: "Schema Validation"
-description: "JSON schema validation guide"
+title: 'Schema Validation'
+description: 'JSON schema validation guide'
 ---
 
 # Schema Validation Guide

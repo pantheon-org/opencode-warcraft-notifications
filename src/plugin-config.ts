@@ -1,7 +1,8 @@
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { exists } from 'fs/promises';
 import { homedir } from 'os';
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 import { validateAndSanitizeConfig } from './schema-validator.js';
 
 /**
@@ -44,6 +45,67 @@ export const getConfigDir = (): string => {
 };
 
 /**
+ * Get the directory containing this module
+ * @returns Directory path of the current module
+ */
+const getModuleDir = (): string => {
+  // In ES modules, we use import.meta.url to get the file path
+  // This works reliably regardless of CWD
+  try {
+    const moduleUrl = import.meta.url;
+    const modulePath = fileURLToPath(moduleUrl);
+    return dirname(modulePath);
+  } catch {
+    // Fallback to process.cwd() if import.meta.url is not available
+    return process.cwd();
+  }
+};
+
+/**
+ * Get the plugin root directory (parent of src/)
+ * @returns Plugin root directory path
+ */
+const getPluginRootDir = (): string => {
+  const moduleDir = getModuleDir();
+  // If we're in src/, go up one level to the plugin root
+  if (moduleDir.endsWith('src')) {
+    return dirname(moduleDir);
+  }
+  return moduleDir;
+};
+
+/**
+ * Try to read package.json from multiple locations
+ * @returns package name or null if not found
+ */
+const getPackageName = (): string | null => {
+  // Strategy:
+  // 1. Try CWD first (for tests and development)
+  // 2. Fall back to plugin root (for production when running from OpenCode)
+
+  const locations = [
+    join(process.cwd(), 'package.json'), // CWD (tests/development)
+    join(getPluginRootDir(), 'package.json'), // Plugin root (production)
+  ];
+
+  for (const pkgPath of locations) {
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as {
+        name?: string;
+      };
+      if (pkg && typeof pkg.name === 'string') {
+        return pkg.name;
+      }
+    } catch {
+      // Try next location
+      continue;
+    }
+  }
+
+  return null;
+};
+
+/**
  * Get the default sounds directory location
  * @returns Default sounds directory path
  */
@@ -60,18 +122,12 @@ export const getDefaultSoundsDir = (): string => {
 
   // Derive a plugin-specific storage folder name from package.json `name`
   let pluginName = 'opencode-plugin';
-  try {
-    const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8')) as {
-      name?: string;
-    };
-    if (pkg && typeof pkg.name === 'string') {
-      const raw = pkg.name;
-      pluginName = raw.includes('/') ? raw.split('/').pop()! : raw;
-      // sanitize to a filesystem-friendly token
-      pluginName = pluginName.replace(/[^a-zA-Z0-9._-]/g, '-');
-    }
-  } catch {
-    // If package.json can't be read, fall back to a generic name
+  const packageName = getPackageName();
+  if (packageName) {
+    const raw = packageName;
+    pluginName = raw.includes('/') ? raw.split('/').pop()! : raw;
+    // sanitize to a filesystem-friendly token
+    pluginName = pluginName.replace(/[^a-zA-Z0-9._-]/g, '-');
   }
 
   return join(baseDataDir, 'opencode', 'storage', 'plugin', pluginName);

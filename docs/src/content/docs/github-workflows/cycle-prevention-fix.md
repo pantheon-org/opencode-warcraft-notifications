@@ -1,6 +1,6 @@
 ---
-title: "Workflow Cycle Prevention Fix"
-description: "The project was experiencing excessive version releases due to a cyclic dependency between two GitHub workflows -"
+title: 'Workflow Cycle Prevention Fix'
+description: 'The project was experiencing excessive version releases due to a cyclic dependency between two GitHub workflows -'
 ---
 
 # Workflow Cycle Prevention Fix

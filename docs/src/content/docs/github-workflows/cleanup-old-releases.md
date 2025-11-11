@@ -1,6 +1,6 @@
 ---
-title: "Cleanup Old Releases Workflow"
-description: "**File -** `.github/workflows/cleanup-old-releases.yml`"
+title: 'Cleanup Old Releases Workflow'
+description: '**File -** `.github/workflows/cleanup-old-releases.yml`'
 ---
 
 # Cleanup Old Releases Workflow

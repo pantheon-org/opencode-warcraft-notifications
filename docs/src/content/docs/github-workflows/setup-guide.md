@@ -1,6 +1,6 @@
 ---
-title: "GitHub Workflows Setup Guide"
-description: "This document explains the streamlined GitHub Actions workflow setup for automated testing, intelligent versioning, and publishing."
+title: 'GitHub Workflows Setup Guide'
+description: 'This document explains the streamlined GitHub Actions workflow setup for automated testing, intelligent versioning, and publishing.'
 ---
 
 # GitHub Workflows Setup Guide

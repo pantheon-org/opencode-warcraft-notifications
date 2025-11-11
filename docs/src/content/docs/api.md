@@ -1,6 +1,6 @@
 ---
-title: "API Documentation"
-description: "Complete API reference for the plugin"
+title: 'API Documentation'
+description: 'Complete API reference for the plugin'
 ---
 
 # API Documentation

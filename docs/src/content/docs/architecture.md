@@ -1,6 +1,6 @@
 ---
-title: "Architecture"
-description: "System architecture and design"
+title: 'Architecture'
+description: 'System architecture and design'
 ---
 
 # Architecture Documentation

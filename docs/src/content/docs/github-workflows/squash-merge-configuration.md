@@ -1,6 +1,6 @@
 ---
-title: "Repository Merge Strategy Configuration"
-description: "Our merge request should always be a squash so we do not have excessive number of releases being created. We want one and only one release per merge r"
+title: 'Repository Merge Strategy Configuration'
+description: 'Our merge request should always be a squash so we do not have excessive number of releases being created. We want one and only one release per merge r'
 ---
 
 # Repository Merge Strategy Configuration
