@@ -1,8 +1,78 @@
 ---
-title: Warcraft II Notifications Plugin
-description: OpenCode plugin for Warcraft II notification sounds
+title: Deployment Guide
+description: Installation and deployment instructions
 ---
 
+# Deployment Guide
+
+## Overview
+
+This guide covers deployment, installation, configuration, and operational aspects of the Warcraft II Notifications Plugin for OpenCode.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Platform-Specific Setup](#platform-specific-setup)
+- [Deployment Architecture](#deployment-architecture)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Monitoring](#monitoring)
+- [Troubleshooting](#troubleshooting)
+- [Maintenance](#maintenance)
+- [Security](#security)
+
+---
+
+## Installation
+
+### End User Installation
+
+#### 1. Add Plugin to OpenCode Configuration
+
+Create or edit your OpenCode configuration file:
+
+**Location**: `~/.config/opencode/opencode.json` or project-specific `.opencode/opencode.json`
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
+}
+```
+
+#### 2. Restart OpenCode
+
+```bash
+opencode
+```
+
+The plugin will automatically:
+
+- Install from npm registry
+- Copy bundled sounds to user data directory
+- Activate on session idle events
+
+### Manual Installation (Development)
+
+```bash
+# Clone repository
+git clone https://github.com/pantheon-org/opencode-warcraft-notifications.git
+cd opencode-warcraft-notifications
+
+# Install dependencies
+bun install
+
+# Build (if needed)
+bun run build
+
+# Link for local testing
+bun link
+
+# In your project
+bun link @pantheon-ai/opencode-warcraft-notifications
+```
+
+---
 
 ## Configuration
 

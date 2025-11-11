@@ -1,6 +1,50 @@
 ---
+title: API Documentation
+description: Complete API reference for the plugin
 ---
 
+# API Documentation
+
+## Overview
+
+This document provides comprehensive API documentation for the Warcraft II Notifications Plugin. The plugin exposes several modules with public APIs for sound management, configuration, and notification handling.
+
+## Table of Contents
+
+- [Plugin Entry Point](#plugin-entry-point)
+- [Notification Module](#notification-module)
+- [Schema Validator Module](#schema-validator-module)
+- [Plugin Configuration Module](#plugin-configuration-module)
+- [Sound Manager Module](#sound-manager-module)
+- [Bundled Sounds Module](#bundled-sounds-module)
+- [Sound Data Module](#sound-data-module)
+- [Type Definitions](#type-definitions)
+- [Usage Examples](#usage-examples)
+
+---
+
+## Plugin Entry Point
+
+### `index.ts`
+
+The main entry point for the OpenCode plugin.
+
+#### Exports
+
+```typescript
+export { NotificationPlugin } from './src/notification';
+```
+
+**Usage**:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
+}
+```
+
+---
 
 ## Notification Module
 

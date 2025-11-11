@@ -1,6 +1,58 @@
 ---
+title: Development Guide
+description: Development setup and contributing
 ---
 
+# Development Guide
+
+## Overview
+
+This guide provides comprehensive information for developers working on the Warcraft II Notifications Plugin. It covers setup, development workflows, testing strategies, and contribution guidelines.
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Development Environment](#development-environment)
+- [Project Structure](#project-structure)
+- [Development Workflow](#development-workflow)
+- [Testing](#testing)
+- [Code Quality](#code-quality)
+- [Debugging](#debugging)
+- [Contributing](#contributing)
+- [Release Process](#release-process)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Bun**: v1.0.0 or higher
+- **Node.js**: v18.0.0 or higher (for compatibility)
+- **Git**: For version control
+- **OpenCode**: For testing the plugin
+
+### Installation
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/pantheon-org/opencode-warcraft-notifications.git
+   cd opencode-warcraft-notifications
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   bun install
+   ```
+
+3. **Verify installation**:
+   ```bash
+   bun run test
+   ```
+
+---
 
 ## Development Environment
 

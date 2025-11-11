@@ -1,6 +1,46 @@
 ---
+title: Onboarding
+description: New contributor onboarding guide
 ---
 
+# Onboarding Guide
+
+Welcome to the Warcraft II Notifications Plugin for OpenCode! This guide will help you get up to speed quickly, whether you're a new contributor, maintainer, or team member.
+
+## Table of Contents
+
+- [Welcome](#welcome)
+- [First Day](#first-day)
+- [First Week](#first-week)
+- [First Month](#first-month)
+- [Key Resources](#key-resources)
+- [Team Structure](#team-structure)
+- [Communication](#communication)
+- [Getting Help](#getting-help)
+
+---
+
+## Welcome
+
+### About the Project
+
+The Warcraft II Notifications Plugin enhances OpenCode with nostalgic Warcraft II unit sounds when your session goes idle. It's a TypeScript-based plugin that demonstrates:
+
+- **OpenCode Plugin Development**: Best practices for building OpenCode plugins
+- **Cross-Platform Audio**: Platform-specific audio playback (macOS/Linux)
+- **Configuration Management**: Multi-level configuration with precedence
+- **Automated CI/CD**: AI-powered version management and release automation
+- **Comprehensive Testing**: Unit, integration, and edge case testing
+
+### Project Goals
+
+1. **User Experience**: Provide a delightful, nostalgic experience for developers
+2. **Code Quality**: Maintain high standards with comprehensive testing and linting
+3. **Documentation**: Keep documentation comprehensive and up-to-date
+4. **Automation**: Minimize manual work through intelligent CI/CD pipelines
+5. **Community**: Foster an open, welcoming contributor community
+
+---
 
 ## First Day
 

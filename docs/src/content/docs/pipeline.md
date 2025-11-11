@@ -1,6 +1,59 @@
 ---
+title: CI/CD Pipeline
+description: Automated release pipeline documentation
 ---
 
+# CI/CD Pipeline Documentation
+
+## Overview
+
+This document provides comprehensive technical documentation for the GitHub Actions CI/CD pipeline that powers the automated build, test, version management, and deployment workflows for the Warcraft II Notifications Plugin.
+
+### Pipeline Philosophy
+
+The pipeline is designed around these core principles:
+
+- **Single Release Per Merge**: Enforces squash merging to ensure one commit = one release
+- **AI-Powered Versioning**: Uses Google Gemini AI with conventional commit fallback for intelligent semantic versioning
+- **Zero-Touch Deployment**: Fully automated from PR merge to npm publication
+- **Quality Gates**: Multi-stage validation with security scanning, testing, and type checking
+- **Self-Healing**: Automatic cleanup, cycle prevention, and error recovery
+
+### Quick Reference
+
+| Workflow                                                      | Trigger            | Duration | Purpose                        |
+| ------------------------------------------------------------- | ------------------ | -------- | ------------------------------ |
+| [PR Validation](#pr-validation-workflow)                      | Pull Request       | ~2-3 min | Quality assurance & security   |
+| [Smart Version Bump](#smart-version-bump-workflow)            | Push to main       | ~1-2 min | AI-powered semantic versioning |
+| [Sync Package Version](#sync-package-version-workflow)        | Tag creation       | ~30 sec  | Legacy version synchronization |
+| [Release & Publish](#release--publish-workflow)               | Tag creation       | ~3-4 min | Build, test, publish to npm    |
+| [Auto-Merge Bot](#auto-merge-bot-workflow)                    | PR events          | ~10 sec  | Automated PR merging           |
+| [Cleanup Merged Branches](#cleanup-merged-branches-workflow)  | PR merge, Schedule | ~15 sec  | Branch housekeeping            |
+| [Cleanup Old Releases](#cleanup-old-releases-workflow)        | Schedule, Tag      | ~30 sec  | Release history management     |
+| [Repo Config Check](#repository-configuration-check-workflow) | Schedule, Manual   | ~10 sec  | Configuration validation       |
+
+---
+
+## Table of Contents
+
+- [Pipeline Architecture](#pipeline-architecture)
+- [Workflow Details](#workflow-details)
+  - [PR Validation](#pr-validation-workflow)
+  - [Smart Version Bump](#smart-version-bump-workflow)
+  - [Sync Package Version](#sync-package-version-workflow)
+  - [Release & Publish](#release--publish-workflow)
+  - [Auto-Merge Bot](#auto-merge-bot-workflow)
+  - [Cleanup Merged Branches](#cleanup-merged-branches-workflow)
+  - [Cleanup Old Releases](#cleanup-old-releases-workflow)
+  - [Repository Configuration Check](#repository-configuration-check-workflow)
+- [Environment Configuration](#environment-configuration)
+- [Secrets Management](#secrets-management)
+- [Monitoring & Observability](#monitoring--observability)
+- [Troubleshooting](#troubleshooting)
+- [Best Practices](#best-practices)
+- [Maintenance](#maintenance)
+
+---
 
 ## Pipeline Architecture
 

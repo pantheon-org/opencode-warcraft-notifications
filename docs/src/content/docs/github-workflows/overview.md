@@ -1,6 +1,135 @@
 ---
+title: Workflows Overview
+description: Overview of all workflows
 ---
 
+# GitHub Actions Workflows Documentation
+
+This document provides comprehensive documentation for all GitHub Actions workflows in this repository.
+
+> **🔧 AUTOMATION REQUIREMENT:** For full automation, you MUST set up a Personal Access Token (PAT) as `WORKFLOW_PAT` secret. Without it, the Smart Version Bump workflow cannot trigger follow-up workflows automatically. See [PAT Setup Guide](#personal-access-token-pat-setup) for details.
+
+## Workflow Overview
+
+The repository uses 5 streamlined GitHub Actions workflows that provide comprehensive CI/CD automation:
+
+| Workflow                                      | File                       | Triggers                       | Purpose                                 |
+| --------------------------------------------- | -------------------------- | ------------------------------ | --------------------------------------- |
+| [PR Validation](#pr-validation)               | `pr-validation.yml`        | Pull Requests                  | Quality assurance and security scanning |
+| [Smart Version Bump](#smart-version-bump)     | `smart-version-bump.yml`   | Push to main, Manual           | AI-powered semantic versioning          |
+| [Sync Package Version](#sync-package-version) | `sync-package-version.yml` | Tag creation                   | Sync package.json with Git tags         |
+| [Release & Publish](#release--publish)        | `release-publish.yml`      | Tag creation, Manual           | Build, test, and publish to npm         |
+| [Cleanup Old Releases](#cleanup-old-releases) | `cleanup-old-releases.yml` | Schedule, Tag creation, Manual | Maintain limited release history        |
+
+## Workflow Flow
+
+```mermaid
+graph TD
+    A[Developer creates PR] --> B[PR Validation runs]
+    B --> C{All checks pass?}
+    C -->|No| D[Fix issues and push]
+    D --> B
+    C -->|Yes| E[PR merged to main]
+    E --> F[Smart Version Bump analyzes changes]
+    F --> G{Version bump needed?}
+    G -->|No| H[No further action]
+    G -->|Yes| I[Create new Git tag]
+    I --> J[Sync Package Version creates PR]
+    J --> K[Auto-merge PR with version sync]
+    K --> L[Release & Publish triggers]
+    L --> M[Build, test, and publish to npm]
+    M --> N[Create GitHub release]
+    N --> O[Cleanup Old Releases triggers]
+    O --> P[Maintain release history limits]
+
+    Q[Weekly Schedule] --> O
+    R[Manual Cleanup] --> O
+```
+
+---
+
+## PR Validation
+
+**File:** `.github/workflows/pr-validation.yml`  
+**Purpose:** Comprehensive quality assurance for all pull requests
+
+### Triggers
+
+- Pull requests to `main` or `develop` branches
+- PR events: `opened`, `synchronize`, `reopened`
+
+### Jobs
+
+#### 1. Validate (`validate`)
+
+Performs comprehensive code quality checks:
+
+```yaml
+steps:
+  - Checkout repository (with full history)
+  - Setup Bun runtime
+  - Cache dependencies
+  - Install dependencies (frozen lockfile)
+  - Check code formatting
+  - Run ESLint
+  - Run TypeScript type checking
+  - Run tests with coverage
+  - Build project
+  - Upload coverage reports to Codecov
+```
+
+**Requirements:**
+
+- All formatting must pass (`bun run format:check`)
+- Linting must pass (`bun run lint`)
+- Type checking must pass (`bun run type-check`)
+- All tests must pass with coverage (`bun run test:coverage`)
+- Project must build successfully (`bun run build`)
+
+#### 2. Security (`security`)
+
+Performs security vulnerability scanning:
+
+```yaml
+steps:
+  - Checkout repository
+  - Run Trivy vulnerability scanner
+  - Upload SARIF results to GitHub Security tab
+```
+
+**Features:**
+
+- Scans filesystem for vulnerabilities
+- Generates SARIF format reports
+- Integrates with GitHub Security Dashboard
+
+#### 3. PR Analysis (`pr-analysis`)
+
+Analyzes PR size and complexity:
+
+```yaml
+steps:
+  - Checkout repository (with full history)
+  - Analyze PR metrics (files, lines added/deleted)
+  - Comment warning for large PRs
+```
+
+**Thresholds:**
+
+- **Large PR Warning:** >20 files changed OR >500 lines added
+- Automatically comments on large PRs suggesting breakdown
+
+### Environment Requirements
+
+- **Node.js/Bun:** Latest Bun version
+- **Dependencies:** All dev dependencies must be installable
+- **Scripts:** Must have `format:check`, `lint`, `type-check`, `test:coverage`, `build`
+
+### Secrets Used
+
+- `CODECOV_TOKEN` (optional) - For coverage reporting
+
+---
 
 ## Smart Version Bump
 

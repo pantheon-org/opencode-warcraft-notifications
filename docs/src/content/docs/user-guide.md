@@ -1,6 +1,51 @@
 ---
+title: User Guide
+description: Installation, configuration, and usage guide
 ---
 
+# User Guide
+
+## Overview
+
+Welcome to the Warcraft II Notifications Plugin for OpenCode! This guide will help you get started, configure the plugin to your preferences, and troubleshoot common issues.
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Using the Plugin](#using-the-plugin)
+- [Sound Factions](#sound-factions)
+- [Customization](#customization)
+- [Troubleshooting](#troubleshooting)
+- [FAQ](#faq)
+
+---
+
+## Quick Start
+
+### 1. Install the Plugin
+
+Add the plugin to your OpenCode configuration:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
+}
+```
+
+### 2. Restart OpenCode
+
+```bash
+opencode
+```
+
+### 3. Enjoy!
+
+When your OpenCode session goes idle, you'll hear authentic Warcraft II unit sounds and see a notification with your session summary.
+
+---
 
 ## Installation
 
