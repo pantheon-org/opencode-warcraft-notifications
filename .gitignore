@@ -24,9 +24,18 @@ docs/node_modules/
 docs/.astro/
 docs/dist/
 
-# Jekyll backup (temporary)
-docs-jekyll-backup/
-docs-jekyll-backup-final/
+# Generated documentation artifacts (deployed to docs branch)
+dist/
+.astro/
 
 # Astro build directory (replaced by docs/)
 .astro-build/
+
+# Migration and implementation documentation (internal only, not for publication)
+MIGRATION_PLAN.md
+MIGRATION_FINAL_SUMMARY.md
+MIGRATION_STATUS_UPDATE.md
+MIGRATION_TESTING_REPORT.md
+DOCS_BRANCH_IMPLEMENTATION.md
+DOCUMENTATION_UPDATE_SUMMARY.md
+STYLE_ANALYSIS.md

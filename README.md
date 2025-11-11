@@ -258,8 +258,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 - **Issues**: [GitHub Issues](https://github.com/pantheon-org/opencode-warcraft-notifications/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/pantheon-org/opencode-warcraft-notifications/discussions)
-- **Documentation**: [Documentation Index](docs/README.md)
-- **Live Docs**: [GitHub Pages](https://pantheon-org.github.io/opencode-warcraft-notifications/)
+- **Documentation**: [Live Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/)
+- **Source Docs**: [Documentation Source](docs/src/content/docs/)
 
 ---
 

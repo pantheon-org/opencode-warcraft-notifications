@@ -50,6 +50,8 @@ export default defineConfig({
           items: [
             { label: 'Deployment Guide', link: '/deployment/' },
             { label: 'CI/CD Pipeline', link: '/pipeline/' },
+            { label: 'Docs Branch Structure', link: '/docs-branch-structure/' },
+            { label: 'Docs Migration Plan', link: '/docs-migration-plan/' },
           ],
         },
         {
