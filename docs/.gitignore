@@ -11,8 +11,5 @@ node_modules/
 # Environment
 .env*
 
-# Generated content
-src/content/docs/
-
 # MacOS
 .DS_Store
