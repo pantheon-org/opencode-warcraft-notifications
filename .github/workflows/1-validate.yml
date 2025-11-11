@@ -1,4 +1,4 @@
-name: PR Validation
+name: 1. Validate PR (Lint, Test, Build)
 
 on:
   pull_request:
@@ -58,7 +58,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
-  # Security and dependency analysis
   security:
     name: Security Analysis
     runs-on: ubuntu-latest
@@ -78,11 +77,10 @@ jobs:
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
-        continue-on-error: true # PR from forks don't have security-events permission
+        continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
 
-  # PR size and complexity check
   pr-analysis:
     name: PR Analysis
     runs-on: ubuntu-latest
@@ -105,7 +103,6 @@ jobs:
           echo "added_lines=$ADDED_LINES" >> $GITHUB_OUTPUT
           echo "deleted_lines=$DELETED_LINES" >> $GITHUB_OUTPUT
 
-          # Warn for large PRs
           if [ $CHANGED_FILES -gt 20 ] || [ $ADDED_LINES -gt 500 ]; then
             echo "large_pr=true" >> $GITHUB_OUTPUT
           else

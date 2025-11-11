@@ -1,0 +1,198 @@
+name: 3. Auto-Merge Version PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  workflow_run:
+    workflows: ["1. Validate PR (Lint, Test, Build)"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-merge:
+    name: Auto-merge version bump PRs
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request' || 
+       github.event_name == 'pull_request_review' ||
+       github.event_name == 'check_suite' ||
+       github.event_name == 'workflow_run')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get PR number
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=""
+          
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          elif [ "${{ github.event_name }}" = "pull_request_review" ]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          elif [ "${{ github.event_name }}" = "workflow_run" ] && [ -n "${{ github.event.workflow_run.pull_requests[0].number }}" ]; then
+            PR_NUMBER="${{ github.event.workflow_run.pull_requests[0].number }}"
+          elif [ "${{ github.event_name }}" = "check_suite" ] && [ -n "${{ github.event.check_suite.pull_requests[0].number }}" ]; then
+            PR_NUMBER="${{ github.event.check_suite.pull_requests[0].number }}"
+          fi
+          
+          if [ -z "$PR_NUMBER" ]; then
+            echo "ℹ️ No PR found for this event"
+            echo "found=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "found=true" >> $GITHUB_OUTPUT
+          echo "🔍 Checking PR #${PR_NUMBER}"
+
+      - name: Check if version bump PR
+        id: check
+        if: steps.pr.outputs.found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.pr.outputs.number }}"
+          
+          # Get PR details
+          PR_DATA=$(gh pr view $PR_NUMBER --json title,author,headRefName,state,labels)
+          
+          PR_TITLE=$(echo "$PR_DATA" | jq -r '.title')
+          PR_AUTHOR=$(echo "$PR_DATA" | jq -r '.author.login')
+          PR_BRANCH=$(echo "$PR_DATA" | jq -r '.headRefName')
+          PR_STATE=$(echo "$PR_DATA" | jq -r '.state')
+          PR_LABELS=$(echo "$PR_DATA" | jq -r '.labels[].name' | tr '\n' ',' | sed 's/,$//')
+          
+          echo "📋 PR Details:"
+          echo "  Title: $PR_TITLE"
+          echo "  Author: $PR_AUTHOR"
+          echo "  Branch: $PR_BRANCH"
+          echo "  State: $PR_STATE"
+          echo "  Labels: $PR_LABELS"
+          
+          # Check if this is a version bump PR
+          IS_VERSION_PR=false
+          
+          if [[ "$PR_TITLE" =~ ^chore:\ bump\ version\ to\ v[0-9]+\.[0-9]+\.[0-9]+$ ]] && \
+             [[ "$PR_BRANCH" =~ ^version-bump/ ]] && \
+             [[ "$PR_AUTHOR" == "github-actions[bot]" ]] && \
+             [[ "$PR_STATE" == "OPEN" ]]; then
+            IS_VERSION_PR=true
+          fi
+          
+          if [ "$IS_VERSION_PR" = "true" ]; then
+            echo "✅ This is a version bump PR"
+            echo "is_version_pr=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Not a version bump PR"
+            echo "is_version_pr=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check PR status
+        id: status
+        if: steps.pr.outputs.found == 'true' && steps.check.outputs.is_version_pr == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.pr.outputs.number }}"
+          
+          # Check mergability
+          MERGEABLE=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
+          
+          if [ "$MERGEABLE" != "MERGEABLE" ]; then
+            echo "⚠️ PR is not mergeable (status: $MERGEABLE)"
+            echo "ready=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Check all required checks
+          CHECKS=$(gh pr checks $PR_NUMBER --json state,conclusion)
+          
+          FAILED_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "COMPLETED" and .conclusion != "SUCCESS")] | length')
+          PENDING_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "IN_PROGRESS" or .state == "QUEUED")] | length')
+          
+          if [ "$FAILED_CHECKS" -gt 0 ]; then
+            echo "❌ Some checks failed ($FAILED_CHECKS failures)"
+            echo "ready=false" >> $GITHUB_OUTPUT
+            echo "reason=failed_checks" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          if [ "$PENDING_CHECKS" -gt 0 ]; then
+            echo "⏳ Some checks are still pending ($PENDING_CHECKS pending)"
+            echo "ready=false" >> $GITHUB_OUTPUT
+            echo "reason=pending_checks" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "✅ All checks passed - ready to merge"
+          echo "ready=true" >> $GITHUB_OUTPUT
+
+      - name: Enable auto-merge
+        if: steps.pr.outputs.found == 'true' && steps.check.outputs.is_version_pr == 'true' && steps.status.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.pr.outputs.number }}"
+          
+          echo "🎯 Enabling auto-merge for PR #${PR_NUMBER}"
+          
+          # Enable auto-merge with squash
+          gh pr merge $PR_NUMBER --squash --auto --delete-branch
+          
+          echo "✅ Auto-merge enabled!"
+          
+          # Add comment
+          gh pr comment $PR_NUMBER --body "🎉 **Auto-merge enabled!**
+
+This version bump PR will be automatically merged once all checks pass.
+
+**Next Steps:**
+- 🏷️ Git tag will be created automatically
+- 📦 npm package will be published
+- 📚 Documentation will be deployed
+
+*This action was performed by the Auto-Merge workflow.*"
+
+      - name: Comment on failed checks
+        if: steps.pr.outputs.found == 'true' && steps.check.outputs.is_version_pr == 'true' && steps.status.outputs.ready == 'false' && steps.status.outputs.reason == 'failed_checks'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.pr.outputs.number }}"
+          
+          gh pr comment $PR_NUMBER --body "❌ **Auto-merge blocked**
+
+This version bump PR has failing checks and cannot be automatically merged.
+
+Please review the failed checks and address any issues, or merge manually if the failures are acceptable.
+
+*This message was generated by the Auto-Merge workflow.*"
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.pr.outputs.found }}" != "true" ]; then
+            echo "ℹ️ No PR found for this event"
+          elif [ "${{ steps.check.outputs.is_version_pr }}" != "true" ]; then
+            echo "ℹ️ Not a version bump PR - skipping"
+          elif [ "${{ steps.status.outputs.ready }}" = "true" ]; then
+            echo "✅ Auto-merge enabled for PR #${{ steps.pr.outputs.number }}"
+          elif [ "${{ steps.status.outputs.reason }}" = "pending_checks" ]; then
+            echo "⏳ Waiting for checks to complete"
+          elif [ "${{ steps.status.outputs.reason }}" = "failed_checks" ]; then
+            echo "❌ Checks failed - cannot auto-merge"
+          else
+            echo "⚠️ PR not ready to merge"
+          fi
