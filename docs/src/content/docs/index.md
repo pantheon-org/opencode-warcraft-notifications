@@ -1,17 +1,13 @@
 ---
-title: "Home"
-description: "Warcraft II Notifications Plugin for OpenCode"
+title: 'Home'
+description: 'Warcraft II Notifications Plugin for OpenCode'
 ---
 
 <div align="center" markdown="1">
 
 # 🎮 Warcraft II Notifications Plugin for OpenCode
 
-[![npm version](https://img.shields.io/npm/v/@pantheon-ai/opencode-warcraft-notifications.svg)](https://www.npmjs.com/package/@pantheon-ai/opencode-warcraft-notifications)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
-[![Bun](https://img.shields.io/badge/Bun-1.0-orange.svg)](https://bun.sh/)
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://pantheon-org.github.io/opencode-warcraft-notifications/)
+[![npm version](https://img.shields.io/npm/v/@pantheon-ai/opencode-warcraft-notifications.svg)](https://www.npmjs.com/package/@pantheon-ai/opencode-warcraft-notifications) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/) [![Bun](https://img.shields.io/badge/Bun-1.0-orange.svg)](https://bun.sh/) [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://pantheon-org.github.io/opencode-warcraft-notifications/)
 
 **Enhance your OpenCode experience with nostalgic Warcraft II unit sounds!**
 
