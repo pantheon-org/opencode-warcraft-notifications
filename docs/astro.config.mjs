@@ -31,6 +31,14 @@ export default defineConfig({
           link: '/',
         },
         {
+          label: 'Documentation Map',
+          link: '/documentation-map/',
+        },
+        {
+          label: 'Quick Reference',
+          link: '/quick-reference/',
+        },
+        {
           label: 'User Guide',
           link: '/user-guide/',
         },

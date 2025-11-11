@@ -32,10 +32,7 @@ dist/
 .astro-build/
 
 # Migration and implementation documentation (internal only, not for publication)
-MIGRATION_PLAN.md
-MIGRATION_FINAL_SUMMARY.md
-MIGRATION_STATUS_UPDATE.md
-MIGRATION_TESTING_REPORT.md
-DOCS_BRANCH_IMPLEMENTATION.md
-DOCUMENTATION_UPDATE_SUMMARY.md
+MIGRATION_*.md
+DOCS_*.md
+DOCUMENTATION_*.md
 STYLE_ANALYSIS.md

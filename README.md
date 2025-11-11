@@ -37,26 +37,36 @@ This plugin plays authentic Warcraft II unit audio clips from both Alliance and 
 
 This project includes comprehensive documentation for all users:
 
+### Quick Access
+
+- **[📚 Documentation Site](https://pantheon-org.github.io/opencode-warcraft-notifications/)** - Complete documentation (recommended)
+- **[🗺️ Documentation Map](https://pantheon-org.github.io/opencode-warcraft-notifications/documentation-map/)** - Navigation guide
+- **[⚡ Quick Reference](https://pantheon-org.github.io/opencode-warcraft-notifications/quick-reference/)** - Common tasks and commands
+
 ### For Users
 
-- **[User Guide](docs/USER_GUIDE.md)** - Installation, configuration, and usage
-- **[FAQ](docs/USER_GUIDE.md#faq)** - Common questions and answers
+- **[User Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/user-guide/)** - Installation, configuration, and usage
+- **[FAQ](https://pantheon-org.github.io/opencode-warcraft-notifications/user-guide/#faq)** - Common questions and answers
+- **[Troubleshooting](https://pantheon-org.github.io/opencode-warcraft-notifications/troubleshooting/)** - Problem resolution
 
 ### For Developers
 
-- **[Development Guide](docs/DEVELOPMENT.md)** - Setup, workflow, and contributing
-- **[API Documentation](docs/API.md)** - Complete technical reference
-- **[Architecture](docs/ARCHITECTURE.md)** - System design and components
+- **[Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/)** - Setup, workflow, and contributing
+- **[API Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/api/)** - Complete technical reference
+- **[Architecture](https://pantheon-org.github.io/opencode-warcraft-notifications/architecture/)** - System design and components
+- **[Onboarding](https://pantheon-org.github.io/opencode-warcraft-notifications/onboarding/)** - New contributor guide
 
 ### For Operations
 
-- **[Deployment Guide](docs/DEPLOYMENT.md)** - Installation and operations
-- **[CI/CD Pipeline](docs/PIPELINE.md)** - Complete pipeline technical reference
-- **[GitHub Workflows](docs/github-workflows/README.md)** - CI/CD setup guides
+- **[Deployment Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/deployment/)** - Installation and operations
+- **[CI/CD Pipeline](https://pantheon-org.github.io/opencode-warcraft-notifications/pipeline/)** - Complete pipeline technical reference
+- **[GitHub Workflows](https://pantheon-org.github.io/opencode-warcraft-notifications/github-workflows/)** - CI/CD setup guides
 
-### Complete Documentation
+### Additional Resources
 
-- **[Documentation Index](docs/README.md)** - Complete documentation map and navigation
+- **[Security Policy](SECURITY.md)** - Security and vulnerability reporting
+- **[Changelog](CHANGELOG.md)** - Version history and release notes
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute
 
 ## Quick Start
 
