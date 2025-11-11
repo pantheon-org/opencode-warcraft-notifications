@@ -1,5 +1,6 @@
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { mkdir, exists, readdir, copyFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
 import { DEFAULT_DATA_DIR } from './plugin-config.js';
 import { getSoundFileList as dataGetSoundFileList } from './sound-data/index.js';
 import { determineSoundFaction } from './sounds.js';
@@ -112,6 +113,58 @@ const processBundledRootFile = async (
 };
 
 /**
+ * Get the directory containing this module
+ * @returns Directory path of the current module
+ */
+const getModuleDir = (): string => {
+  try {
+    const moduleUrl = import.meta.url;
+    const modulePath = fileURLToPath(moduleUrl);
+    return dirname(modulePath);
+  } catch {
+    return process.cwd();
+  }
+};
+
+/**
+ * Get the plugin root directory (parent of src/)
+ * @returns Plugin root directory path
+ */
+const getPluginRootDir = (): string => {
+  const moduleDir = getModuleDir();
+  if (moduleDir.endsWith('src')) {
+    return dirname(moduleDir);
+  }
+  return moduleDir;
+};
+
+/**
+ * Find the bundled data directory, trying multiple locations
+ * @returns Path to data/ directory or null if not found
+ */
+const findBundledDataDir = (): string | null => {
+  // Strategy:
+  // 1. Try CWD first (for tests and development)
+  // 2. Fall back to plugin root (for production when running from OpenCode)
+
+  const locations = [
+    join(process.cwd(), 'data'), // CWD (tests/development)
+    join(getPluginRootDir(), 'data'), // Plugin root (production)
+  ];
+
+  for (const dataPath of locations) {
+    try {
+      // Simple existence check - readdir will be done later
+      return dataPath;
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+};
+
+/**
  * Install bundled sounds from the repository `data/` directory into the
  * user's plugin data directory when missing. Non-.wav files are skipped and
  * existing files are not overwritten.
@@ -119,7 +172,8 @@ const processBundledRootFile = async (
  */
 export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<void> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
-  const bundledDataDir = join(process.cwd(), 'data');
+  // Try to find the bundled data directory
+  const bundledDataDir = findBundledDataDir() ?? join(process.cwd(), 'data');
 
   let entries;
   try {

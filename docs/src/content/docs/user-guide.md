@@ -1,6 +1,6 @@
 ---
-title: "User Guide"
-description: "Installation, configuration, and usage guide"
+title: 'User Guide'
+description: 'Installation, configuration, and usage guide'
 ---
 
 # User Guide

@@ -1,6 +1,6 @@
 ---
-title: "Development Guide"
-description: "Development setup and contributing"
+title: 'Development Guide'
+description: 'Development setup and contributing'
 ---
 
 # Development Guide

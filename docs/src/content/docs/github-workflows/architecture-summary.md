@@ -1,6 +1,6 @@
 ---
-title: "Workflow Architecture & Cleanup Summary"
-description: "This document summarizes the complete workflow architecture refactoring and cleanup that was performed to resolve GitHub Actions failures and improve "
+title: 'Workflow Architecture & Cleanup Summary'
+description: 'This document summarizes the complete workflow architecture refactoring and cleanup that was performed to resolve GitHub Actions failures and improve '
 ---
 
 # Workflow Architecture & Cleanup Summary

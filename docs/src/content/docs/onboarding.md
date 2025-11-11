@@ -1,6 +1,6 @@
 ---
-title: "Onboarding"
-description: "New contributor onboarding guide"
+title: 'Onboarding'
+description: 'New contributor onboarding guide'
 ---
 
 # Onboarding Guide

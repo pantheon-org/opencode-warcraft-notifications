@@ -1,6 +1,6 @@
 ---
-title: "Troubleshooting"
-description: "Common issues and solutions"
+title: 'Troubleshooting'
+description: 'Common issues and solutions'
 ---
 
 # Troubleshooting Guide

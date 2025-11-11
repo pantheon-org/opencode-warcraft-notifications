@@ -1,6 +1,6 @@
 ---
-title: "GitHub Actions Workflows Documentation"
-description: "This document provides comprehensive documentation for all GitHub Actions workflows in this repository."
+title: 'GitHub Actions Workflows Documentation'
+description: 'This document provides comprehensive documentation for all GitHub Actions workflows in this repository.'
 ---
 
 # GitHub Actions Workflows Documentation
