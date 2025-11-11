@@ -13,7 +13,7 @@ jobs:
   validate:
     name: Lint, Test & Type Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -62,7 +62,7 @@ jobs:
   security:
     name: Security Analysis
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -78,6 +78,7 @@ jobs:
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true # PR from forks don't have security-events permission
         with:
           sarif_file: 'trivy-results.sarif'
 
@@ -86,7 +87,7 @@ jobs:
     name: PR Analysis
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -99,11 +100,11 @@ jobs:
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | wc -l)
           ADDED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | awk '{added+=$1} END {print added+0}')
           DELETED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | awk '{deleted+=$2} END {print deleted+0}')
-          
+
           echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
           echo "added_lines=$ADDED_LINES" >> $GITHUB_OUTPUT
           echo "deleted_lines=$DELETED_LINES" >> $GITHUB_OUTPUT
-          
+
           # Warn for large PRs
           if [ $CHANGED_FILES -gt 20 ] || [ $ADDED_LINES -gt 500 ]; then
             echo "large_pr=true" >> $GITHUB_OUTPUT

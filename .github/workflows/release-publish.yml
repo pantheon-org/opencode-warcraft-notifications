@@ -19,7 +19,7 @@ jobs:
   publish:
     name: Build, Test & Publish to npm
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
           else
             TAG=${GITHUB_REF#refs/tags/}
           fi
-          
+
           VERSION=${TAG#v}
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -56,19 +56,19 @@ jobs:
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           TAG_VERSION="${{ steps.version.outputs.version }}"
-          
+
           if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
             echo "❌ Version mismatch: package.json ($PACKAGE_VERSION) != tag ($TAG_VERSION)"
             exit 1
           fi
-          
+
           echo "✅ Version verified: $PACKAGE_VERSION"
 
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -79,13 +79,13 @@ jobs:
         run: |
           echo "🧪 Running linter..."
           bun run lint
-          
+
           echo "🔍 Type checking..."
           bun run type-check
-          
+
           echo "🧪 Running tests with coverage..."
           bun run test:coverage
-          
+
           echo "🏗️ Building project..."
           bun run build
 
@@ -104,7 +104,7 @@ jobs:
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION="${{ steps.version.outputs.version }}"
-          
+
           if npm view "$PACKAGE_NAME@$VERSION" version 2>/dev/null; then
             echo "already_published=true" >> $GITHUB_OUTPUT
             echo "⚠️ Version $VERSION is already published to npm"
@@ -120,7 +120,7 @@ jobs:
         run: |
           echo "🚀 Publishing to npm..."
           npm publish --access public --provenance
-          
+
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION="${{ steps.version.outputs.version }}"
           echo "✅ Successfully published $PACKAGE_NAME@$VERSION to npm"
@@ -132,7 +132,7 @@ jobs:
           script: |
             const tag = '${{ steps.version.outputs.tag }}';
             const version = '${{ steps.version.outputs.version }}';
-            
+
             // Get the release if it exists
             let release;
             try {
@@ -159,31 +159,31 @@ jobs:
                 throw error;
               }
             }
-            
+
             // Update release with npm publication info
             const npmPackageName = require('./package.json').name;
             const npmUrl = `https://www.npmjs.com/package/${npmPackageName}/v/${version}`;
-            
+
             const publishedStatus = '${{ steps.check-published.outputs.already_published }}' === 'false' 
               ? '✅ Published to npm' 
               : '⚠️ Already published to npm';
-            
+
             const updatedBody = `${release.body}
-            
+
             ## 📦 Package Information
-            
+
             - **npm Package:** [\`${npmPackageName}@${version}\`](${npmUrl})
             - **Status:** ${publishedStatus}
             - **Installation:** \`npm install ${npmPackageName}@${version}\`
-            
+
             ## 🔧 Build Information
-            
+
             - **Node.js:** 20.x
             - **Runtime:** Bun
             - **Build Status:** ✅ Passed
             - **Tests:** ✅ Passed with coverage
             `;
-            
+
             await github.rest.repos.updateRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -199,7 +199,7 @@ jobs:
           echo "🔍 Validating npm publication..."
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION="${{ steps.version.outputs.version }}"
-          
+
           # Wait for npm to propagate with retry logic
           echo "Waiting for npm registry to propagate package..."
           for i in {1..6}; do
@@ -214,7 +214,7 @@ jobs:
               fi
             fi
           done
-          
+
           echo "❌ Failed to validate npm package publication after 90 seconds"
           echo "Note: Package may still be published successfully, npm propagation can be slow"
           exit 1

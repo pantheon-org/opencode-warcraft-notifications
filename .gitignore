@@ -1,6 +1,11 @@
 # dependencies (bun install)
 node_modules
 
+# Lock files
+# Keep bun.lock for reproducible builds (Bun uses text format in v1.2.x)
+# Ignore npm lockfile since we use Bun
+package-lock.json
+
 # GitHub Actions - override global gitignore that excludes .github directories
 # Note: Global gitignore has **/.github pattern, so we need to explicitly include
 !.github/
