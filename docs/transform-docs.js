@@ -10,7 +10,7 @@ import { join, basename, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DOCS_SOURCE = join(__dirname, '../docs');
+const DOCS_SOURCE = join(__dirname, '../docs-jekyll-backup-final');
 const DOCS_DEST = join(__dirname, 'src/content/docs');
 
 // Ensure destination exists

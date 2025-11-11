@@ -18,3 +18,15 @@ node_modules
 
 .opencode-sounds/
 .context/
+
+# Astro documentation build
+docs/node_modules/
+docs/.astro/
+docs/dist/
+
+# Jekyll backup (temporary)
+docs-jekyll-backup/
+docs-jekyll-backup-final/
+
+# Astro build directory (replaced by docs/)
+.astro-build/
