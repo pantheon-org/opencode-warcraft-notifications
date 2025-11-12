@@ -1,16 +1,46 @@
-/* Custom styles to match OpenCode docs */
+/* OpenCode Documentation Styles - Phase 2: Color System */
 
 :root {
-  /* Override Starlight colors */
+  /* Base Colors - Light Mode */
+  --sl-color-white: #ffffff;
+  --sl-color-black: #0f1117;
+
+  /* Gray Scale - Light Mode */
+  --sl-color-gray-1: #f6f6f7;
+  --sl-color-gray-2: #ededef;
+  --sl-color-gray-3: #c6c6ca;
+  --sl-color-gray-4: #98989d;
+  --sl-color-gray-5: #55555c;
+  --sl-color-gray-6: #2d2d33;
+  --sl-color-gray-7: #18181b;
+
+  /* Accent Colors - Light Mode */
   --sl-color-accent-low: #eff6ff;
   --sl-color-accent: #3b82f6;
   --sl-color-accent-high: #1e3a8a;
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #f6f6f7;
-  --sl-color-gray-2: #e5e5e7;
-  --sl-color-gray-3: #86868b;
-  --sl-color-gray-4: #1c1c1e;
-  --sl-color-black: #0d1117;
+
+  /* Text Colors - Light Mode */
+  --sl-color-text: #18181b;
+  --sl-color-text-accent: #3b82f6;
+
+  /* Background Colors - Light Mode */
+  --sl-color-bg: #ffffff;
+  --sl-color-bg-nav: #f6f6f7;
+  --sl-color-bg-sidebar: #f6f6f7;
+  --sl-color-bg-inline-code: #ededef;
+
+  /* Hairline/Border Colors - Light Mode */
+  --sl-color-hairline: #ededef;
+  --sl-color-hairline-shade: #c6c6ca;
+  --sl-color-hairline-light: #f6f6f7;
+
+  /* Badge Colors - Light Mode */
+  --sl-color-badge-default: #f6f6f7;
+  --sl-color-badge-note: #3b82f6;
+  --sl-color-badge-tip: #10b981;
+  --sl-color-badge-success: #10b981;
+  --sl-color-badge-caution: #f59e0b;
+  --sl-color-badge-danger: #ef4444;
 
   /* Typography */
   --sl-font:
@@ -28,17 +58,48 @@
   --sl-border-radius: 8px;
 }
 
-/* Dark mode overrides */
+/* Dark mode overrides - OpenCode Theme */
 :root[data-theme='dark'] {
+  /* Base Colors - Dark Mode */
+  --sl-color-white: #0f1117;
+  --sl-color-black: #f6f6f7;
+
+  /* Gray Scale - Dark Mode */
+  --sl-color-gray-1: #18181b;
+  --sl-color-gray-2: #2d2d33;
+  --sl-color-gray-3: #55555c;
+  --sl-color-gray-4: #98989d;
+  --sl-color-gray-5: #c6c6ca;
+  --sl-color-gray-6: #ededef;
+  --sl-color-gray-7: #f6f6f7;
+
+  /* Accent Colors - Dark Mode */
   --sl-color-accent-low: #1e3a8a;
   --sl-color-accent: #60a5fa;
   --sl-color-accent-high: #eff6ff;
-  --sl-color-white: #0d1117;
-  --sl-color-gray-1: #161b22;
-  --sl-color-gray-2: #30363d;
-  --sl-color-gray-3: #8b949e;
-  --sl-color-gray-4: #e6edf3;
-  --sl-color-black: #ffffff;
+
+  /* Text Colors - Dark Mode */
+  --sl-color-text: #f6f6f7;
+  --sl-color-text-accent: #60a5fa;
+
+  /* Background Colors - Dark Mode */
+  --sl-color-bg: #0f1117;
+  --sl-color-bg-nav: #18181b;
+  --sl-color-bg-sidebar: #18181b;
+  --sl-color-bg-inline-code: #2d2d33;
+
+  /* Hairline/Border Colors - Dark Mode */
+  --sl-color-hairline: #2d2d33;
+  --sl-color-hairline-shade: #55555c;
+  --sl-color-hairline-light: #18181b;
+
+  /* Badge Colors - Dark Mode */
+  --sl-color-badge-default: #2d2d33;
+  --sl-color-badge-note: #60a5fa;
+  --sl-color-badge-tip: #10b981;
+  --sl-color-badge-success: #10b981;
+  --sl-color-badge-caution: #f59e0b;
+  --sl-color-badge-danger: #ef4444;
 }
 
 /* Horizontal rules - more prominent spacing */
