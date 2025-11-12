@@ -17,7 +17,7 @@ jobs:
   create-tag:
     name: Create Git Tag from package.json Version
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,9 +34,9 @@ jobs:
         id: check
         run: |
           LATEST_COMMIT_MSG=$(git log -1 --pretty=format:"%s")
-          
-          # Only create tag for version bump commits
-          if [[ "$LATEST_COMMIT_MSG" =~ ^chore:\ bump\ version\ to\ [0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+
+          # Only create tag for version bump commits (allows PR number suffix)
+          if [[ "$LATEST_COMMIT_MSG" =~ ^chore:\ bump\ version\ to\ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
             echo "✅ Version bump commit detected: $LATEST_COMMIT_MSG"
             echo "is_version_bump=true" >> $GITHUB_OUTPUT
           else
@@ -50,7 +50,7 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           TAG="v${VERSION}"
-          
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "📦 Package version: $VERSION"
@@ -61,21 +61,21 @@ jobs:
         if: steps.check.outputs.is_version_bump == 'true'
         run: |
           TAG="${{ steps.version.outputs.tag }}"
-          
+
           # Check local tags
           if git tag -l "$TAG" | grep -q "$TAG"; then
             echo "⚠️ Tag $TAG already exists locally"
             echo "exists=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           # Check remote tags
           if git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
             echo "⚠️ Tag $TAG already exists on remote"
             echo "exists=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           echo "✅ Tag $TAG does not exist"
           echo "exists=false" >> $GITHUB_OUTPUT
 
@@ -84,11 +84,11 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           VERSION="${{ steps.version.outputs.version }}"
-          
+
           # Configure git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
+
           # Create annotated tag
           git tag -a "$TAG" -m "Release $TAG
 
@@ -96,10 +96,10 @@ jobs:
           Commit: ${{ github.sha }}
 
           This tag triggers npm publishing and documentation deployment."
-          
+
           # Push tag
           git push origin "$TAG"
-          
+
           echo "✅ Created and pushed tag $TAG"
           echo "🚀 This will trigger the publish workflow"
 
