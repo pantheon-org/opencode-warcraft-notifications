@@ -106,6 +106,11 @@ const getPackageName = (): string | null => {
 };
 
 /**
+ * Subdirectory name for sound files within the plugin storage
+ */
+export const SOUNDS_SUBDIR = 'sounds';
+
+/**
  * Get the default sounds directory location
  * @returns Default sounds directory path
  */
@@ -130,7 +135,7 @@ export const getDefaultSoundsDir = (): string => {
     pluginName = pluginName.replace(/[^a-zA-Z0-9._-]/g, '-');
   }
 
-  return join(baseDataDir, 'opencode', 'storage', 'plugin', pluginName);
+  return join(baseDataDir, 'opencode', 'storage', 'plugin', pluginName, SOUNDS_SUBDIR);
 };
 
 /**

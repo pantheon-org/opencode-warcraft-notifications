@@ -345,7 +345,7 @@ opencode --version
 cat ~/.cache/opencode/node_modules/@pantheon-ai/opencode-warcraft-notifications/package.json | grep version
 
 # Check sound files
-ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 
 # Check configuration
 cat ~/.config/opencode/plugin.json

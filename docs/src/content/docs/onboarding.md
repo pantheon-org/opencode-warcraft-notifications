@@ -205,7 +205,7 @@ opencode
 
 ```bash
 # Check if sounds are installed
-ls ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+ls ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 
 # Enable debug mode
 DEBUG_OPENCODE=1 opencode

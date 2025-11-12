@@ -44,6 +44,7 @@ describe('Plugin configuration module', () => {
     expect(soundsDir).toContain('opencode');
     expect(soundsDir).toContain('storage');
     expect(soundsDir).toContain('plugin');
+    expect(soundsDir).toContain('sounds');
   });
 
   it('should export default constants', () => {
