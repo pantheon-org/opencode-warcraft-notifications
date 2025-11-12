@@ -34,9 +34,7 @@ git add package.json
 git commit -m "chore: bump version to $NEW_VERSION
 
 Version Type: $VERSION_TYPE
-Previous Version: $CURRENT_VERSION
-
-[skip ci]"
+Previous Version: $CURRENT_VERSION"
 
 # Push branch
 git push origin "$BRANCH_NAME"
