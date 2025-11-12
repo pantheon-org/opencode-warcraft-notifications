@@ -277,3 +277,5 @@ _"Work complete!"_ - Warcraft II Peasant
 _"Zug zug!"_ - Warcraft II Orc
 
 > **Note:** This plugin uses an advanced AI-powered workflow system for automated versioning, publishing, and auto-merging. See [GitHub Workflows Documentation](docs/github-workflows/README.md) for details.
+
+<!-- Test workflow validation - 2025-11-12 -->
