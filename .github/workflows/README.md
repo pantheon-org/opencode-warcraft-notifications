@@ -108,8 +108,10 @@ All workflows use concurrency groups to prevent parallel runs:
 ## Secrets Required
 
 - `GITHUB_TOKEN` - Automatic (provided by GitHub Actions)
-- `WORKFLOW_PAT` - Personal Access Token for triggering workflows (optional)
+- `WORKFLOW_PAT` - Personal Access Token for creating PRs and triggering workflows (required - owned by thoroc)
 - `NPM_TOKEN` - For publishing to npm registry
+
+**Note**: This repository requires `WORKFLOW_PAT` because GitHub Actions is not permitted to create pull requests. The auto-merge workflow is configured to accept version bump PRs from both `github-actions[bot]` and the WORKFLOW_PAT owner (`thoroc`).
 
 ## Troubleshooting
 
