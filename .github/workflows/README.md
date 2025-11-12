@@ -108,8 +108,10 @@ All workflows use concurrency groups to prevent parallel runs:
 ## Secrets Required
 
 - `GITHUB_TOKEN` - Automatic (provided by GitHub Actions)
-- `WORKFLOW_PAT` - Personal Access Token for triggering workflows (optional)
+- `WORKFLOW_PAT` - Personal Access Token for triggering workflows (used only in workflow 4 for tag creation)
 - `NPM_TOKEN` - For publishing to npm registry
+
+**Note**: Version bump PRs (workflow 2) use only `GITHUB_TOKEN` to ensure they are created by `github-actions[bot]`, which is required for the auto-merge workflow (workflow 3) to recognize and process them.
 
 ## Troubleshooting
 
