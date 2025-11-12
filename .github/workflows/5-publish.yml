@@ -101,11 +101,19 @@ jobs:
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION="${{ steps.version.outputs.version }}"
 
-          if npm view "$PACKAGE_NAME@$VERSION" version 2>/dev/null; then
+          echo "🔍 Checking if $PACKAGE_NAME@$VERSION exists on npm..."
+
+          # Try to check if version exists (capture both stdout and stderr)
+          NPM_CHECK=$(npm view "$PACKAGE_NAME@$VERSION" version 2>&1 || true)
+
+          if echo "$NPM_CHECK" | grep -q "E404"; then
+            echo "✅ Version $VERSION not yet published (404 - not found)"
+            echo "published=false" >> $GITHUB_OUTPUT
+          elif echo "$NPM_CHECK" | grep -q "$VERSION"; then
             echo "⚠️ Version $VERSION already published to npm"
             echo "published=true" >> $GITHUB_OUTPUT
           else
-            echo "✅ Version $VERSION not yet published"
+            echo "⚠️ Could not determine publication status, assuming not published"
             echo "published=false" >> $GITHUB_OUTPUT
           fi
 
@@ -114,12 +122,26 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          echo "🚀 Publishing to npm..."
-          npm publish --access public --provenance
-
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION="${{ steps.version.outputs.version }}"
-          echo "✅ Published $PACKAGE_NAME@$VERSION to npm"
+
+          echo "🚀 Publishing $PACKAGE_NAME@$VERSION to npm..."
+
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "❌ Error: NPM_TOKEN secret is not set!"
+            echo "Please add NPM_TOKEN to repository secrets"
+            exit 1
+          fi
+
+          # Attempt to publish with detailed error handling
+          if npm publish --access public --provenance; then
+            echo "✅ Successfully published $PACKAGE_NAME@$VERSION to npm"
+          else
+            NPM_EXIT_CODE=$?
+            echo "❌ npm publish failed with exit code: $NPM_EXIT_CODE"
+            echo "Check npm token permissions and package configuration"
+            exit $NPM_EXIT_CODE
+          fi
 
       - name: Verify npm publication
         if: steps.check-npm.outputs.published == 'false'
