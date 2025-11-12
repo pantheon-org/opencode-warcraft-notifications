@@ -254,27 +254,27 @@ jobs:
             
             const body = `# Release ${tag}
 
-${changelogHeader}
+            ${changelogHeader}
 
-${commits}
+            ${commits}
 
-## 📦 Package Information
+            ## 📦 Package Information
 
-- **npm Package**: [\`${npmPackageName}@${version}\`](${npmUrl})
-- **Installation**: \`npm install ${npmPackageName}@${version}\`
-- **Documentation**: [View Docs](${docsUrl})
+            - **npm Package**: [\`${npmPackageName}@${version}\`](${npmUrl})
+            - **Installation**: \`npm install ${npmPackageName}@${version}\`
+            - **Documentation**: [View Docs](${docsUrl})
 
-## 🔧 Build Information
+            ## 🔧 Build Information
 
-- **Node.js**: 20.x
-- **Runtime**: Bun
-- **Build Status**: ✅ All tests passed
-- **Coverage**: ✅ Full coverage
+            - **Node.js**: 20.x
+            - **Runtime**: Bun
+            - **Build Status**: ✅ All tests passed
+            - **Coverage**: ✅ Full coverage
 
----
+            ---
 
-*This release was automatically created by the Publish Release workflow.*
-`;
+            *This release was automatically created by the Publish Release workflow.*
+            `;
             
             await github.rest.repos.createRelease({
               owner: context.repo.owner,

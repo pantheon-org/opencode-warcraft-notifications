@@ -92,10 +92,10 @@ jobs:
           # Create annotated tag
           git tag -a "$TAG" -m "Release $TAG
 
-Version: $VERSION
-Commit: ${{ github.sha }}
+          Version: $VERSION
+          Commit: ${{ github.sha }}
 
-This tag triggers npm publishing and documentation deployment."
+          This tag triggers npm publishing and documentation deployment."
           
           # Push tag
           git push origin "$TAG"
