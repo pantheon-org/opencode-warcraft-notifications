@@ -127,11 +127,11 @@ bun run preview
 
 ### Data Directories
 
-| Platform | Default Location                                                                         |
-| -------- | ---------------------------------------------------------------------------------------- |
+| Platform | Default Location                                                                                |
+| -------- | ----------------------------------------------------------------------------------------------- |
 | macOS    | `~/Library/Application Support/opencode/storage/plugin/opencode-warcraft-notifications/sounds/` |
 | Linux    | `~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/sounds/`                |
-| Windows  | `%APPDATA%\opencode\storage\plugin\opencode-warcraft-notifications\`                     |
+| Windows  | `%APPDATA%\opencode\storage\plugin\opencode-warcraft-notifications\`                            |
 
 ### Sound Files
 
