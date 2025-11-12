@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import * as sounds from './sounds';
-import { createTempDir, removeTempDir } from './test-utils';
+import * as sounds from './index';
+import { createTempDir, removeTempDir } from '../test-utils';
 
 // Deterministic randomness helper
 const withMathRandom = (value: number, fn: () => void) => {

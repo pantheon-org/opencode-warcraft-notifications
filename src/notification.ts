@@ -1,6 +1,10 @@
 import type { Plugin } from '@opencode-ai/plugin';
 import { createLogger } from './logger.js';
-import { getRandomSoundPathFromFaction, soundExists, determineSoundFaction } from './sounds.js';
+import {
+  getRandomSoundPathFromFaction,
+  soundExists,
+  determineSoundFaction,
+} from './sounds/index.js';
 import { ensureSoundAvailable, installBundledSoundsIfMissing } from './bundled-sounds.js';
 import { loadPluginConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */

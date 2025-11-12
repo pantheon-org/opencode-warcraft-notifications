@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test';
-import * as sounds from './sounds';
+import * as sounds from './index';
 
 describe('sounds edge cases', () => {
   it('determineSoundFaction is case-sensitive and defaults to alliance', () => {

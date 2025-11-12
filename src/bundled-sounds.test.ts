@@ -77,7 +77,7 @@ describe('sounds/bundled-sounds [integration] - installer and filesystem behavio
     const list = getSoundFileList();
     const filename = list[0];
 
-    const { determineSoundFaction } = await import('./sounds.js');
+    const { determineSoundFaction } = await import('./sounds/index.js');
     const faction = determineSoundFaction(filename);
     const factionDir = join(tempDir, faction);
     const path = join(factionDir, filename);
@@ -92,7 +92,7 @@ describe('sounds/bundled-sounds [integration] - installer and filesystem behavio
 
   it('soundExists reports presence and absence', async () => {
     const filename = 'work_completed.wav';
-    const { determineSoundFaction } = await import('./sounds.js');
+    const { determineSoundFaction } = await import('./sounds/index.js');
     const faction = determineSoundFaction(filename);
     const factionDir = join(tempDir, faction);
     const path = join(factionDir, filename);
