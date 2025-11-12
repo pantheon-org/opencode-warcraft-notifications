@@ -43,9 +43,8 @@ graph TB
         BD[Bundled Data<br/>data/alliance/<br/>data/horde/]
     end
 
-    subgraph "Platform Services"
-        MAC[macOS<br/>afplay]
-        LIN[Linux<br/>canberra-gtk-play]
+    subgraph "External Services"
+        SH[Shell Commands<br/>afplay/canberra-gtk-play]
         TUI[OpenCode TUI<br/>Toast Notifications]
     end
 
@@ -64,8 +63,7 @@ graph TB
     BS --> FS
     BS --> DD
     BS --> BD
-    NC --> MAC
-    NC --> LIN
+    NC --> SH
     NC --> TUI
 
     style NP fill:#e1f5ff

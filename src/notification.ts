@@ -8,10 +8,19 @@ import {
 } from './sounds/index.js';
 import { installBundledSoundsIfMissing } from './bundled-sounds.js';
 import { loadPluginConfig } from './config/index.js';
-import { getPlatform } from './notification/platforms.js';
+import { extractFilename, getIdleSummary } from './notification-utils.js';
 /* eslint-disable jsdoc/require-param */
 
 const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
+
+// Constants for toast durations and cache keys
+const TOAST_DURATION = {
+  SUCCESS: 3000,
+  WARNING: 5000,
+  INFO: 4000,
+} as const;
+
+const CACHE_KEY_NOTIFIED_MISSING = '_notified_missing';
 
 /**
  * Notification idle plugin
@@ -30,9 +39,6 @@ export const NotificationPlugin: Plugin = async (ctx) => {
   void _project;
   void _worktree;
 
-  // Get platform-specific implementation
-  const platform = getPlatform($);
-
   // Load plugin configuration from plugin.json
   const pluginName = '@pantheon-ai/opencode-warcraft-notifications';
   const pluginConfig = await loadPluginConfig(pluginName);
@@ -48,7 +54,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
             title: 'Warcraft Sounds',
             message: `Installed ${installedCount} sound file${installedCount > 1 ? 's' : ''} successfully`,
             variant: 'success',
-            duration: 3000,
+            duration: TOAST_DURATION.SUCCESS,
           },
         });
       } catch (toastErr) {
@@ -66,7 +72,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
           title: 'Warcraft Sounds',
           message: 'Failed to install sound files. Using system sounds as fallback.',
           variant: 'warning',
-          duration: 5000,
+          duration: TOAST_DURATION.WARNING,
         },
       });
     } catch (toastErr) {
@@ -87,7 +93,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
 
     // Choose a random sound filename from the specified faction(s)
     const soundPath = getRandomSoundPathFromFaction(faction, explicitDataDir);
-    const filename = soundPath.split('/').pop() as string;
+    const filename = extractFilename(soundPath);
     const soundFaction = determineSoundFaction(filename);
 
     // If we've already confirmed availability, return the path
@@ -113,16 +119,16 @@ export const NotificationPlugin: Plugin = async (ctx) => {
    * Show a toast notification about missing sound file
    */
   const showMissingSoundToast = async (filename: string) => {
-    if (checkedSoundCache.has('_notified_missing')) return;
+    if (checkedSoundCache.has(CACHE_KEY_NOTIFIED_MISSING)) return;
 
-    checkedSoundCache.set('_notified_missing', true);
+    checkedSoundCache.set(CACHE_KEY_NOTIFIED_MISSING, true);
     try {
       await client.tui.showToast({
         body: {
           title: 'Warcraft Sounds',
           message: `Sound file not found: ${filename}. Using system sound as fallback.`,
           variant: 'info',
-          duration: 4000,
+          duration: TOAST_DURATION.INFO,
         },
       });
     } catch (toastErr) {
@@ -133,24 +139,54 @@ export const NotificationPlugin: Plugin = async (ctx) => {
 
   /**
    * Handle playing sound with fallback
+   *
+   * @param soundPath - Full path to the sound file
+   * @param existsLocally - Whether the sound file exists locally
+   * @param filename - Name of the sound file
    */
   const playIdleSound = async (soundPath: string, existsLocally: boolean, filename: string) => {
-    if (existsLocally) {
-      await platform.playSound(soundPath);
-    } else {
-      const fallbackSound =
-        process.platform === 'darwin' ? '/System/Library/Sounds/Glass.aiff' : undefined;
-      await platform.playSound(soundPath, fallbackSound);
-      await showMissingSoundToast(filename);
+    try {
+      if (existsLocally) {
+        // Play the sound using platform-specific commands
+        if (process.platform === 'darwin') {
+          await $`afplay ${soundPath}`;
+        } else if (process.platform === 'linux') {
+          // Try paplay first, fall back to aplay
+          try {
+            await $`paplay ${soundPath}`;
+          } catch {
+            await $`aplay ${soundPath}`;
+          }
+        } else if (process.platform === 'win32') {
+          log.warn('Windows sound playback not yet supported', { soundPath });
+        }
+      } else {
+        // Play fallback sound if primary sound is missing
+        if (process.platform === 'darwin') {
+          const fallbackSound = '/System/Library/Sounds/Glass.aiff';
+          log.warn('Primary sound not found, using fallback', { soundPath, fallbackSound });
+          await $`afplay ${fallbackSound}`;
+        } else if (process.platform === 'linux') {
+          log.warn('Primary sound not found, using system sound', { soundPath });
+          await $`canberra-gtk-play --id=message`;
+        } else if (process.platform === 'win32') {
+          log.warn('Windows sound playback not yet supported', { soundPath });
+        }
+        await showMissingSoundToast(filename);
+      }
+    } catch (error) {
+      log.error('Failed to play sound', { error, soundPath });
     }
   };
 
   /**
    * Handle session idle event
+   *
+   * @param summary - Short summary of the session activity
    */
   const handleSessionIdle = async (summary: string) => {
     const soundPath = await ensureAndGetSoundPath();
-    const filename = soundPath.split('/').pop() as string;
+    const filename = extractFilename(soundPath);
     const fileSoundFaction = determineSoundFaction(filename);
     const existsLocally = await soundExists(filename, fileSoundFaction, pluginConfig.soundsDir);
 
@@ -160,7 +196,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
       // Use sound description if available, otherwise use summary as title
       const soundDescription = getSoundDescription(filename);
       const toastTitle = soundDescription || 'opencode';
-      const toastMessage = soundDescription ? summary : summary;
+      const toastMessage = summary;
 
       // Show toast notification (enabled by default)
       const showToast = pluginConfig.showDescriptionInToast !== false;
@@ -171,7 +207,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
               title: toastTitle,
               message: toastMessage,
               variant: 'info',
-              duration: 4000,
+              duration: TOAST_DURATION.INFO,
             },
           });
         } catch (toastErr) {
@@ -204,31 +240,6 @@ export const NotificationPlugin: Plugin = async (ctx) => {
       }
     },
   };
-};
-
-/**
- * Extract a last `*Summary:* ...` line at the end of the text
- */
-
-/**
- * Extract a short idle summary from the end of a message text.
- *
- * If the text contains a line like `Summary: ...` it returns that; otherwise it
- * truncates the text to 80 characters.
- *
- * @param text - Message text to extract the summary from
- * @returns The extracted summary or `undefined` when no text is provided
- */
-const getIdleSummary = (text: string | null) => {
-  if (!text) return;
-  const idleMatch = text.match(/[_*]Summary:[_*]? (.*)[_*]?$/m);
-  if (idleMatch && idleMatch[1]) {
-    return idleMatch[1].trim();
-  }
-  if (text.length > 80) {
-    return text.slice(0, 80) + '...';
-  }
-  return text;
 };
 
 // Also see:
