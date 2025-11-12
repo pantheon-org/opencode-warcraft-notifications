@@ -27,7 +27,6 @@ This plugin plays authentic Warcraft II unit audio clips from both Alliance and 
 - 💻 **Cross-Platform**: Works on macOS and Linux
 - 🎨 **Toast Notifications**: In-app toast notifications with authentic voice lines (e.g., "Yes, milord?" / "Work, work.")
 - 🚀 **Automated Releases**: Fully automated CI/CD pipeline with AI-powered version management
-- 🤖 **AI Code Review**: Automatic GitHub Copilot code reviews on every pull request
 - 📚 **Comprehensive Documentation**: Complete documentation suite for users, developers, and operators
 - 🎮 **Unit Variety**: Includes voices from:
   - **Alliance**: Human Units (peasants, knights, mages), Elven Archers, Dwarven Demolition Squad, Naval Units
@@ -56,14 +55,12 @@ This project includes comprehensive documentation for all users:
 - **[API Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/api/)** - Complete technical reference
 - **[Architecture](https://pantheon-org.github.io/opencode-warcraft-notifications/architecture/)** - System design and components
 - **[Onboarding](https://pantheon-org.github.io/opencode-warcraft-notifications/onboarding/)** - New contributor guide
-- **[AI Code Review Setup](.github/COPILOT_REVIEW_SETUP.md)** - GitHub Copilot automatic code review configuration
 
 ### For Operations
 
 - **[Deployment Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/deployment/)** - Installation and operations
 - **[CI/CD Pipeline](https://pantheon-org.github.io/opencode-warcraft-notifications/pipeline/)** - Complete pipeline technical reference
 - **[GitHub Workflows](https://pantheon-org.github.io/opencode-warcraft-notifications/github-workflows/)** - CI/CD setup guides
-- **[AI Code Reviewers Guide](AI_CODE_REVIEWERS_GUIDE.md)** - Complete guide for adding AI code reviewers (Copilot, Claude, Gemini)
 
 ### Additional Resources
 
