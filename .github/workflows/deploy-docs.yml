@@ -62,6 +62,20 @@ jobs:
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Ensure GitHub Pages source is set to docs
+        env:
+          GITHUB_API: https://api.github.com
+        run: |
+          echo "Ensuring GitHub Pages source is 'docs' at path '/'..."
+          set -euo pipefail
+          repo="${{ github.repository }}"
+          # idempotent PUT to set Pages source; requires pages: write permission
+          curl -sS -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "$GITHUB_API/repos/$repo/pages" \
+            -d '{"source":{"branch":"docs","path":"/"}}' \
+          | sed -n '1,200p'
       - name: Summary
         run: |
           echo "🎉 Documentation Deployment Complete!"
