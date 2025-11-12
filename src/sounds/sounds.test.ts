@@ -14,7 +14,7 @@ import {
   getSoundsByFaction,
   getRandomSoundFromFaction,
   getRandomSoundPathFromFaction,
-} from './sounds.ts';
+} from './index';
 
 describe('sounds data structure', () => {
   test('should have all expected categories', () => {
@@ -219,7 +219,7 @@ describe('soundExists()', () => {
   });
 
   test('defaults to real fs when no existsFn supplied', async () => {
-    const { createTempDir, removeTempDir, writeTempFileForFaction } = await import('./test-utils');
+    const { createTempDir, removeTempDir, writeTempFileForFaction } = await import('../test-utils');
     const tmp = createTempDir();
     try {
       const filename = 'human_selected1.wav';

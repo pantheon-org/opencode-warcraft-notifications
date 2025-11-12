@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { createLogger } from './logger.js';
 import { DEFAULT_DATA_DIR } from './plugin-config.js';
 import { getSoundFileList as dataGetSoundFileList } from './sound-data/index.js';
-import { determineSoundFaction } from './sounds.js';
+import { determineSoundFaction } from './sounds/index.js';
 
 const DEBUG = Boolean(process.env.DEBUG_OPENCODE);
 const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
