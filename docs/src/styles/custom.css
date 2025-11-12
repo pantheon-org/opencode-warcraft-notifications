@@ -1,6 +1,22 @@
-/* OpenCode Documentation Styles - Phase 2: Color System */
+/**
+ * OpenCode Documentation Styles
+ * 
+ * Warcraft Notifications Plugin Documentation
+ * Implements OpenCode design system for consistent styling
+ * 
+ * Structure:
+ * 1. Color System (Light/Dark themes)
+ * 2. Component Styles (Buttons, Badges, Code blocks, Navigation)
+ * 3. Typography & Spacing
+ * 4. Responsive Design (Mobile 800px, Wide 1152px)
+ * 5. Accessibility (Focus states, Reduced motion, Print)
+ */
+
+/* === Phase 2: Color System === */
 
 :root {
+  /* Smooth scrolling for better UX (respects prefers-reduced-motion) */
+  scroll-behavior: smooth;
   /* Base Colors - Light Mode */
   --sl-color-white: #ffffff;
   --sl-color-black: #0f1117;
