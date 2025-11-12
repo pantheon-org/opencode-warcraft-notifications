@@ -26,6 +26,13 @@ export default defineConfig({
         baseUrl: 'https://github.com/pantheon-org/opencode-warcraft-notifications/edit/main/docs/',
       },
       customCss: ['./src/styles/custom.css'],
+      defaultLocale: 'root',
+      locales: {
+        root: {
+          label: 'English',
+          lang: 'en',
+        },
+      },
       sidebar: [
         {
           label: 'Getting Started',
