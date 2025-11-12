@@ -463,9 +463,71 @@
   font-style: italic;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* === Phase 7: Responsive Design === */
+
+/* Mobile breakpoint - 800px (50em) to match OpenCode */
+@media (max-width: 50em) {
   :root {
     --sl-content-width: 100%;
+    --sl-text-base: 0.9375rem;
+  }
+
+  /* Mobile typography adjustments */
+  .sl-markdown-content h1 {
+    font-size: 1.875rem;
+  }
+
+  .sl-markdown-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .sl-markdown-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .sl-markdown-content h4 {
+    font-size: 1rem;
+  }
+
+  /* Mobile code blocks - full bleed */
+  .sl-markdown-content pre {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+  }
+
+  /* Mobile tables - horizontal scroll */
+  .sl-markdown-content table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  /* Mobile spacing adjustments */
+  .sl-markdown-content {
+    font-size: 0.9375rem;
+  }
+
+  .sl-markdown-content aside {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Desktop - sticky header with blur */
+@media (min-width: 50em) {
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--sl-color-bg) 90%, transparent);
+  }
+}
+
+/* Wide desktop - increased content width */
+@media (min-width: 72em) {
+  :root {
+    --sl-content-width: 56rem;
   }
 }
