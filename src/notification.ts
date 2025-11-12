@@ -22,11 +22,10 @@ const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
  * to download wave files from the network.
  */
 export const NotificationPlugin: Plugin = async (ctx) => {
-  const { project: _project, client: _client, $, worktree: _worktree } = ctx;
+  const { project: _project, client, $, worktree: _worktree } = ctx;
   // Keep a simple cache flag to avoid repeated checks.
   const checkedSoundCache = new Map<string, boolean>();
   void _project;
-  void _client;
   void _worktree;
 
   // Load plugin configuration from plugin.json
@@ -35,10 +34,40 @@ export const NotificationPlugin: Plugin = async (ctx) => {
 
   // Install bundled sounds into the user's config on first run
   try {
-    await installBundledSoundsIfMissing(pluginConfig.soundsDir);
+    const installedCount = await installBundledSoundsIfMissing(pluginConfig.soundsDir);
+    // Only notify user if files were actually installed
+    if (installedCount > 0) {
+      try {
+        await client.tui.showToast({
+          body: {
+            title: 'Warcraft Sounds',
+            message: `Installed ${installedCount} sound file${installedCount > 1 ? 's' : ''} successfully`,
+            variant: 'success',
+            duration: 3000,
+          },
+        });
+      } catch (toastErr) {
+        // Silently ignore toast errors - not critical
+        if (process.env.DEBUG_OPENCODE) log.debug('Toast notification failed', { error: toastErr });
+      }
+    }
   } catch (err) {
     if (process.env.DEBUG_OPENCODE)
       log.warn('installBundledSoundsIfMissing failed', { error: err });
+    // Notify user of installation failure
+    try {
+      await client.tui.showToast({
+        body: {
+          title: 'Warcraft Sounds',
+          message: 'Failed to install sound files. Using system sounds as fallback.',
+          variant: 'warning',
+          duration: 5000,
+        },
+      });
+    } catch (toastErr) {
+      // Silently ignore toast errors - not critical
+      if (process.env.DEBUG_OPENCODE) log.debug('Toast notification failed', { error: toastErr });
+    }
   }
 
   const ensureAndGetSoundPath = async () => {
@@ -108,6 +137,24 @@ export const NotificationPlugin: Plugin = async (ctx) => {
           } else {
             // Fallback to system sound if the file isn't available
             await $`osascript -e 'do shell script "afplay /System/Library/Sounds/Glass.aiff"'`;
+            // Notify user about missing sound file (only once per session)
+            if (!checkedSoundCache.has('_notified_missing')) {
+              checkedSoundCache.set('_notified_missing', true);
+              try {
+                await client.tui.showToast({
+                  body: {
+                    title: 'Warcraft Sounds',
+                    message: `Sound file not found: ${filename}. Using system sound as fallback.`,
+                    variant: 'info',
+                    duration: 4000,
+                  },
+                });
+              } catch (toastErr) {
+                // Silently ignore toast errors - not critical
+                if (process.env.DEBUG_OPENCODE)
+                  log.debug('Toast notification failed', { error: toastErr });
+              }
+            }
           }
 
           await $`osascript -e 'display notification ${JSON.stringify(summary)} with title "opencode"'`;

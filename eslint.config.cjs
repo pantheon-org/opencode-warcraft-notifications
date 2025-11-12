@@ -79,6 +79,9 @@ module.exports = [
       'jsdoc/no-undefined-types': 'off',
       'jsdoc/require-param-type': 'off',
       'jsdoc/require-returns-type': 'off',
+      'no-inner-declarations': 'error',
+      // Disallow nested functions (any function defined inside another function)
+      'max-nested-callbacks': ['error', 0],
     },
   },
   {
@@ -87,6 +90,7 @@ module.exports = [
       'tsdoc/syntax': 'off',
       'prettier/prettier': 'off',
       'max-lines': 'off',
+      'max-nested-callbacks': 'off',
     },
   },
   {

@@ -16,6 +16,27 @@ import type { SoundFile } from './types.js';
  * @param baseUrl - Base URL to prepend to each entry's path
  * @returns Array of `SoundFile` objects ready for download
  */
+/**
+ * Transform sound entry to SoundFile object
+ */
+const transformToSoundFile = (
+  entry: { filename: string; path: string; description: string },
+  effectiveBaseUrl: string,
+  faction: 'alliance' | 'horde',
+): SoundFile => ({
+  filename: entry.filename,
+  url: `${effectiveBaseUrl}/${entry.path}`,
+  description: entry.description,
+  faction: faction,
+  subdirectory: faction,
+});
+
+/**
+ * Build the list of SoundFile objects for a specific faction
+ * @param faction - The faction to build sounds for ('alliance' or 'horde')
+ * @param baseUrl - Base URL to prepend to each entry's path
+ * @returns Array of SoundFile objects ready for download
+ */
 export const buildSoundsToDownload = (
   faction: 'alliance' | 'horde',
   baseUrl: string,
@@ -24,13 +45,11 @@ export const buildSoundsToDownload = (
   const hordeBaseUrl = 'https://www.thanatosrealms.com/war2/sounds/orcs';
   const effectiveBaseUrl = faction === 'horde' ? hordeBaseUrl : baseUrl;
 
-  return entries.map((e) => ({
-    filename: e.filename,
-    url: `${effectiveBaseUrl}/${e.path}`,
-    description: e.description,
-    faction: faction,
-    subdirectory: faction,
-  }));
+  const result: SoundFile[] = [];
+  for (const entry of entries) {
+    result.push(transformToSoundFile(entry, effectiveBaseUrl, faction));
+  }
+  return result;
 };
 
 /**
@@ -46,19 +65,24 @@ export const buildAllSoundsToDownload = (allianceBaseUrl: string): SoundFile[] =
 };
 
 /**
+ * Extract filename from sound entry
+ */
+const extractFilename = (e: { filename: string }): string => e.filename;
+
+/**
  * Return the list of expected sound filenames for a specific faction
  * @param faction - The faction to get filenames for
  * @returns Array of sound filenames
  */
 export const getSoundFileList = (faction?: 'alliance' | 'horde'): string[] => {
   if (faction === 'alliance') {
-    return allianceSoundEntries.map((e) => e.filename);
+    return allianceSoundEntries.map(extractFilename);
   }
   if (faction === 'horde') {
-    return hordeSoundEntries.map((e) => e.filename);
+    return hordeSoundEntries.map(extractFilename);
   }
   // Return all sounds if no faction specified
-  return [...allianceSoundEntries, ...hordeSoundEntries].map((e) => e.filename);
+  return [...allianceSoundEntries, ...hordeSoundEntries].map(extractFilename);
 };
 
 /**

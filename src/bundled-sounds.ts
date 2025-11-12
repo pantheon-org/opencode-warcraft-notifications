@@ -36,19 +36,21 @@ const copyIfMissing = async (
   sourcePath: string,
   targetDir: string,
   filename: string,
-): Promise<void> => {
+): Promise<boolean> => {
   const targetPath = join(targetDir, filename);
 
   // Ensure target directory
-  if (!(await ensureDirExists(targetDir))) return;
+  if (!(await ensureDirExists(targetDir))) return false;
 
-  if (await fileExists(targetPath)) return;
+  if (await fileExists(targetPath)) return false;
 
   try {
     await copyFile(sourcePath, targetPath);
     if (DEBUG) log.info(`Installed bundled sound: ${filename}`, { targetPath });
+    return true;
   } catch (err) {
     if (DEBUG) log.error(`Failed to install bundled sound ${filename}`, { error: err });
+    return false;
   }
 };
 
@@ -85,33 +87,36 @@ const processBundledSubdir = async (
   bundledDataDir: string,
   subdir: string,
   effectiveDataDir: string,
-) => {
+): Promise<number> => {
   const subdirPath = join(bundledDataDir, subdir);
   let files: string[] = [];
   try {
     files = await readdir(subdirPath);
   } catch (err) {
     if (DEBUG) log.warn('Failed to read bundled subdir', { subdirPath, error: err });
-    return;
+    return 0;
   }
 
+  let count = 0;
   for (const file of files) {
     if (!file.toLowerCase().endsWith('.wav')) continue;
     const source = join(subdirPath, file);
     const targetDir = join(effectiveDataDir, subdir);
-    await copyIfMissing(source, targetDir, file);
+    const installed = await copyIfMissing(source, targetDir, file);
+    if (installed) count++;
   }
+  return count;
 };
 
 const processBundledRootFile = async (
   bundledDataDir: string,
   filename: string,
   effectiveDataDir: string,
-) => {
+): Promise<boolean> => {
   const source = join(bundledDataDir, filename);
   const faction = determineSoundFaction(filename);
   const targetDir = join(effectiveDataDir, faction);
-  await copyIfMissing(source, targetDir, filename);
+  return await copyIfMissing(source, targetDir, filename);
 };
 
 /**
@@ -167,14 +172,32 @@ const findBundledDataDir = (): string | null => {
 };
 
 /**
+ * Process a single directory entry and return count of installed files
+ */
+const processEntry = async (
+  entry: { name: string; isDirectory: () => boolean; isFile: () => boolean },
+  bundledDataDir: string,
+  effectiveDataDir: string,
+): Promise<number> => {
+  if (entry.isDirectory()) {
+    return await processBundledSubdir(bundledDataDir, entry.name, effectiveDataDir);
+  }
+  if (entry.isFile() && entry.name.toLowerCase().endsWith('.wav')) {
+    const installed = await processBundledRootFile(bundledDataDir, entry.name, effectiveDataDir);
+    return installed ? 1 : 0;
+  }
+  return 0;
+};
+
+/**
  * Install bundled sounds from the repository `data/` directory into the
  * user's plugin data directory when missing. Non-.wav files are skipped and
  * existing files are not overwritten.
  * @param dataDir - Optional override for the base data directory
+ * @returns Number of sound files installed
  */
-export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<void> => {
+export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<number> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
-  // Try to find the bundled data directory
   const bundledDataDir = findBundledDataDir() ?? join(process.cwd(), 'data');
 
   let entries;
@@ -185,19 +208,16 @@ export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<v
       log.warn('No bundled sounds installed (data/ directory missing or unreadable)', {
         error: err,
       });
-    return;
+    return 0;
   }
 
-  // Ensure base data directory exists
-  if (!(await ensureDirExists(effectiveDataDir))) return;
+  if (!(await ensureDirExists(effectiveDataDir))) return 0;
 
+  let totalInstalled = 0;
   for (const entry of entries) {
-    if (entry.isDirectory()) {
-      await processBundledSubdir(bundledDataDir, entry.name, effectiveDataDir);
-    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.wav')) {
-      await processBundledRootFile(bundledDataDir, entry.name, effectiveDataDir);
-    }
+    totalInstalled += await processEntry(entry, bundledDataDir, effectiveDataDir);
   }
+  return totalInstalled;
 };
 
 /**

@@ -60,12 +60,17 @@ const formatInvalidTypeError = (path: string, issue: ZodIssueData): string => {
 };
 
 /**
+ * Format a single enum option value
+ */
+const formatEnumOption = (o: unknown): string => `'${o}'`;
+
+/**
  * Format invalid_value error (enum)
  */
 const formatInvalidValueError = (path: string, issue: ZodIssueData): string => {
   const values = issue.values as unknown[];
   if (values && Array.isArray(values)) {
-    const options = values.map((o: unknown) => `'${o}'`).join(', ');
+    const options = values.map(formatEnumOption).join(', ');
     return `${path}: Invalid enum value. Must be one of: ${options}`;
   }
   return `${path}: Invalid value`;
@@ -120,6 +125,16 @@ const formatZodIssue = (issue: ZodIssueData): string => {
 };
 
 /**
+ * Wrapper for formatZodIssue to avoid nested callback
+ */
+const formatZodIssueWrapper = (issue: z.ZodIssue): string => formatZodIssue(issue as ZodIssueData);
+
+/**
+ * Format error message with indentation
+ */
+const formatErrorWithIndent = (err: string): string => `  - ${err}`;
+
+/**
  * Validate plugin configuration against the schema
  *
  * This function validates the provided configuration object against the
@@ -168,7 +183,7 @@ export const validatePluginConfig = (config: unknown): ValidationResult => {
   } catch (error) {
     // Parse Zod validation errors into user-friendly messages
     if (error instanceof z.ZodError) {
-      const errors = error.issues.map((issue) => formatZodIssue(issue as ZodIssueData));
+      const errors = error.issues.map(formatZodIssueWrapper);
 
       return {
         valid: false,
@@ -213,7 +228,7 @@ export const validateAndSanitizeConfig = (config: unknown): WarcraftNotification
   if (!result.valid) {
     const errorMessage = [
       '[Warcraft Notifications] Configuration validation failed:',
-      ...(result.errors || []).map((err) => `  - ${err}`),
+      ...(result.errors || []).map(formatErrorWithIndent),
     ].join('\n');
 
     throw new Error(errorMessage);
