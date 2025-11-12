@@ -1,11 +1,13 @@
 import { join, dirname } from 'path';
 import { mkdir, exists, readdir, copyFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
+import { createLogger } from './logger.js';
 import { DEFAULT_DATA_DIR } from './plugin-config.js';
 import { getSoundFileList as dataGetSoundFileList } from './sound-data/index.js';
 import { determineSoundFaction } from './sounds.js';
 
 const DEBUG = Boolean(process.env.DEBUG_OPENCODE);
+const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
 
 /**
  * Ensure a directory exists by creating it recursively.
@@ -17,7 +19,7 @@ const ensureDirExists = async (dir: string): Promise<boolean> => {
     await mkdir(dir, { recursive: true });
     return true;
   } catch (err) {
-    if (DEBUG) console.warn('Failed to create directory:', dir, err);
+    if (DEBUG) log.warn('Failed to create directory', { dir, error: err });
     return false;
   }
 };
@@ -44,9 +46,9 @@ const copyIfMissing = async (
 
   try {
     await copyFile(sourcePath, targetPath);
-    if (DEBUG) console.log(`Installed bundled sound: ${filename} -> ${targetPath}`);
+    if (DEBUG) log.info(`Installed bundled sound: ${filename}`, { targetPath });
   } catch (err) {
-    if (DEBUG) console.error(`Failed to install bundled sound ${filename}:`, err);
+    if (DEBUG) log.error(`Failed to install bundled sound ${filename}`, { error: err });
   }
 };
 
@@ -89,7 +91,7 @@ const processBundledSubdir = async (
   try {
     files = await readdir(subdirPath);
   } catch (err) {
-    if (DEBUG) console.warn('Failed to read bundled subdir:', subdirPath, err);
+    if (DEBUG) log.warn('Failed to read bundled subdir', { subdirPath, error: err });
     return;
   }
 
@@ -180,7 +182,9 @@ export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<v
     entries = await readdir(bundledDataDir, { withFileTypes: true });
   } catch (err) {
     if (DEBUG)
-      console.warn('No bundled sounds installed (data/ directory missing or unreadable):', err);
+      log.warn('No bundled sounds installed (data/ directory missing or unreadable)', {
+        error: err,
+      });
     return;
   }
 

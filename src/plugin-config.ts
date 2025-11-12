@@ -3,7 +3,10 @@ import { exists } from 'fs/promises';
 import { homedir } from 'os';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
+import { createLogger } from './logger.js';
 import { validateAndSanitizeConfig } from './schema-validator.js';
+
+const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
 
 /**
  * Faction type for Warcraft II sounds
@@ -210,7 +213,7 @@ export const loadPluginConfig = async (pluginName: string): Promise<WarcraftNoti
 
       // Only warn for other errors when explicit debug flag is set to avoid noisy logs during tests
       if (process.env.DEBUG_OPENCODE) {
-        console.warn(`Failed to load plugin config from ${configPath}:`, error);
+        log.warn(`Failed to load plugin config from ${configPath}`, { error });
       }
     }
   }

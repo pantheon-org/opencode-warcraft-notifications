@@ -1,5 +1,8 @@
 import { z } from 'zod';
+import { createLogger } from './logger.js';
 import type { WarcraftNotificationConfig } from './plugin-config.js';
+
+const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
 
 /**
  * Validation result interface
@@ -200,7 +203,7 @@ export const validatePluginConfig = (config: unknown): ValidationResult => {
  *   const config = validateAndSanitizeConfig({ faction: 'alliance' });
  *   // config is now typed as WarcraftNotificationConfig
  * } catch (error) {
- *   console.error('Configuration invalid:', error.message);
+ *   log.error('Configuration invalid', { error });
  * }
  * ```
  */
@@ -218,9 +221,9 @@ export const validateAndSanitizeConfig = (config: unknown): WarcraftNotification
 
   // Log warnings if in debug mode
   if (result.warnings && process.env.DEBUG_OPENCODE) {
-    console.warn('[Warcraft Notifications] Configuration warnings:');
+    log.warn('Configuration warnings');
     for (const warning of result.warnings) {
-      console.warn(`  - ${warning}`);
+      log.warn(warning);
     }
   }
 

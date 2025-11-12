@@ -1,8 +1,11 @@
 import type { Plugin } from '@opencode-ai/plugin';
+import { createLogger } from './logger.js';
 import { getRandomSoundPathFromFaction, soundExists, determineSoundFaction } from './sounds.js';
 import { ensureSoundAvailable, installBundledSoundsIfMissing } from './bundled-sounds.js';
 import { loadPluginConfig } from './plugin-config.js';
 /* eslint-disable jsdoc/require-param */
+
+const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
 
 /**
  * Notification idle plugin
@@ -30,7 +33,8 @@ export const NotificationPlugin: Plugin = async (ctx) => {
   try {
     await installBundledSoundsIfMissing(pluginConfig.soundsDir);
   } catch (err) {
-    if (process.env.DEBUG_OPENCODE) console.warn('installBundledSoundsIfMissing failed:', err);
+    if (process.env.DEBUG_OPENCODE)
+      log.warn('installBundledSoundsIfMissing failed', { error: err });
   }
 
   const ensureAndGetSoundPath = async () => {
@@ -62,7 +66,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
       // No network downloads — just report availability
       return soundPath;
     } catch (error) {
-      console.error('Error ensuring sound available:', error);
+      log.error('Error ensuring sound available', { error });
       return soundPath;
     }
   };
