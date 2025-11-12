@@ -54,8 +54,8 @@ class ConsoleLogger implements Logger {
  * This approach ensures compatibility during development/testing
  * while maintaining the same API as OpenCode's native logging.
  *
- * @param options - Logger configuration
- * @param options.module - Module name for log entries
+ * @param config - Logger configuration
+ * @param config.module - Module name for log entries
  * @returns Logger instance
  */
 export const createLogger = ({ module }: { module: string }): Logger => {
