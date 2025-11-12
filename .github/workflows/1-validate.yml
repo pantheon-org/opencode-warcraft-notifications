@@ -127,3 +127,89 @@ jobs:
               
               Consider breaking it down into smaller, focused PRs for easier review.`
             })
+
+  copilot-review:
+    name: GitHub Copilot Code Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Request Copilot Review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          echo "🤖 Requesting GitHub Copilot code review for PR #${PR_NUMBER}"
+
+          # Check if Copilot is available as a reviewer
+          if gh api repos/${{ github.repository }}/collaborators/copilot 2>/dev/null; then
+            echo "✅ Copilot is available as a reviewer"
+            
+            # Request review from Copilot
+            gh pr edit $PR_NUMBER --add-reviewer copilot
+            
+            echo "✅ Copilot review requested successfully!"
+            
+            # Add a comment to notify
+            gh pr comment $PR_NUMBER --body "🤖 **GitHub Copilot Review Requested**
+            
+            Copilot is now analyzing this PR and will provide feedback shortly.
+            
+            📝 Review typically completes in ~30 seconds
+            🔍 Copilot will comment on potential issues and improvements
+            ✨ Suggested changes can be applied with one click
+            
+            *This is an automated AI code review. Human review is still recommended.*"
+          else
+            echo "⚠️ Copilot reviewer not available for this repository"
+            echo "💡 To enable: Repository Settings → Code review → Enable Copilot"
+            
+            gh pr comment $PR_NUMBER --body "⚠️ **Copilot Review Not Available**
+            
+            GitHub Copilot code review is not enabled for this repository.
+            
+            To enable automatic AI code reviews:
+            1. Ensure you have a GitHub Copilot subscription
+            2. Go to Repository Settings → Code review
+            3. Enable GitHub Copilot as a reviewer
+            
+            Alternatively, manually add Copilot as a reviewer from the PR sidebar.
+            
+            *See [AI_CODE_REVIEWERS_GUIDE.md](../blob/main/AI_CODE_REVIEWERS_GUIDE.md) for more information.*"
+          fi
+
+      - name: Wait for Copilot Review
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          MAX_WAIT=60  # Wait up to 60 seconds
+          WAIT_TIME=0
+
+          echo "⏳ Waiting for Copilot to complete review..."
+
+          while [ $WAIT_TIME -lt $MAX_WAIT ]; do
+            # Check if Copilot has submitted a review
+            REVIEW_COUNT=$(gh api repos/${{ github.repository }}/pulls/$PR_NUMBER/reviews \
+              --jq '[.[] | select(.user.login == "copilot[bot]")] | length')
+            
+            if [ "$REVIEW_COUNT" -gt 0 ]; then
+              echo "✅ Copilot review completed!"
+              exit 0
+            fi
+            
+            sleep 5
+            WAIT_TIME=$((WAIT_TIME + 5))
+            echo "⏳ Still waiting... ($WAIT_TIME/$MAX_WAIT seconds)"
+          done
+
+          echo "⚠️ Copilot review taking longer than expected"
+          echo "💡 Check the PR for Copilot's review - it may complete shortly"
