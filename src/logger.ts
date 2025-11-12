@@ -1,13 +1,12 @@
 /**
  * Logging module for OpenCode Warcraft Notifications Plugin
  *
- * This module provides a unified logging interface that uses OpenCode's
- * native logging system when available, and falls back to console logging
- * for development and testing environments.
+ * This module provides structured logging that follows OpenCode conventions.
+ * Logs are output through stderr/stdout where OpenCode can capture and process them.
  */
 
 /** Logger interface matching OpenCode's Log API */
-interface Logger {
+export interface Logger {
   info(message: string, context?: Record<string, unknown>): void;
   warn(message: string, context?: Record<string, unknown>): void;
   error(message: string, context?: Record<string, unknown>): void;
@@ -15,48 +14,70 @@ interface Logger {
 }
 
 /**
- * Console-based logger fallback for development/testing
+ * Structured logger implementation for OpenCode plugins
+ *
+ * Outputs structured JSON logs that OpenCode can parse and display appropriately.
+ * Uses stderr for warnings/errors and stdout for info/debug messages.
  */
-class ConsoleLogger implements Logger {
+class StructuredLogger implements Logger {
   constructor(private readonly module: string) {}
 
-  private formatMessage(level: string, message: string, context?: Record<string, unknown>): string {
-    const prefix = `[${this.module}] [${level.toUpperCase()}]`;
-    if (context) {
-      return `${prefix} ${message} ${JSON.stringify(context)}`;
+  private log(
+    level: 'info' | 'warn' | 'error' | 'debug',
+    message: string,
+    context?: Record<string, unknown>,
+  ): void {
+    const logEntry = {
+      level,
+      module: this.module,
+      message,
+      timestamp: new Date().toISOString(),
+      ...(context && { context }),
+    };
+
+    // Output structured JSON to appropriate stream
+    const output = JSON.stringify(logEntry);
+    if (level === 'error' || level === 'warn') {
+      process.stderr.write(output + '\n');
+    } else {
+      process.stdout.write(output + '\n');
     }
-    return `${prefix} ${message}`;
   }
 
   info(message: string, context?: Record<string, unknown>): void {
-    console.log(this.formatMessage('info', message, context));
+    this.log('info', message, context);
   }
 
   warn(message: string, context?: Record<string, unknown>): void {
-    console.warn(this.formatMessage('warn', message, context));
+    this.log('warn', message, context);
   }
 
   error(message: string, context?: Record<string, unknown>): void {
-    console.error(this.formatMessage('error', message, context));
+    this.log('error', message, context);
   }
 
   debug(message: string, context?: Record<string, unknown>): void {
     if (process.env.DEBUG_OPENCODE) {
-      console.debug(this.formatMessage('debug', message, context));
+      this.log('debug', message, context);
     }
   }
 }
 
 /**
- * Create a logger instance
+ * Create a logger instance for OpenCode plugins
  *
- * Uses console-based logging with structured format.
- * This approach ensures compatibility during development/testing
- * while maintaining the same API as OpenCode's native logging.
+ * Creates a structured logger that outputs JSON-formatted logs to stdout/stderr.
+ * This allows OpenCode to capture, parse, and display logs appropriately in its UI.
  *
- * @param config - Logger configuration containing the module name
- * @returns Logger instance
+ * - Info/debug logs go to stdout
+ * - Warn/error logs go to stderr
+ * - All logs include timestamp, level, module name, and optional context
+ * - Debug logs only output when DEBUG_OPENCODE environment variable is set
+ *
+ * @param config - Logger configuration
+ * @param config.module - Module name for identifying the source of logs
+ * @returns Logger instance with structured logging
  */
 export const createLogger = ({ module }: { module: string }): Logger => {
-  return new ConsoleLogger(module);
+  return new StructuredLogger(module);
 };
