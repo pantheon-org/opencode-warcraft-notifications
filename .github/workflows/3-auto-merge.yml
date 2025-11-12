@@ -118,10 +118,12 @@ jobs:
           fi
 
           # Check all required checks
-          CHECKS=$(gh pr checks $PR_NUMBER --json state,conclusion)
+          # Note: gh pr checks only supports state field, not conclusion
+          # state can be: failure, pending, success
+          CHECKS=$(gh pr checks $PR_NUMBER --json state,bucket)
 
-          FAILED_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "COMPLETED" and .conclusion != "SUCCESS")] | length')
-          PENDING_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "IN_PROGRESS" or .state == "QUEUED")] | length')
+          FAILED_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "failure")] | length')
+          PENDING_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "pending")] | length')
 
           if [ "$FAILED_CHECKS" -gt 0 ]; then
             echo "❌ Some checks failed ($FAILED_CHECKS failures)"
