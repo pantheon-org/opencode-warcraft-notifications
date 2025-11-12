@@ -27,7 +27,6 @@ Welcome to the Warcraft II Notifications Plugin for OpenCode! This guide will he
 - **OpenCode**: Latest version
 - **Operating System**: macOS or Linux
 - **Audio**: Working audio output
-- **Notifications**: System notifications enabled
 
 ### Installation Steps
 
@@ -168,6 +167,33 @@ Customize where sound files are stored:
 - **macOS**: `~/Library/Application Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/`
 - **Linux**: `~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/`
 
+#### `showDescriptionInToast`
+
+**Type**: `boolean`  
+**Default**: `true`
+
+Control whether toast notifications are shown when the session goes idle:
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "showDescriptionInToast": true
+  }
+}
+```
+
+**Examples**:
+
+- `true` (default): Shows in-app toast with voice line as title (e.g., "Yes, milord?" with your session summary)
+- `false`: Sound-only mode (no visual notification)
+
+**Toast Notification Example**:
+
+- **Title**: "Yes, milord?" (Warcraft II voice line)
+- **Message**: "Created notification system with sound descriptions"
+- **Duration**: 4 seconds
+- **Appearance**: Info-style toast in OpenCode interface
+
 ### Configuration Examples
 
 #### Example 1: Alliance Only (Global)
@@ -207,6 +233,33 @@ Customize where sound files are stored:
 }
 ```
 
+#### Example 4: Silent Mode (Sound Only, No Toast)
+
+**File**: `.opencode/plugin.json`
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "faction": "both",
+    "showDescriptionInToast": false
+  }
+}
+```
+
+#### Example 5: Full Configuration
+
+**File**: `~/.config/opencode/plugin.json`
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "soundsDir": "/custom/sounds",
+    "faction": "alliance",
+    "showDescriptionInToast": true
+  }
+}
+```
+
 ### Environment Variables
 
 You can also use environment variables:
@@ -227,6 +280,7 @@ The plugin automatically validates your configuration when it loads. If your con
 
 - `faction`: Must be `"alliance"`, `"horde"`, or `"both"`
 - `soundsDir`: Must be a string path (if provided)
+- `showDescriptionInToast`: Must be a boolean (`true` or `false`)
 
 If you encounter validation errors, see the [Troubleshooting Guide](/troubleshooting/#configuration-validation-errors) for solutions.
 
@@ -253,8 +307,9 @@ sequenceDiagram
     OpenCode->>Plugin: session.idle event
     Plugin->>Plugin: Select random sound
     Plugin->>System: Play sound
-    Plugin->>System: Show notification
-    System-->>You: 🔊 "Zug zug!" + notification
+    Plugin->>OpenCode: Show toast notification
+    System-->>You: 🔊 "Zug zug!"
+    OpenCode-->>You: 💬 Toast: "Zug zug!" + summary
 ```
 
 ### When Sounds Play
@@ -288,12 +343,23 @@ Depending on your faction setting:
 - "D'you call me?" (Troll)
 - "Orc work completed!" (Special)
 
-### Notifications
+### Toast Notifications
 
-Along with the sound, you'll see a system notification showing:
+Along with the sound, you'll see an in-app toast notification showing:
 
-- **Title**: "opencode"
+- **Title**: The Warcraft II voice line (e.g., "Yes, milord?" or "Work, work.")
 - **Message**: Summary of your last session activity
+- **Duration**: 4 seconds
+- **Style**: Info-style notification in OpenCode
+
+**Example**:
+
+- Sound plays: `human_selected1.wav`
+- Toast appears:
+  - Title: **"Yes, milord?"**
+  - Message: **"Created notification system with sound descriptions"**
+
+You can disable toast notifications by setting `showDescriptionInToast: false` in your configuration.
 
 ---
 

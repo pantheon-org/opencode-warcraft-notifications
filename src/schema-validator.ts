@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createLogger } from './logger.js';
-import type { WarcraftNotificationConfig } from './plugin-config.js';
+import type { WarcraftNotificationConfig } from './config/index.js';
 
 const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
 
@@ -32,6 +32,10 @@ const warcraftConfigSchema = z
       .enum(['alliance', 'horde', 'both'])
       .optional()
       .describe("Which faction sounds to use: 'alliance', 'horde', or 'both' (default: 'both')"),
+    showDescriptionInToast: z
+      .boolean()
+      .optional()
+      .describe('Whether to show toast notifications with voice lines when idle (default: true)'),
   })
   .strict(); // Reject unknown properties
 
@@ -60,12 +64,17 @@ const formatInvalidTypeError = (path: string, issue: ZodIssueData): string => {
 };
 
 /**
+ * Format a single enum option value
+ */
+const formatEnumOption = (o: unknown): string => `'${o}'`;
+
+/**
  * Format invalid_value error (enum)
  */
 const formatInvalidValueError = (path: string, issue: ZodIssueData): string => {
   const values = issue.values as unknown[];
   if (values && Array.isArray(values)) {
-    const options = values.map((o: unknown) => `'${o}'`).join(', ');
+    const options = values.map(formatEnumOption).join(', ');
     return `${path}: Invalid enum value. Must be one of: ${options}`;
   }
   return `${path}: Invalid value`;
@@ -77,7 +86,7 @@ const formatInvalidValueError = (path: string, issue: ZodIssueData): string => {
 const formatUnrecognizedKeysError = (issue: ZodIssueData): string => {
   const keys = issue.keys as string[];
   if (keys && Array.isArray(keys)) {
-    return `Unrecognized configuration key(s): ${keys.join(', ')}. Only 'soundsDir' and 'faction' are allowed.`;
+    return `Unrecognized configuration key(s): ${keys.join(', ')}. Only 'soundsDir', 'faction', and 'showDescriptionInToast' are allowed.`;
   }
   return `Unrecognized configuration keys`;
 };
@@ -118,6 +127,17 @@ const formatZodIssue = (issue: ZodIssueData): string => {
       return `${path}: ${message || 'Validation failed'}`;
   }
 };
+
+/**
+ * Wrapper for formatZodIssue to avoid nested callback
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const formatZodIssueWrapper = (issue: any): string => formatZodIssue(issue as ZodIssueData);
+
+/**
+ * Format error message with indentation
+ */
+const formatErrorWithIndent = (err: string): string => `  - ${err}`;
 
 /**
  * Validate plugin configuration against the schema
@@ -168,7 +188,7 @@ export const validatePluginConfig = (config: unknown): ValidationResult => {
   } catch (error) {
     // Parse Zod validation errors into user-friendly messages
     if (error instanceof z.ZodError) {
-      const errors = error.issues.map((issue) => formatZodIssue(issue as ZodIssueData));
+      const errors = error.issues.map(formatZodIssueWrapper);
 
       return {
         valid: false,
@@ -213,7 +233,7 @@ export const validateAndSanitizeConfig = (config: unknown): WarcraftNotification
   if (!result.valid) {
     const errorMessage = [
       '[Warcraft Notifications] Configuration validation failed:',
-      ...(result.errors || []).map((err) => `  - ${err}`),
+      ...(result.errors || []).map(formatErrorWithIndent),
     ].join('\n');
 
     throw new Error(errorMessage);

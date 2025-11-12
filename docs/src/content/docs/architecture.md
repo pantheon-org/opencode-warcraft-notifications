@@ -43,9 +43,9 @@ graph TB
         BD[Bundled Data<br/>data/alliance/<br/>data/horde/]
     end
 
-    subgraph "Platform Services"
-        MAC[macOS<br/>afplay + osascript]
-        LIN[Linux<br/>canberra-gtk-play + notify-send]
+    subgraph "External Services"
+        SH[Shell Commands<br/>afplay/canberra-gtk-play]
+        TUI[OpenCode TUI<br/>Toast Notifications]
     end
 
     OC --> PE
@@ -63,8 +63,8 @@ graph TB
     BS --> FS
     BS --> DD
     BS --> BD
-    NC --> MAC
-    NC --> LIN
+    NC --> SH
+    NC --> TUI
 
     style NP fill:#e1f5ff
     style NC fill:#fff3e0
@@ -98,7 +98,8 @@ graph TB
 - Load plugin configuration
 - Install bundled sounds on first run
 - Select random sounds based on faction preference
-- Play sounds and display notifications using platform-specific commands
+- Play sounds using platform-specific commands
+- Display toast notifications via OpenCode TUI
 - Extract and format session summaries
 
 **Event Flow**:
@@ -138,13 +139,14 @@ sequenceDiagram
         NC->>OS: Play fallback sound
     end
 
-    NC->>OS: Display notification
+    NC->>OC: Display toast notification
 ```
 
 **Configuration Integration**:
 
 - Reads `soundsDir` from plugin configuration
 - Reads `faction` preference (alliance/horde/both)
+- Reads `showDescriptionInToast` preference (default: true)
 - Falls back to platform-specific defaults
 
 ### 3. Schema Validator (`schema-validator.ts`)
@@ -176,6 +178,7 @@ flowchart LR
 
 - `faction`: Must be `'alliance'`, `'horde'`, or `'both'` (optional)
 - `soundsDir`: Must be a string (optional)
+- `showDescriptionInToast`: Must be a boolean (optional, default: true)
 - No unrecognized keys allowed (strict mode)
 
 **Error Message Format**:

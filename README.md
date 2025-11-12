@@ -25,7 +25,7 @@ This plugin plays authentic Warcraft II unit audio clips from both Alliance and 
 - 🎲 **Random Selection**: Plays a different sound each time for variety
 - ⚔️ **Faction Choice**: Choose Alliance, Horde, or both factions
 - 💻 **Cross-Platform**: Works on macOS and Linux
-- 📱 **Smart Notifications**: Shows session summary with the sound notification
+- 🎨 **Toast Notifications**: In-app toast notifications with authentic voice lines (e.g., "Yes, milord?" / "Work, work.")
 - 🚀 **Automated Releases**: Fully automated CI/CD pipeline with AI-powered version management
 - 📚 **Comprehensive Documentation**: Complete documentation suite for users, developers, and operators
 - 🎮 **Unit Variety**: Includes voices from:
@@ -129,6 +129,29 @@ Choose which faction sounds to play:
 }
 ```
 
+### Toast Notifications
+
+By default, the plugin shows toast notifications with the Warcraft II voice line as the title when your session goes idle. You can disable this feature if you prefer silent mode (sound only):
+
+```json
+{
+  "@pantheon-ai/opencode-warcraft-notifications": {
+    "showDescriptionInToast": false
+  }
+}
+```
+
+**Example with toast enabled (default):**
+
+- Toast Title: `"Yes, milord?"`
+- Toast Message: `Created notification system with sound descriptions`
+- Sound plays: `human_selected1.wav`
+
+**Example with toast disabled:**
+
+- Sound plays: `human_selected1.wav`
+- No visual notification shown
+
 ### Custom Sound Directory
 
 You can customize where sound files are stored:
@@ -137,7 +160,8 @@ You can customize where sound files are stored:
 {
   "@pantheon-ai/opencode-warcraft-notifications": {
     "soundsDir": "/path/to/custom/sounds",
-    "faction": "both"
+    "faction": "both",
+    "showDescriptionInToast": true
   }
 }
 ```
@@ -159,7 +183,7 @@ For complete configuration options and examples, see:
 1. **Idle Detection**: When your OpenCode session goes idle, the plugin triggers
 2. **Sound Selection**: Randomly selects a Warcraft II unit sound from your configured faction(s)
 3. **Sound Playback**: Plays the sound using platform-specific audio tools
-4. **Notification**: Shows a system notification with your session summary
+4. **Toast Notification**: Shows an in-app toast with the voice line as the title (e.g., "Yes, milord?") and your session summary
 
 The plugin includes 100+ authentic sounds from both factions, including:
 
@@ -180,8 +204,9 @@ For the complete list of sounds and examples, see:
 
 ## Platform Support
 
-- **macOS**: Uses `afplay` for audio and `osascript` for notifications
-- **Linux**: Uses `canberra-gtk-play` for audio and `notify-send` for notifications
+- **macOS**: Uses `afplay` for audio playback
+- **Linux**: Uses `canberra-gtk-play` for audio playback
+- **Toast Notifications**: Cross-platform using OpenCode's built-in toast system
 
 For detailed platform-specific setup and troubleshooting, see:
 
@@ -237,6 +262,26 @@ bun run type-check
 # Run linting
 bun run lint
 ```
+
+### Debugging
+
+To debug the plugin and see detailed logging:
+
+```bash
+# Enable debug logging
+DEBUG_OPENCODE=1 opencode
+
+# Test toast notifications manually
+bun run test-toast-manual.ts
+```
+
+The debug mode will log:
+
+- All event types received by the plugin
+- Message text saved for idle summaries
+- Session idle events and handling
+- Toast notification attempts and results
+- Sound file selection and playback
 
 See the [Development Guide](docs/DEVELOPMENT.md) for complete development workflow, testing strategies, and contributing guidelines.
 

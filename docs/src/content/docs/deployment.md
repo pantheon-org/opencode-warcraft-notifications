@@ -156,10 +156,9 @@ osascript
 ```bash
 # Test audio playback
 afplay /System/Library/Sounds/Glass.aiff
-
-# Test notification
-osascript -e 'display notification "Test" with title "OpenCode"'
 ```
+
+**Note**: The plugin uses OpenCode's built-in toast notification system, so no additional notification setup is required.
 
 ### Linux
 
@@ -180,11 +179,6 @@ osascript -e 'display notification "Test" with title "OpenCode"'
 sudo apt-get install libcanberra-gtk-module  # Ubuntu/Debian
 sudo dnf install libcanberra-gtk3            # Fedora
 sudo pacman -S libcanberra                   # Arch
-
-# Notifications
-sudo apt-get install libnotify-bin           # Ubuntu/Debian
-sudo dnf install libnotify                   # Fedora
-sudo pacman -S libnotify                     # Arch
 ```
 
 #### Verification
@@ -192,10 +186,9 @@ sudo pacman -S libnotify                     # Arch
 ```bash
 # Test audio playback
 canberra-gtk-play --id=message
-
-# Test notification
-notify-send 'OpenCode' 'Test notification'
 ```
+
+**Note**: The plugin uses OpenCode's built-in toast notification system, so no additional notification setup is required.
 
 ### Windows
 

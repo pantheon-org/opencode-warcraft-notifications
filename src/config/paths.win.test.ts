@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { join } from 'path';
-import { getDefaultSoundsDir } from './plugin-config.ts';
+import { getDefaultSoundsDir } from './index';
 
 // Unit test: simulate Windows behavior by calling getDefaultSoundsDir()
 // directly after mutating process.platform and APPDATA. Avoid relying on
