@@ -1,4 +1,4 @@
-name: Chores — Pages Configuration Check
+name: Chores — GitHub Pages Configuration
 
 on:
   schedule:

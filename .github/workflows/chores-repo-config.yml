@@ -1,4 +1,4 @@
-name: Repository Configuration Check
+name: Chores — Repository Configuration
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
   push:
     paths:
       - '.github/scripts/check-repo-config.cjs'
-      - '.github/workflows/repo-config-check.yml'
+      - '.github/workflows/chores-repo-config.yml'
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
   check-config:
     name: Verify Repository Configuration
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -97,7 +97,7 @@ jobs:
 
               Or trigger the workflow manually:
               \`\`\`bash
-              gh workflow run repo-config-check.yml
+              gh workflow run chores-repo-config.yml
               \`\`\`
 
               ## Why This Matters
