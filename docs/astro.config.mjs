@@ -11,7 +11,8 @@ export default defineConfig({
       title: 'Warcraft Notifications',
       description: 'OpenCode plugin for Warcraft II notification sounds',
       logo: {
-        src: './src/assets/logo.svg',
+        light: './src/assets/logo-dark.svg',
+        dark: './src/assets/logo-light.svg',
         replacesTitle: false,
       },
       social: [
