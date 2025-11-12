@@ -1,0 +1,72 @@
+name: Chores — Pages Configuration Check
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # daily at 00:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: read
+  issues: write
+
+jobs:
+  pages-check:
+    name: Check GitHub Pages Configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq (if missing)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+
+      - name: Run Pages check script
+        id: pages_check
+        continue-on-error: true
+        run: |
+          set +e
+          chmod +x scripts/check-pages-source.sh
+          ./scripts/check-pages-source.sh "${{ github.repository }}"
+          rc=$?
+          echo "exit_code=$rc" >> $GITHUB_OUTPUT
+          if [ $rc -ne 0 ]; then
+            echo "Pages check failed (exit code $rc)"
+          else
+            echo "Pages check passed"
+          fi
+
+      - name: Create GitHub issue on failure
+        if: steps.pages_check.outputs.exit_code != '0'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const label = 'chores/pages-check';
+            const title = `[chores] GitHub Pages misconfigured for ${owner}/${repo}`;
+            const body = `The scheduled GitHub Pages configuration check failed for **${owner}/${repo}**.\n\n` +
+              `Please verify the Pages source is set to branch **docs** and path **/**, or inspect the workflow run logs.\n\n` +
+              `Workflow run: ${context.serverUrl}/${owner}/${repo}/actions/runs/${github.context.runId}`;
+
+            // Check for existing open issues with the label
+            const existing = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: label });
+            if (existing.data && existing.data.length > 0) {
+              console.log('An open issue for Pages check already exists; skipping creation.');
+            } else {
+              // Create the issue (label will be added; if label doesn't exist it will be created automatically)
+              await github.rest.issues.create({ owner, repo, title, body, labels: [label] });
+              console.log('Created issue:', title);
+            }
+
+      - name: Final status
+        run: |
+          if [ "${{ steps.pages_check.outputs.exit_code }}" = "0" ]; then
+            echo "Pages check: OK"
+          else
+            echo "Pages check: FAILURE — issue created or already exists"
+            exit 1
+          fi
