@@ -237,9 +237,9 @@ Use this checklist to deploy GitHub Copilot automatic code review to your reposi
 - [ ] Monitoring set up
 - [ ] Feedback process established
 
-**Implementation Lead**: ********\_\_\_********  
-**Date**: ********\_\_\_********  
-**Approved By**: ********\_\_\_********
+**Implementation Lead**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Date**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Approved By**: **\*\*\*\***\_\_\_**\*\*\*\***
 
 ---
 
