@@ -5,11 +5,10 @@ import {
   getConfigDir,
   getDefaultSoundsDir,
   DEFAULT_DATA_DIR,
-  DEFAULT_BASE_URL,
   loadPluginConfig,
   type WarcraftNotificationConfig,
-} from './plugin-config';
-import { createTempDir, removeTempDir } from './test-utils';
+} from './index';
+import { createTempDir, removeTempDir } from '../test-utils';
 
 describe('Plugin configuration module', () => {
   it('should load configuration from plugin.json (direct file read)', async () => {
@@ -49,8 +48,7 @@ describe('Plugin configuration module', () => {
 
   it('should export default constants', () => {
     expect(typeof DEFAULT_DATA_DIR).toBe('string');
-    expect(typeof DEFAULT_BASE_URL).toBe('string');
-    expect(DEFAULT_BASE_URL).toContain('http');
+    expect(DEFAULT_DATA_DIR).toContain('opencode');
   });
 
   it('should load configuration from CWD/.opencode/plugin.json via loadPluginConfig', async () => {

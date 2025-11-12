@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'bun:test';
 import { join } from 'path';
 import { mkdir, writeFile } from 'fs/promises';
-import { loadPluginConfig } from './plugin-config';
-import { createTempDir, removeTempDir } from './test-utils';
+import { loadPluginConfig } from './index';
+import { createTempDir, removeTempDir } from '../test-utils';
 
 describe('Plugin configuration coverage tests', () => {
   it('loadPluginConfig throws validation errors with file path context', async () => {

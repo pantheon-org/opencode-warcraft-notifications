@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'bun:test';
 import { join } from 'path';
-import { createTempDir, removeTempDir, withCwd } from './test-utils';
-import { getDefaultSoundsDir } from './plugin-config';
+import { createTempDir, removeTempDir, withCwd } from '../test-utils';
+import { getDefaultSoundsDir } from './index';
 
 describe('plugin-config package name handling', () => {
   it('sanitizes package.json name with scope and special chars', async () => {

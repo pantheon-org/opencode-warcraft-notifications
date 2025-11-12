@@ -1,10 +1,24 @@
 import { join } from 'path';
 import { exists } from 'fs/promises';
-import { DEFAULT_DATA_DIR, type Faction } from '../plugin-config.js';
+import { DEFAULT_DATA_DIR, type Faction } from '../config/index.js';
 import { allianceSounds, hordeSounds, sounds } from './data/index.js';
+import {
+  allianceSoundDescriptions,
+  hordeSoundDescriptions,
+  soundDescriptions,
+  getSoundDescription,
+} from './descriptions.js';
 
 // Re-export sound data for backward compatibility
 export { allianceSounds, hordeSounds, sounds };
+
+// Export sound descriptions
+export {
+  allianceSoundDescriptions,
+  hordeSoundDescriptions,
+  soundDescriptions,
+  getSoundDescription,
+};
 
 /**
  * Get sound path for a specific faction
@@ -131,6 +145,34 @@ export const getRandomSoundFromCategory = (category: keyof typeof sounds): strin
  * @returns Array of sound filenames
  */
 export const getAllSounds = (): string[] => Object.values(sounds).flat();
+
+/**
+ * Get list of sound filenames for a specific faction or all factions
+ * @param faction - Optional faction to filter by ('alliance' or 'horde')
+ * @returns Array of sound filenames
+ *
+ * @example
+ * ```typescript
+ * // Get all sounds
+ * const allSounds = getSoundFileList();
+ *
+ * // Get alliance sounds only
+ * const allianceSounds = getSoundFileList('alliance');
+ *
+ * // Get horde sounds only
+ * const hordeSounds = getSoundFileList('horde');
+ * ```
+ */
+export const getSoundFileList = (faction?: 'alliance' | 'horde'): string[] => {
+  if (faction === 'alliance') {
+    return Object.values(allianceSounds).flat();
+  }
+  if (faction === 'horde') {
+    return Object.values(hordeSounds).flat();
+  }
+  // Return all sounds if no faction specified
+  return getAllSounds();
+};
 
 /**
  * Pick a random sound filename from the full set (backward compatibility)
