@@ -200,6 +200,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
 
       // Show toast notification (enabled by default)
       const showToast = pluginConfig.showDescriptionInToast !== false;
+
       if (showToast) {
         try {
           await client.tui.showToast({
@@ -211,9 +212,10 @@ export const NotificationPlugin: Plugin = async (ctx) => {
             },
           });
         } catch (toastErr) {
-          // Silently ignore toast errors - not critical
-          if (process.env.DEBUG_OPENCODE)
-            log.debug('Toast notification failed', { error: toastErr });
+          // Only log toast errors in debug mode
+          if (process.env.DEBUG_OPENCODE) {
+            log.error('Toast notification failed', { error: toastErr });
+          }
         }
       }
     } catch (error) {
@@ -228,10 +230,18 @@ export const NotificationPlugin: Plugin = async (ctx) => {
 
   return {
     event: async ({ event }) => {
+      // Debug: Log all events to understand what's firing
+      if (process.env.DEBUG_OPENCODE) {
+        log.debug('Event received', { type: event.type });
+      }
+
       // Save message text for idle summary
       if (event.type === 'message.part.updated' && event.properties.part.type === 'text') {
         const { messageID, text } = event.properties.part;
         lastMessage = { messageID, text };
+        if (process.env.DEBUG_OPENCODE) {
+          log.debug('Message saved for idle summary', { messageID, textLength: text?.length });
+        }
       }
 
       if (event.type === 'session.idle') {

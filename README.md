@@ -263,6 +263,26 @@ bun run type-check
 bun run lint
 ```
 
+### Debugging
+
+To debug the plugin and see detailed logging:
+
+```bash
+# Enable debug logging
+DEBUG_OPENCODE=1 opencode
+
+# Test toast notifications manually
+bun run test-toast-manual.ts
+```
+
+The debug mode will log:
+
+- All event types received by the plugin
+- Message text saved for idle summaries
+- Session idle events and handling
+- Toast notification attempts and results
+- Sound file selection and playback
+
 See the [Development Guide](docs/DEVELOPMENT.md) for complete development workflow, testing strategies, and contributing guidelines.
 
 ---

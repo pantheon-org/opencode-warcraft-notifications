@@ -32,6 +32,10 @@ const warcraftConfigSchema = z
       .enum(['alliance', 'horde', 'both'])
       .optional()
       .describe("Which faction sounds to use: 'alliance', 'horde', or 'both' (default: 'both')"),
+    showDescriptionInToast: z
+      .boolean()
+      .optional()
+      .describe('Whether to show toast notifications with voice lines when idle (default: true)'),
   })
   .strict(); // Reject unknown properties
 
@@ -82,7 +86,7 @@ const formatInvalidValueError = (path: string, issue: ZodIssueData): string => {
 const formatUnrecognizedKeysError = (issue: ZodIssueData): string => {
   const keys = issue.keys as string[];
   if (keys && Array.isArray(keys)) {
-    return `Unrecognized configuration key(s): ${keys.join(', ')}. Only 'soundsDir' and 'faction' are allowed.`;
+    return `Unrecognized configuration key(s): ${keys.join(', ')}. Only 'soundsDir', 'faction', and 'showDescriptionInToast' are allowed.`;
   }
   return `Unrecognized configuration keys`;
 };
