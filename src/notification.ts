@@ -4,9 +4,10 @@ import {
   getRandomSoundPathFromFaction,
   soundExists,
   determineSoundFaction,
+  getSoundDescription,
 } from './sounds/index.js';
 import { installBundledSoundsIfMissing } from './bundled-sounds.js';
-import { loadPluginConfig } from './plugin-config.js';
+import { loadPluginConfig } from './config/index.js';
 import { getPlatform } from './notification/platforms.js';
 /* eslint-disable jsdoc/require-param */
 
@@ -16,7 +17,7 @@ const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
  * Notification idle plugin
  *
  * This plugin plays a random Warcraft II sound (Alliance and/or Horde) when the session becomes idle
- * and displays a notification with a short summary of the last message.
+ * and displays a toast notification with the voice line and a short summary of the last message.
  *
  * The plugin ensures bundled sounds are installed during first run and checks
  * for the presence of files on every subsequent call. It no longer attempts
@@ -155,7 +156,30 @@ export const NotificationPlugin: Plugin = async (ctx) => {
 
     try {
       await playIdleSound(soundPath, existsLocally, filename);
-      await platform.showNotification('opencode', summary);
+
+      // Use sound description if available, otherwise use summary as title
+      const soundDescription = getSoundDescription(filename);
+      const toastTitle = soundDescription || 'opencode';
+      const toastMessage = soundDescription ? summary : summary;
+
+      // Show toast notification (enabled by default)
+      const showToast = pluginConfig.showDescriptionInToast !== false;
+      if (showToast) {
+        try {
+          await client.tui.showToast({
+            body: {
+              title: toastTitle,
+              message: toastMessage,
+              variant: 'info',
+              duration: 4000,
+            },
+          });
+        } catch (toastErr) {
+          // Silently ignore toast errors - not critical
+          if (process.env.DEBUG_OPENCODE)
+            log.debug('Toast notification failed', { error: toastErr });
+        }
+      }
     } catch (error) {
       log.error('Failed to play sound or show notification', { error });
     }

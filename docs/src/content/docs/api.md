@@ -197,6 +197,7 @@ if (result.valid) {
 
 - `faction` must be one of: `'alliance'`, `'horde'`, `'both'` (if provided)
 - `soundsDir` must be a string (if provided)
+- `showDescriptionInToast` must be a boolean (if provided)
 - No unrecognized configuration keys are allowed
 
 **Error Examples**:
@@ -212,7 +213,7 @@ validatePluginConfig({ soundsDir: 123 });
 
 // Unrecognized keys
 validatePluginConfig({ faction: 'alliance', unknownKey: 'value' });
-// Returns: { valid: false, errors: ['Unrecognized configuration key(s): unknownKey. Only \'soundsDir\' and \'faction\' are allowed.'] }
+// Returns: { valid: false, errors: ['Unrecognized configuration key(s): unknownKey. Only \'soundsDir\', \'faction\', and \'showDescriptionInToast\' are allowed.'] }
 ```
 
 ##### `validateAndSanitizeConfig()`
@@ -274,6 +275,7 @@ export type Faction = 'alliance' | 'horde' | 'both';
 export interface WarcraftNotificationConfig {
   soundsDir?: string;
   faction?: Faction;
+  showDescriptionInToast?: boolean;
 }
 ```
 
@@ -283,6 +285,7 @@ export interface WarcraftNotificationConfig {
 
 - `soundsDir?: string` - Custom directory for sound file storage
 - `faction?: Faction` - Which faction sounds to play (default: 'both')
+- `showDescriptionInToast?: boolean` - Whether to show toast notifications when idle (default: true)
 
 For schema validation and IDE autocomplete support, see the [Schema Validation Guide](/validate-schema/).
 

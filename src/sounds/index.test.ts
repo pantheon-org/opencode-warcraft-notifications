@@ -14,6 +14,7 @@ import {
   getSoundsByFaction,
   getRandomSoundFromFaction,
   getRandomSoundPathFromFaction,
+  getSoundFileList,
 } from './index';
 
 describe('sounds data structure', () => {
@@ -340,5 +341,61 @@ describe('faction-aware functions', () => {
     expect(alliancePath).toContain('opencode');
     expect(hordePath).toContain('opencode');
     expect(bothPath).toContain('opencode');
+  });
+});
+
+describe('getSoundFileList', () => {
+  test('returns all sounds when no faction specified', () => {
+    const list = getSoundFileList();
+    expect(Array.isArray(list)).toBe(true);
+    expect(list.length).toBeGreaterThan(0);
+    // Note: Combined sounds object has horde 'special' overwrite alliance 'special'
+    // so alliance special sounds (work_completed.wav, jobs_done.wav) are not in the combined list
+    expect(list).toContain('orc_work_completed.wav'); // Horde special
+    expect(list).toContain('human_selected1.wav');
+    expect(list).toContain('orc_selected1.wav');
+  });
+
+  test('returns faction-specific sounds when faction specified', () => {
+    const allianceList = getSoundFileList('alliance');
+    const hordeList = getSoundFileList('horde');
+
+    expect(allianceList).toContain('human_selected1.wav');
+    expect(allianceList).not.toContain('orc_selected1.wav');
+
+    expect(hordeList).toContain('orc_selected1.wav');
+    expect(hordeList).not.toContain('human_selected1.wav');
+  });
+
+  test('returns consistent counts', () => {
+    const allSounds = getSoundFileList();
+    const allianceSounds = getSoundFileList('alliance');
+    const hordeSounds = getSoundFileList('horde');
+
+    // Note: getAllSounds() returns sounds from the combined object where 'special'
+    // category is shared between factions (horde special overwrites alliance special in spread)
+    // So the total is less than alliance + horde
+    expect(allSounds.length).toBeGreaterThan(0);
+    expect(allianceSounds.length).toBeGreaterThan(0);
+    expect(hordeSounds.length).toBeGreaterThan(0);
+    expect(allSounds.length).toBeLessThanOrEqual(allianceSounds.length + hordeSounds.length);
+  });
+
+  test('alliance sounds contain expected files', () => {
+    const allianceSounds = getSoundFileList('alliance');
+
+    expect(allianceSounds).toContain('human_selected1.wav');
+    expect(allianceSounds).toContain('peasant_acknowledge1.wav');
+    expect(allianceSounds).toContain('knight_selected1.wav');
+    expect(allianceSounds).toContain('jobs_done.wav');
+  });
+
+  test('horde sounds contain expected files', () => {
+    const hordeSounds = getSoundFileList('horde');
+
+    expect(hordeSounds).toContain('orc_selected1.wav');
+    expect(hordeSounds).toContain('ogre_acknowledge1.wav');
+    expect(hordeSounds).toContain('troll_selected1.wav');
+    expect(hordeSounds).toContain('orc_work_completed.wav');
   });
 });

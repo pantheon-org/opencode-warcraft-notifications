@@ -13,9 +13,7 @@ export {
   getConfigDir,
   getDefaultSoundsDir,
   getDefaultDataDir,
-  getDefaultBaseUrl,
   DEFAULT_DATA_DIR,
-  DEFAULT_BASE_URL,
   SOUNDS_SUBDIR,
 } from './paths.js';
 

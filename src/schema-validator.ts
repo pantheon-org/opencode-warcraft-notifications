@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createLogger } from './logger.js';
-import type { WarcraftNotificationConfig } from './plugin-config.js';
+import type { WarcraftNotificationConfig } from './config/index.js';
 
 const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
 

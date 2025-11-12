@@ -2,9 +2,11 @@ import { join, dirname } from 'path';
 import { mkdir, exists, readdir, copyFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { createLogger } from './logger.js';
-import { DEFAULT_DATA_DIR } from './plugin-config.js';
-import { getSoundFileList as dataGetSoundFileList } from './sound-data/index.js';
-import { determineSoundFaction } from './sounds/index.js';
+import { DEFAULT_DATA_DIR } from './config/index.js';
+import {
+  getSoundFileList as soundsGetSoundFileList,
+  determineSoundFaction,
+} from './sounds/index.js';
 
 const DEBUG = Boolean(process.env.DEBUG_OPENCODE);
 const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
@@ -308,5 +310,5 @@ export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<n
  * ```
  */
 export const getSoundFileList = (): string[] => {
-  return dataGetSoundFileList();
+  return soundsGetSoundFileList();
 };

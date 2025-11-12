@@ -11,6 +11,8 @@ export interface WarcraftNotificationConfig {
   soundsDir?: string;
   /** Which faction sounds to use: 'alliance', 'horde', or 'both' (default: 'both') */
   faction?: Faction;
+  /** Whether to show toast notifications when idle (default: true). When enabled, displays voice lines as toast title */
+  showDescriptionInToast?: boolean;
 }
 
 /**
