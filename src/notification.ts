@@ -5,8 +5,9 @@ import {
   soundExists,
   determineSoundFaction,
 } from './sounds/index.js';
-import { ensureSoundAvailable, installBundledSoundsIfMissing } from './bundled-sounds.js';
+import { installBundledSoundsIfMissing } from './bundled-sounds.js';
 import { loadPluginConfig } from './plugin-config.js';
+import { getPlatform } from './notification/platforms.js';
 /* eslint-disable jsdoc/require-param */
 
 const log = createLogger({ module: 'opencode-plugin-warcraft-notifications' });
@@ -27,6 +28,9 @@ export const NotificationPlugin: Plugin = async (ctx) => {
   const checkedSoundCache = new Map<string, boolean>();
   void _project;
   void _worktree;
+
+  // Get platform-specific implementation
+  const platform = getPlatform($);
 
   // Load plugin configuration from plugin.json
   const pluginName = '@pantheon-ai/opencode-warcraft-notifications';
@@ -104,6 +108,59 @@ export const NotificationPlugin: Plugin = async (ctx) => {
     }
   };
 
+  /**
+   * Show a toast notification about missing sound file
+   */
+  const showMissingSoundToast = async (filename: string) => {
+    if (checkedSoundCache.has('_notified_missing')) return;
+
+    checkedSoundCache.set('_notified_missing', true);
+    try {
+      await client.tui.showToast({
+        body: {
+          title: 'Warcraft Sounds',
+          message: `Sound file not found: ${filename}. Using system sound as fallback.`,
+          variant: 'info',
+          duration: 4000,
+        },
+      });
+    } catch (toastErr) {
+      // Silently ignore toast errors - not critical
+      if (process.env.DEBUG_OPENCODE) log.debug('Toast notification failed', { error: toastErr });
+    }
+  };
+
+  /**
+   * Handle playing sound with fallback
+   */
+  const playIdleSound = async (soundPath: string, existsLocally: boolean, filename: string) => {
+    if (existsLocally) {
+      await platform.playSound(soundPath);
+    } else {
+      const fallbackSound =
+        process.platform === 'darwin' ? '/System/Library/Sounds/Glass.aiff' : undefined;
+      await platform.playSound(soundPath, fallbackSound);
+      await showMissingSoundToast(filename);
+    }
+  };
+
+  /**
+   * Handle session idle event
+   */
+  const handleSessionIdle = async (summary: string) => {
+    const soundPath = await ensureAndGetSoundPath();
+    const filename = soundPath.split('/').pop() as string;
+    const fileSoundFaction = determineSoundFaction(filename);
+    const existsLocally = await soundExists(filename, fileSoundFaction, pluginConfig.soundsDir);
+
+    try {
+      await playIdleSound(soundPath, existsLocally, filename);
+      await platform.showNotification('opencode', summary);
+    } catch (error) {
+      log.error('Failed to play sound or show notification', { error });
+    }
+  };
+
   let lastMessage: { messageID: string | null; text: string | null } = {
     messageID: null,
     text: null,
@@ -119,49 +176,7 @@ export const NotificationPlugin: Plugin = async (ctx) => {
 
       if (event.type === 'session.idle') {
         const summary = getIdleSummary(lastMessage?.text) ?? 'Idle';
-
-        if (process.platform === 'darwin') {
-          const soundPath = await ensureAndGetSoundPath();
-          const filename = soundPath.split('/').pop() as string;
-
-          // Determine the faction for soundExists call and pass explicit data dir
-          const fileSoundFaction = determineSoundFaction(filename);
-          const existsLocally = await soundExists(
-            filename,
-            fileSoundFaction,
-            pluginConfig.soundsDir,
-          );
-
-          if (existsLocally) {
-            await $`osascript -e 'do shell script "afplay ${soundPath}"'`;
-          } else {
-            // Fallback to system sound if the file isn't available
-            await $`osascript -e 'do shell script "afplay /System/Library/Sounds/Glass.aiff"'`;
-            // Notify user about missing sound file (only once per session)
-            if (!checkedSoundCache.has('_notified_missing')) {
-              checkedSoundCache.set('_notified_missing', true);
-              try {
-                await client.tui.showToast({
-                  body: {
-                    title: 'Warcraft Sounds',
-                    message: `Sound file not found: ${filename}. Using system sound as fallback.`,
-                    variant: 'info',
-                    duration: 4000,
-                  },
-                });
-              } catch (toastErr) {
-                // Silently ignore toast errors - not critical
-                if (process.env.DEBUG_OPENCODE)
-                  log.debug('Toast notification failed', { error: toastErr });
-              }
-            }
-          }
-
-          await $`osascript -e 'display notification ${JSON.stringify(summary)} with title "opencode"'`;
-        } else {
-          await $`canberra-gtk-play --id=message`;
-          await $`notify-send 'opencode' '${summary.replace(/'/g, "'\\''")}'`;
-        }
+        await handleSessionIdle(summary);
       }
     },
   };

@@ -59,6 +59,21 @@ const copyIfMissing = async (
  * @param filename - Sound filename
  * @param dataDir - Optional override for the base data directory
  * @returns `true` when the file exists
+ *
+ * @example
+ * ```typescript
+ * // Check if a sound file exists
+ * const exists = await soundExists('orc_work_completed.wav');
+ * if (exists) {
+ *   console.log('Sound is ready to play');
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Check with custom data directory
+ * const exists = await soundExists('human_selected1.wav', '/custom/sounds/dir');
+ * ```
  */
 export const soundExists = async (filename: string, dataDir?: string): Promise<boolean> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
@@ -75,6 +90,17 @@ export const soundExists = async (filename: string, dataDir?: string): Promise<b
  * @param filename - Sound filename
  * @param dataDir - Optional override for the base data directory
  * @returns `true` when the sound is available
+ *
+ * @example
+ * ```typescript
+ * // Ensure a sound is available before playing
+ * const available = await ensureSoundAvailable('peasant_acknowledge1.wav');
+ * if (available) {
+ *   // Play the sound
+ * } else {
+ *   console.warn('Sound file not found');
+ * }
+ * ```
  */
 export const ensureSoundAvailable = async (
   filename: string,
@@ -193,14 +219,42 @@ const processEntry = async (
  * Install bundled sounds from the repository `data/` directory into the
  * user's plugin data directory when missing. Non-.wav files are skipped and
  * existing files are not overwritten.
+ *
+ * Uses parallel processing for improved performance when installing multiple files.
+ *
  * @param dataDir - Optional override for the base data directory
  * @returns Number of sound files installed
+ *
+ * @example
+ * ```typescript
+ * // Install all bundled sounds on plugin initialization
+ * const count = await installBundledSoundsIfMissing();
+ * console.log(`Installed ${count} sound files`);
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Install to custom directory
+ * const count = await installBundledSoundsIfMissing('/custom/sounds/path');
+ * if (count > 0) {
+ *   console.log(`Installed ${count} new sound files`);
+ * } else {
+ *   console.log('All sounds already installed');
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Safe to call multiple times - existing files are not overwritten
+ * await installBundledSoundsIfMissing(); // First call: installs all files
+ * await installBundledSoundsIfMissing(); // Second call: returns 0 (no new files)
+ * ```
  */
 export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<number> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
   const bundledDataDir = findBundledDataDir() ?? join(process.cwd(), 'data');
 
-  let entries;
+  let entries: { name: string; isDirectory: () => boolean; isFile: () => boolean }[];
   try {
     entries = await readdir(bundledDataDir, { withFileTypes: true });
   } catch (err) {
@@ -213,16 +267,45 @@ export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<n
 
   if (!(await ensureDirExists(effectiveDataDir))) return 0;
 
+  // Process all entries in parallel for better performance
+  const installPromises = entries.map((entry) =>
+    processEntry(entry, bundledDataDir, effectiveDataDir),
+  );
+
+  const results = await Promise.allSettled(installPromises);
+
+  // Count successful installations
   let totalInstalled = 0;
-  for (const entry of entries) {
-    totalInstalled += await processEntry(entry, bundledDataDir, effectiveDataDir);
+  for (const result of results) {
+    if (result.status === 'fulfilled') {
+      totalInstalled += result.value;
+    } else if (DEBUG) {
+      log.warn('Failed to process entry during parallel installation', { error: result.reason });
+    }
   }
+
   return totalInstalled;
 };
 
 /**
  * Return the list of known bundled sound filenames.
  * @returns Array of bundled sound filenames
+ *
+ * @example
+ * ```typescript
+ * // Get all available sound files
+ * const sounds = getSoundFileList();
+ * console.log(`Total sounds: ${sounds.length}`);
+ * sounds.forEach(sound => console.log(sound));
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Filter by faction
+ * const sounds = getSoundFileList();
+ * const orcSounds = sounds.filter(s => s.startsWith('orc_'));
+ * console.log(`Orc sounds: ${orcSounds.length}`);
+ * ```
  */
 export const getSoundFileList = (): string[] => {
   return dataGetSoundFileList();
