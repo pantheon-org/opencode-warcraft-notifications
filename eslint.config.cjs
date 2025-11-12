@@ -37,7 +37,7 @@ module.exports = [
         },
       ],
 
-      'max-lines': ['warn', { max: 300, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['warn', { max: 200, skipBlankLines: true, skipComments: true }],
       'max-statements': ['error', 30],
       'prefer-arrow/prefer-arrow-functions': [
         'error',
@@ -86,6 +86,13 @@ module.exports = [
     rules: {
       'tsdoc/syntax': 'off',
       'prettier/prettier': 'off',
+      'max-lines': 'off',
+    },
+  },
+  {
+    files: ['src/sound-data/*.ts', 'src/test-utils.ts'],
+    rules: {
+      'max-lines': 'off',
     },
   },
 ];
