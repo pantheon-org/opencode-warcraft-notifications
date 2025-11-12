@@ -102,11 +102,183 @@
   --sl-color-badge-danger: #ef4444;
 }
 
+/* === Phase 3: Component Styling === */
+
+/* === Button Components === */
+.sl-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4375rem 1.125rem;
+  border-radius: 999rem;
+  font-size: var(--sl-text-sm, 0.875rem);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.sl-link-button.primary {
+  background: var(--sl-color-accent);
+  color: var(--sl-color-black);
+  border: 1px solid var(--sl-color-accent);
+}
+
+.sl-link-button.primary:hover {
+  background: var(--sl-color-accent-high);
+  border-color: var(--sl-color-accent-high);
+}
+
+.sl-link-button.secondary {
+  background: transparent;
+  color: var(--sl-color-accent);
+  border: 1px solid var(--sl-color-accent);
+}
+
+.sl-link-button.secondary:hover {
+  background: var(--sl-color-accent-low);
+}
+
+.sl-link-button.minimal {
+  background: transparent;
+  color: var(--sl-color-text);
+  border: none;
+}
+
+.sl-link-button.minimal:hover {
+  background: var(--sl-color-gray-2);
+}
+
+/* === Badge Components === */
+.sl-badge {
+  display: inline-block;
+  padding: 0.175rem 0.35rem;
+  border-radius: 0.25rem;
+  border: 1px solid currentColor;
+  font-size: var(--sl-text-xs, 0.75rem);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.sl-badge.default {
+  color: var(--sl-color-gray-4);
+  background: var(--sl-color-badge-default);
+  border-color: var(--sl-color-gray-3);
+}
+
+.sl-badge.note {
+  color: var(--sl-color-badge-note);
+  background: color-mix(in srgb, var(--sl-color-badge-note) 15%, transparent);
+  border-color: var(--sl-color-badge-note);
+}
+
+.sl-badge.success,
+.sl-badge.tip {
+  color: var(--sl-color-badge-success);
+  background: color-mix(in srgb, var(--sl-color-badge-success) 15%, transparent);
+  border-color: var(--sl-color-badge-success);
+}
+
+.sl-badge.caution {
+  color: var(--sl-color-badge-caution);
+  background: color-mix(in srgb, var(--sl-color-badge-caution) 15%, transparent);
+  border-color: var(--sl-color-badge-caution);
+}
+
+.sl-badge.danger {
+  color: var(--sl-color-badge-danger);
+  background: color-mix(in srgb, var(--sl-color-badge-danger) 15%, transparent);
+  border-color: var(--sl-color-badge-danger);
+}
+
+/* === Code Block Styling === */
+.expressive-code {
+  margin: 1.5rem 0;
+  border-radius: var(--sl-border-radius);
+  overflow: hidden;
+}
+
+.expressive-code .frame {
+  border: 1px solid var(--sl-color-gray-3);
+  background: var(--sl-color-gray-1);
+}
+
+.expressive-code .frame.is-terminal {
+  background: #1a1f2c;
+}
+
+.expressive-code .copy {
+  background: var(--sl-color-gray-2);
+  color: var(--sl-color-gray-4);
+  border: 1px solid var(--sl-color-gray-3);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: var(--sl-text-xs, 0.75rem);
+  transition: all 0.2s ease;
+}
+
+.expressive-code .copy:hover {
+  background: var(--sl-color-gray-3);
+  border-color: var(--sl-color-accent);
+}
+
+/* Syntax highlighting colors */
+.expressive-code .ec-line .code {
+  color: #d8dee9;
+}
+
+.expressive-code .keyword {
+  color: #b48ead;
+}
+
+.expressive-code .string {
+  color: #a3be8c;
+}
+
+.expressive-code .number {
+  color: #d08770;
+}
+
+.expressive-code .function {
+  color: #88c0d0;
+}
+
+.expressive-code .comment {
+  color: #616e88;
+  font-style: italic;
+}
+
+/* === Sidebar Navigation === */
+.sidebar-content a[aria-current='page'] {
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent);
+  font-weight: 600;
+  border-left: 3px solid var(--sl-color-accent);
+  padding-left: calc(1rem - 3px);
+}
+
+.sidebar-content a:hover {
+  background: var(--sl-color-gray-2);
+  color: var(--sl-color-accent);
+}
+
+/* === Table of Contents === */
+.right-sidebar-panel a[aria-current='true'] {
+  color: var(--sl-color-accent);
+  font-weight: 600;
+}
+
+.right-sidebar-panel a:hover {
+  color: var(--sl-color-accent);
+  text-decoration: underline;
+}
+
+/* === Existing Styles === */
+
 /* Horizontal rules - more prominent spacing */
 .sl-markdown-content hr {
   margin: 3rem 0;
   border: none;
-  border-top: 1px solid var(--sl-color-gray-2);
+  border-top: 1px solid var(--sl-color-hairline);
 }
 
 /* Code blocks */
@@ -122,19 +294,6 @@
   padding: 1rem 1.5rem;
   border-radius: var(--sl-border-radius);
   border-left: 4px solid currentColor;
-}
-
-/* Active navigation item */
-.sidebar-content a[aria-current='page'] {
-  font-weight: 600;
-  background: var(--sl-color-accent-low);
-  border-left: 3px solid var(--sl-color-accent);
-}
-
-/* Table of contents active item */
-.right-sidebar a[aria-current='true'] {
-  color: var(--sl-color-accent);
-  font-weight: 600;
 }
 
 /* Link styles */
