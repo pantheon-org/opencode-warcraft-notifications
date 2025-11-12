@@ -74,8 +74,7 @@ class StructuredLogger implements Logger {
  * - All logs include timestamp, level, module name, and optional context
  * - Debug logs only output when DEBUG_OPENCODE environment variable is set
  *
- * @param config - Logger configuration
- * @param config.module - Module name for identifying the source of logs
+ * @param options - Logger configuration options
  * @returns Logger instance with structured logging
  */
 export const createLogger = ({ module }: { module: string }): Logger => {
