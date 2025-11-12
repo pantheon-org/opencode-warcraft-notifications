@@ -222,8 +222,8 @@ interface WarcraftNotificationConfig {
 
 **Platform-Specific Defaults**:
 
-- **macOS**: `~/Library/Application Support/opencode/storage/plugin/<package-name>`
-- **Linux**: `~/.local/share/opencode/storage/plugin/<package-name>`
+- **macOS**: `~/Library/Application Support/opencode/storage/plugin/<package-name>/sounds`
+- **Linux**: `~/.local/share/opencode/storage/plugin/<package-name>/sounds`
 - **Windows** (planned): `%APPDATA%\opencode\storage\plugin\<package-name>`
 
 > **Note**: Windows support is planned for a future release. Currently supported: macOS and Linux.

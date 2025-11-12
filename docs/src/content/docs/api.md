@@ -325,16 +325,16 @@ export const getDefaultSoundsDir = (): string
 
 **Platform-Specific Paths**:
 
-- **macOS**: `~/Library/Application Support/opencode/storage/plugin/<package-name>`
+- **macOS**: `~/Library/Application Support/opencode/storage/plugin/<package-name>/sounds`
 - **Windows**: `%APPDATA%\opencode\storage\plugin\<package-name>`
-- **Linux**: `~/.local/share/opencode/storage/plugin/<package-name>`
+- **Linux**: `~/.local/share/opencode/storage/plugin/<package-name>/sounds`
 
 **Example**:
 
 ```typescript
 const soundsDir = getDefaultSoundsDir();
-// macOS: '/Users/username/Library/Application Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications'
-// Linux: '/home/username/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications'
+// macOS: '/Users/username/Library/Application Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds'
+// Linux: '/home/username/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds'
 ```
 
 ##### `getDefaultDataDir()`
@@ -567,7 +567,7 @@ export const getSoundPath = (
 
 ```typescript
 const path = getSoundPath('human_selected1.wav', 'alliance');
-// Returns: '/home/user/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/human_selected1.wav'
+// Returns: '/home/user/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/human_selected1.wav'
 
 const customPath = getSoundPath('orc_selected1.wav', 'horde', '/custom/sounds');
 // Returns: '/custom/sounds/horde/orc_selected1.wav'

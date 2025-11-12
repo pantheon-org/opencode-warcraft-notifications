@@ -90,10 +90,10 @@ After installation, the plugin will:
 
 ```bash
 # macOS
-ls -la ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+ls -la ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 
 # Linux
-ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 ```
 
 You should see `alliance/` and `horde/` directories with WAV files.
@@ -165,8 +165,8 @@ Customize where sound files are stored:
 
 **Default Locations**:
 
-- **macOS**: `~/Library/Application Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/`
-- **Linux**: `~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/`
+- **macOS**: `~/Library/Application Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/`
+- **Linux**: `~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/`
 
 ### Configuration Examples
 
@@ -441,10 +441,10 @@ If you want to use a custom location for sounds:
 
    ```bash
    # macOS
-   cp -r ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/* /custom/sounds/path/
+   cp -r ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/* /custom/sounds/path/
 
    # Linux
-   cp -r ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/* /custom/sounds/path/
+   cp -r ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/* /custom/sounds/path/
    ```
 
 3. **Update configuration**:
@@ -464,10 +464,10 @@ You can add your own WAV files:
 
    ```bash
    # macOS
-   cd ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/
+   cd ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/
 
    # Linux
-   cd ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/
+   cd ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/
    ```
 
 2. **Add your WAV files**:
@@ -496,20 +496,20 @@ You can add your own WAV files:
 
    ```bash
    # macOS
-   ls -la ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/
+   ls -la ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/
 
    # Linux
-   ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/
+   ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/
    ```
 
 2. **Test audio playback manually**:
 
    ```bash
    # macOS
-   afplay ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/human_selected1.wav
+   afplay ~/Library/Application\ Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/human_selected1.wav
 
    # Linux
-   canberra-gtk-play --file ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/human_selected1.wav
+   canberra-gtk-play --file ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/human_selected1.wav
    ```
 
 3. **Check audio output**:
@@ -799,7 +799,7 @@ Use a shared sound directory for multiple projects:
 mkdir -p ~/shared-warcraft-sounds
 
 # Copy sounds
-cp -r ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/* ~/shared-warcraft-sounds/
+cp -r ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/* ~/shared-warcraft-sounds/
 
 # Configure all projects to use shared directory
 echo '{"@pantheon-ai/opencode-warcraft-notifications":{"soundsDir":"~/shared-warcraft-sounds"}}' > ~/.config/opencode/plugin.json

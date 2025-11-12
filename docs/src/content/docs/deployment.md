@@ -138,7 +138,7 @@ export SOUNDS_BASE_URL=https://custom-cdn.com/sounds
 ~/.config/opencode/plugin.json
 
 # Sound storage
-~/Library/Application Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+~/Library/Application Support/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 ```
 
 #### Required Commands
@@ -170,7 +170,7 @@ osascript -e 'display notification "Test" with title "OpenCode"'
 ~/.config/opencode/plugin.json
 
 # Sound storage (XDG compliant)
-~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 ```
 
 #### Required Commands
@@ -429,13 +429,13 @@ cat ~/.cache/opencode/node_modules/@pantheon-ai/opencode-warcraft-notifications/
 
 ```bash
 # Check sound directory
-ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 
 # Count alliance sounds
-ls -1 ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/ | wc -l
+ls -1 ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/ | wc -l
 
 # Count horde sounds
-ls -1 ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/horde/ | wc -l
+ls -1 ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/horde/ | wc -l
 ```
 
 #### Configuration
@@ -489,14 +489,14 @@ DEBUG_OPENCODE=1 opencode
 
 ```bash
 # Check if sound files exist
-ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/
+ls -la ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/
 
 # Check platform commands
 which afplay        # macOS
 which canberra-gtk-play  # Linux
 
 # Test sound playback manually
-afplay ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/alliance/human_selected1.wav
+afplay ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/alliance/human_selected1.wav
 ```
 
 **Solutions**:
@@ -655,7 +655,7 @@ cp ~/.config/opencode/plugin.json ~/.config/opencode/plugin.json.backup
 
 ```bash
 # Backup sound directory
-tar -czf warcraft-sounds-backup.tar.gz ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+tar -czf warcraft-sounds-backup.tar.gz ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 ```
 
 ### Cleanup
@@ -670,7 +670,7 @@ tar -czf warcraft-sounds-backup.tar.gz ~/.local/share/opencode/storage/plugin/@p
 rm -rf ~/.cache/opencode/node_modules/@pantheon-ai/opencode-warcraft-notifications
 
 # Remove sound files (optional)
-rm -rf ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/
+rm -rf ~/.local/share/opencode/storage/plugin/@pantheon-ai/opencode-warcraft-notifications/sounds/
 ```
 
 #### Clear Cache

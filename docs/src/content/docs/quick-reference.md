@@ -127,11 +127,11 @@ bun run preview
 
 ### Data Directories
 
-| Platform | Default Location                                                                         |
-| -------- | ---------------------------------------------------------------------------------------- |
-| macOS    | `~/Library/Application Support/opencode/storage/plugin/opencode-warcraft-notifications/` |
-| Linux    | `~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/`                |
-| Windows  | `%APPDATA%\opencode\storage\plugin\opencode-warcraft-notifications\`                     |
+| Platform | Default Location                                                                                |
+| -------- | ----------------------------------------------------------------------------------------------- |
+| macOS    | `~/Library/Application Support/opencode/storage/plugin/opencode-warcraft-notifications/sounds/` |
+| Linux    | `~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/sounds/`                |
+| Windows  | `%APPDATA%\opencode\storage\plugin\opencode-warcraft-notifications\`                            |
 
 ### Sound Files
 
@@ -273,7 +273,7 @@ const WarcraftNotificationConfigSchema = z.object({
 
 ```bash
 # Check sound files exist
-ls -la ~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/
+ls -la ~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/sounds/
 
 # Reinstall plugin
 cd ~ && sed -i.bak '/"@pantheon-ai\/opencode-warcraft-notifications"/d' .cache/opencode/package.json
@@ -325,7 +325,7 @@ afplay /path/to/sound.wav
 osascript -e 'display notification "message" with title "title"'
 
 # Check data directory
-ls -la ~/Library/Application\ Support/opencode/storage/plugin/opencode-warcraft-notifications/
+ls -la ~/Library/Application\ Support/opencode/storage/plugin/opencode-warcraft-notifications/sounds/
 ```
 
 ### Linux
@@ -338,7 +338,7 @@ canberra-gtk-play --id=message
 notify-send 'title' 'message'
 
 # Check data directory
-ls -la ~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/
+ls -la ~/.local/share/opencode/storage/plugin/opencode-warcraft-notifications/sounds/
 ```
 
 ---
