@@ -160,6 +160,39 @@ it('loadPluginConfig handles invalid JSON gracefully', async () => {
   }
 });
 
+it('loadPluginConfig throws validation errors with proper context', async () => {
+  const cwdTemp = createTempDir('opencode-validation-error-');
+  try {
+    await mkdir(join(cwdTemp, '.opencode'), { recursive: true });
+
+    const pluginConfig = {
+      '@pantheon-ai/opencode-warcraft-notifications': {
+        faction: 'invalid-faction',
+        soundsDir: 123,
+      },
+    };
+    const configPath = join(cwdTemp, '.opencode', 'plugin.json');
+    await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
+
+    const origCwd = process.cwd();
+    try {
+      process.chdir(cwdTemp);
+      await expect(async () => {
+        await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
+      }).toThrow();
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      const message = (error as Error).message;
+      expect(message).toContain('Configuration validation failed');
+      expect(message).toContain('Configuration file:');
+    } finally {
+      process.chdir(origCwd);
+    }
+  } finally {
+    removeTempDir(cwdTemp);
+  }
+});
+
 it('getConfigDir returns darwin path when platform is darwin', () => {
   const origPlatform = process.platform;
   try {
@@ -243,6 +276,42 @@ it('loadPluginConfig reads from XDG_CONFIG_HOME when present', async () => {
       Object.defineProperty(process, 'platform', { value: origPlatform });
       if (origXdg === undefined) delete process.env.XDG_CONFIG_HOME;
       else process.env.XDG_CONFIG_HOME = origXdg;
+    }
+  } finally {
+    removeTempDir(cwdTemp);
+  }
+});
+
+it('loadPluginConfig throws validation errors with file path context', async () => {
+  const cwdTemp = createTempDir('opencode-validation-error-');
+  try {
+    await mkdir(join(cwdTemp, '.opencode'), { recursive: true });
+
+    const pluginConfig = {
+      '@pantheon-ai/opencode-warcraft-notifications': {
+        faction: 'invalid-faction',
+        soundsDir: 123,
+      },
+    };
+    const configPath = join(cwdTemp, '.opencode', 'plugin.json');
+    await writeFile(configPath, JSON.stringify(pluginConfig, null, 2));
+
+    const origCwd = process.cwd();
+    try {
+      process.chdir(cwdTemp);
+      let errorThrown = false;
+      try {
+        await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
+      } catch (error) {
+        errorThrown = true;
+        expect(error).toBeInstanceOf(Error);
+        const message = (error as Error).message;
+        expect(message).toContain('Configuration validation failed');
+        expect(message).toContain('Configuration file:');
+      }
+      expect(errorThrown).toBe(true);
+    } finally {
+      process.chdir(origCwd);
     }
   } finally {
     removeTempDir(cwdTemp);
