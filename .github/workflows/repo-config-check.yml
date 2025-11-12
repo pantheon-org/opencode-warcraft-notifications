@@ -69,54 +69,54 @@ jobs:
               labels: ['configuration', 'automation'],
               body: `## Issue
 
-The repository configuration check detected settings that may allow multiple releases per merge request.
+              The repository configuration check detected settings that may allow multiple releases per merge request.
 
-## Problem
+              ## Problem
 
-Our workflow requires **squash merges only** to ensure:
-- One commit per PR merge
-- One version bump per merge
-- One release per version
+              Our workflow requires **squash merges only** to ensure:
+              - One commit per PR merge
+              - One version bump per merge
+              - One release per version
 
-## Required Configuration
+              ## Required Configuration
 
-Go to [Repository Settings](https://github.com/${context.repo.owner}/${context.repo.repo}/settings) → **General → Pull Requests**:
+              Go to [Repository Settings](https://github.com/${context.repo.owner}/${context.repo.repo}/settings) → **General → Pull Requests**:
 
-### Merge Settings
-- ✅ **Enable** "Allow squash merging"
-- ❌ **Disable** "Allow merge commits"
-- ❌ **Disable** "Allow rebase merging"
-- ✅ **Enable** "Automatically delete head branches"
+              ### Merge Settings
+              - ✅ **Enable** "Allow squash merging"
+              - ❌ **Disable** "Allow merge commits"
+              - ❌ **Disable** "Allow rebase merging"
+              - ✅ **Enable** "Automatically delete head branches"
 
-## Verification
+              ## Verification
 
-After making changes, run:
-\`\`\`bash
-node .github/scripts/check-repo-config.cjs
-\`\`\`
+              After making changes, run:
+              \`\`\`bash
+              node .github/scripts/check-repo-config.cjs
+              \`\`\`
 
-Or trigger the workflow manually:
-\`\`\`bash
-gh workflow run repo-config-check.yml
-\`\`\`
+              Or trigger the workflow manually:
+              \`\`\`bash
+              gh workflow run repo-config-check.yml
+              \`\`\`
 
-## Why This Matters
+              ## Why This Matters
 
-Without squash merge enforcement:
-- Multiple commits in a PR create multiple tags
-- Multiple tags trigger multiple releases
-- Release history becomes cluttered
-- Version numbers become unpredictable
+              Without squash merge enforcement:
+              - Multiple commits in a PR create multiple tags
+              - Multiple tags trigger multiple releases
+              - Release history becomes cluttered
+              - Version numbers become unpredictable
 
-## Documentation
+              ## Documentation
 
-- [Workflow Documentation](.github/WORKFLOWS.md)
-- [Repository Configuration Script](.github/scripts/check-repo-config.cjs)
+              - [Workflow Documentation](.github/WORKFLOWS.md)
+              - [Repository Configuration Script](.github/scripts/check-repo-config.cjs)
 
----
+              ---
 
-*This issue was automatically created by the Repository Configuration Check workflow.*  
-*Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}*`
+              *This issue was automatically created by the Repository Configuration Check workflow.*  
+              *Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}*`
             });
 
       - name: Summary
