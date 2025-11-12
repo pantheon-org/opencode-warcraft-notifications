@@ -303,43 +303,44 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-    A[Push to main] --> B[Smart Version Bump]
-    B --> C[Release & Publish]
-    C --> D[npm Publish]
-    C --> E[GitHub Release]
+    A[Push to main] --> B[Version Update]
+    B --> C[Auto-Merge]
+    C --> D[Create Tag]
+    D --> E[Publish Release]
+    E --> F[npm + Docs + Release]
 
-    F[Pull Request] --> G[PR Validation]
-    G --> H[Tests]
-    G --> I[Linting]
-    G --> J[Type Check]
+    G[Pull Request] --> H[PR Validation]
+    H --> I[Tests + Lint + Build]
+
+    J[docs/** changes] --> K[Deploy Docs]
 
     style B fill:#4caf50
-    style C fill:#2196f3
-    style D fill:#ff9800
-    style E fill:#9c27b0
+    style E fill:#2196f3
+    style F fill:#ff9800
+    style K fill:#9c27b0
 ```
 
 ### Workflows
 
-#### 1. Smart Version Bump
+#### 1. Version Update
 
-**Trigger**: Push to `main` branch  
-**Purpose**: Automatically determine and apply semantic version bump
+**Trigger**: Push to `main` branch (code changes only)  
+**Purpose**: Automatically determine semantic version bump using conventional commits
 
 **Steps**:
 
 1. Analyze commits since last tag
-2. Use AI (Gemini) + conventional commits to determine version type
-3. Cross-validate decisions
-4. Update `package.json`
-5. Create git tag
-6. Push tag (triggers release)
+2. Use conventional commit patterns to determine version type
+3. Create version bump PR with updated `package.json`
+4. Auto-merge PR (workflow 3)
+5. Create git tag (workflow 4)
+6. Tag triggers release (workflow 5)
 
 **Version Types**:
 
-- **MAJOR**: Breaking changes, API changes
-- **MINOR**: New features, backwards-compatible additions
-- **PATCH**: Bug fixes, documentation, improvements
+- **MAJOR**: Breaking changes (`BREAKING CHANGE`, `!:`)
+- **MINOR**: New features (`feat:`)
+- **PATCH**: Bug fixes, improvements (`fix:`, `chore:`, `docs:`)
 
 #### 2. Release & Publish
 

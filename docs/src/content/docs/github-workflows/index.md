@@ -32,6 +32,8 @@ This directory contains all documentation related to GitHub Actions workflows, a
 
 This repository uses **sequential orchestrated workflows** (see [Sequential Orchestration](./sequential-orchestration.md)):
 
+### Automated Release Pipeline
+
 1. **Validate PR** (1-validate.yml) - Lint, test, build, security scan
 2. **Version Update** (2-version-update.yml) - Analyze commits & create version PR
 3. **Auto-Merge** (3-auto-merge.yml) - Auto-merge version PRs
@@ -39,8 +41,9 @@ This repository uses **sequential orchestrated workflows** (see [Sequential Orch
 5. **Publish Release** (5-publish.yml) - Publish npm, docs, and GitHub release
 6. **Cleanup** (6-cleanup.yml) - Clean old releases and branches
 
-### Supporting Workflows
+### Independent Workflows
 
+- **Deploy Documentation** (deploy-docs.yml) - Deploys docs immediately on `docs/**` changes (no version required)
 - **Repository Config Check** (repo-config-check.yml) - Verify squash merge settings
 
 ## Key Features
@@ -56,7 +59,14 @@ This repository uses **sequential orchestrated workflows** (see [Sequential Orch
 - ✅ Squash merge enforcement
 - ✅ Extracted shell scripts for maintainability
 
-## Recent Updates (2025-11-11)
+## Recent Updates
+
+### 2025-11-12
+
+- **📚 NEW: Independent Docs Deployment** - Documentation now deploys immediately on `docs/**` changes without requiring a release
+- **📖 Enhanced Documentation** - Added comprehensive README for all workflows
+
+### 2025-11-11
 
 - **🎉 NEW: Sequential Orchestration** - Complete workflow restructuring (see [Sequential Orchestration](./sequential-orchestration.md))
 - **📖 NEW: Migration Guide** - Step-by-step migration instructions (see [Migration Guide](./migration-guide.md))

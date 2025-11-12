@@ -5,6 +5,8 @@ description: 'Automated release pipeline documentation'
 
 # CI/CD Pipeline Documentation
 
+> **📚 Note:** For the most current workflow documentation, see [GitHub Workflows Overview](/github-workflows/overview/). This document provides detailed technical reference for the CI/CD pipeline.
+
 ## Overview
 
 This document provides comprehensive technical documentation for the GitHub Actions CI/CD pipeline that powers the automated build, test, version management, and deployment workflows for the Warcraft II Notifications Plugin.
@@ -13,25 +15,25 @@ This document provides comprehensive technical documentation for the GitHub Acti
 
 The pipeline is designed around these core principles:
 
-- **Single Release Per Merge**: Enforces squash merging to ensure one commit = one release
-- **AI-Powered Versioning**: Uses Google Gemini AI with conventional commit fallback for intelligent semantic versioning
+- **Sequential Orchestration**: Workflows trigger in sequence (1→2→3→4→5→6) for predictable releases
+- **Conventional Commits**: Uses conventional commit patterns for semantic versioning (no AI dependency)
 - **Zero-Touch Deployment**: Fully automated from PR merge to npm publication
-- **Quality Gates**: Multi-stage validation with security scanning, testing, and type checking
+- **Quality Gates**: Multi-stage validation with testing, type checking, and linting
+- **Independent Documentation**: Documentation deploys immediately without version requirements
 - **Self-Healing**: Automatic cleanup, cycle prevention, and error recovery
 
 ### Quick Reference
 
-| Workflow                                                      | Trigger            | Duration | Purpose                        |
-| ------------------------------------------------------------- | ------------------ | -------- | ------------------------------ |
-| [PR Validation](#pr-validation-workflow)                      | Pull Request       | ~2-3 min | Quality assurance & security   |
-| [Smart Version Bump](#smart-version-bump-workflow)            | Push to main       | ~1-2 min | AI-powered semantic versioning |
-| [Sync Package Version](#sync-package-version-workflow)        | Tag creation       | ~30 sec  | Legacy version synchronization |
-| [Release & Publish](#release--publish-workflow)               | Tag creation       | ~3-4 min | Build, test, publish to npm    |
-| [Deploy Documentation](#deploy-documentation-workflow)        | Push to main       | ~2-5 min | Build and deploy docs          |
-| [Auto-Merge Bot](#auto-merge-bot-workflow)                    | PR events          | ~10 sec  | Automated PR merging           |
-| [Cleanup Merged Branches](#cleanup-merged-branches-workflow)  | PR merge, Schedule | ~15 sec  | Branch housekeeping            |
-| [Cleanup Old Releases](#cleanup-old-releases-workflow)        | Schedule, Tag      | ~30 sec  | Release history management     |
-| [Repo Config Check](#repository-configuration-check-workflow) | Schedule, Manual   | ~10 sec  | Configuration validation       |
+| #   | Workflow                                                      | Trigger               | Duration | Purpose                               |
+| --- | ------------------------------------------------------------- | --------------------- | -------- | ------------------------------------- |
+| 1   | [Validate PR](#validate-pr-workflow)                          | Pull Request          | ~2-3 min | Quality assurance (lint, test, build) |
+| 2   | [Version Update](#version-update-workflow)                    | Push to main (code)   | ~1-2 min | Conventional commit analysis          |
+| 3   | [Auto-Merge](#auto-merge-workflow)                            | Version PR creation   | ~10 sec  | Auto-merge version PRs                |
+| 4   | [Create Tag](#create-tag-workflow)                            | Version commit merged | ~15 sec  | Create git tag from package.json      |
+| 5   | [Publish Release](#publish-release-workflow)                  | Tag push (`v*`)       | ~3-4 min | Publish npm, docs, GitHub release     |
+| 6   | [Cleanup](#cleanup-workflow)                                  | After publish         | ~30 sec  | Delete old branches and releases      |
+| -   | [Deploy Documentation](#deploy-documentation-workflow)        | Push to main (docs)   | ~30 sec  | Independent docs deployment           |
+| -   | [Repo Config Check](#repository-configuration-check-workflow) | Schedule, Manual      | ~10 sec  | Configuration validation              |
 
 ## Pipeline Architecture
 
