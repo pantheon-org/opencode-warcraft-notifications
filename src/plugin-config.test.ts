@@ -177,7 +177,7 @@ it('loadPluginConfig throws validation errors with proper context', async () => 
     const origCwd = process.cwd();
     try {
       process.chdir(cwdTemp);
-      await expect(async () => {
+      expect(async () => {
         await loadPluginConfig('@pantheon-ai/opencode-warcraft-notifications');
       }).toThrow();
     } catch (error) {

@@ -127,7 +127,8 @@ const formatZodIssue = (issue: ZodIssueData): string => {
 /**
  * Wrapper for formatZodIssue to avoid nested callback
  */
-const formatZodIssueWrapper = (issue: z.ZodIssue): string => formatZodIssue(issue as ZodIssueData);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const formatZodIssueWrapper = (issue: any): string => formatZodIssue(issue as ZodIssueData);
 
 /**
  * Format error message with indentation

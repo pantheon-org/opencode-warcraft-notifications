@@ -69,7 +69,7 @@ describe('bundled-sounds module', () => {
     const temp = createTempDir('wc-ensure-sound-exists-');
     try {
       // Create the sound file
-      await writeTempFileForFaction(temp, 'alliance', 'test_sound.wav', 'test data');
+      writeTempFileForFaction(temp, 'alliance', 'test_sound.wav', 'test data');
       const available = await ensureSoundAvailable('test_sound.wav', temp);
       expect(available).toBe(true);
     } finally {
