@@ -62,12 +62,6 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Install OpenCode
-        run: |
-          echo "Installing OpenCode CLI..."
-          npm install -g @opencode-ai/cli@latest
-          echo "✅ OpenCode CLI installed"
-
       - name: Check for Available AI Provider
         id: check_provider
         env:
@@ -193,7 +187,7 @@ jobs:
       - name: Create documentation regeneration prompt
         if: steps.check_provider.outputs.provider_available == 'true'
         run: |
-          cat > .github/scripts/regenerate-docs-prompt.txt << 'EOF'
+          cat > .github/scripts/regenerate-docs-prompt.txt << 'PROMPT_EOF'
           Please regenerate the documentation under docs/src/content/docs/ by analyzing the current codebase.
 
           Focus on these key documentation files:
@@ -221,7 +215,7 @@ jobs:
           - Modify workflow files or CI/CD configurations
 
           Please review each documentation file and update it based on the current codebase.
-          EOF
+          PROMPT_EOF
 
           echo "✅ Documentation prompt created"
 
@@ -229,6 +223,7 @@ jobs:
         if: steps.check_provider.outputs.provider_available == 'true'
         id: regenerate
         continue-on-error: true
+        timeout-minutes: 15
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -238,9 +233,15 @@ jobs:
           echo "Starting documentation regeneration..."
           echo "Provider: ${{ github.event.inputs.ai_provider || 'anthropic' }}"
 
-          # Run OpenCode with the prompt
-          opencode --no-interactive < .github/scripts/regenerate-docs-prompt.txt || {
-            echo "⚠️  OpenCode execution completed with warnings"
+          # Run OpenCode with the prompt using npx for reproducibility
+          # Use timeout command as additional safeguard (900 seconds = 15 minutes)
+          timeout 900 npx --yes @opencode-ai/cli@latest --no-interactive < .github/scripts/regenerate-docs-prompt.txt || {
+            EXIT_CODE=$?
+            if [ $EXIT_CODE -eq 124 ]; then
+              echo "⚠️  OpenCode execution timed out after 15 minutes"
+            else
+              echo "⚠️  OpenCode execution completed with warnings (exit code: $EXIT_CODE)"
+            fi
           }
 
           # Check if any docs were changed
@@ -250,6 +251,11 @@ jobs:
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
             echo "✅ Documentation changes detected"
+            
+            # Output diff stats for visibility
+            echo ""
+            echo "📊 Documentation Change Statistics:"
+            git diff --stat docs/src/content/docs/
           fi
 
       - name: Validate documentation changes
@@ -302,6 +308,12 @@ jobs:
             - Documentation files under `docs/src/content/docs/` have been regenerated
             - Code examples and API references have been updated to match current implementation
             - All documentation has been validated and tested to build successfully
+
+            ### Change Statistics
+
+            ```
+            ${{ steps.regenerate.outputs.diff_stats }}
+            ```
 
             ### Validation
 

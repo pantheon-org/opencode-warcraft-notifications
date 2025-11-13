@@ -64,6 +64,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER="${{ steps.pr.outputs.number }}"
+          WORKFLOW_PAT_OWNER="${{ vars.WORKFLOW_PAT_OWNER || 'thoroc' }}"
 
           # Get PR details
           PR_DATA=$(gh pr view $PR_NUMBER --json title,author,headRefName,state,labels)
@@ -80,14 +81,15 @@ jobs:
           echo "  Branch: $PR_BRANCH"
           echo "  State: $PR_STATE"
           echo "  Labels: $PR_LABELS"
+          echo "  Allowed PAT Owner: $WORKFLOW_PAT_OWNER"
 
           # Check if this is a version bump PR
           IS_VERSION_PR=false
 
-          # Accept PRs from github-actions[bot] or the WORKFLOW_PAT user (thoroc)
+          # Accept PRs from github-actions[bot] or the WORKFLOW_PAT user (configurable)
           if [[ "$PR_TITLE" =~ ^chore:\ bump\ version\ to\ v[0-9]+\.[0-9]+\.[0-9]+$ ]] && \
              [[ "$PR_BRANCH" =~ ^version-bump/ ]] && \
-             ( [[ "$PR_AUTHOR" == "github-actions[bot]" ]] || [[ "$PR_AUTHOR" == "thoroc" ]] ) && \
+             ( [[ "$PR_AUTHOR" == "github-actions[bot]" ]] || [[ "$PR_AUTHOR" == "$WORKFLOW_PAT_OWNER" ]] ) && \
              [[ "$PR_STATE" == "OPEN" ]]; then
             IS_VERSION_PR=true
           fi
@@ -107,40 +109,71 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER="${{ steps.pr.outputs.number }}"
+          MAX_RETRIES=3
+          RETRY_DELAY=30
+          ATTEMPT=1
 
-          # Check mergability
-          MERGEABLE=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
+          while [ $ATTEMPT -le $MAX_RETRIES ]; do
+            echo "🔄 Attempt $ATTEMPT of $MAX_RETRIES..."
 
-          if [ "$MERGEABLE" != "MERGEABLE" ]; then
-            echo "⚠️ PR is not mergeable (status: $MERGEABLE)"
-            echo "ready=false" >> $GITHUB_OUTPUT
+            # Check mergability
+            MERGEABLE=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
+
+            if [ "$MERGEABLE" != "MERGEABLE" ]; then
+              echo "⚠️ PR is not mergeable (status: $MERGEABLE)"
+              
+              if [ $ATTEMPT -lt $MAX_RETRIES ]; then
+                echo "⏳ Waiting ${RETRY_DELAY}s before retry..."
+                sleep $RETRY_DELAY
+                ATTEMPT=$((ATTEMPT + 1))
+                continue
+              else
+                echo "ready=false" >> $GITHUB_OUTPUT
+                echo "reason=not_mergeable" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+            fi
+
+            # Check all required checks
+            # Note: gh pr checks only supports state field, not conclusion
+            # state can be: failure, pending, success
+            CHECKS=$(gh pr checks $PR_NUMBER --json state,bucket 2>/dev/null || echo '[]')
+
+            FAILED_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "failure")] | length')
+            PENDING_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "pending")] | length')
+
+            if [ "$FAILED_CHECKS" -gt 0 ]; then
+              echo "❌ Some checks failed ($FAILED_CHECKS failures)"
+              echo "ready=false" >> $GITHUB_OUTPUT
+              echo "reason=failed_checks" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+
+            if [ "$PENDING_CHECKS" -gt 0 ]; then
+              echo "⏳ Some checks are still pending ($PENDING_CHECKS pending)"
+              
+              if [ $ATTEMPT -lt $MAX_RETRIES ]; then
+                echo "⏳ Waiting ${RETRY_DELAY}s for checks to complete..."
+                sleep $RETRY_DELAY
+                ATTEMPT=$((ATTEMPT + 1))
+                continue
+              else
+                echo "ready=false" >> $GITHUB_OUTPUT
+                echo "reason=pending_checks" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+            fi
+
+            # All checks passed!
+            echo "✅ All checks passed - ready to merge"
+            echo "ready=true" >> $GITHUB_OUTPUT
             exit 0
-          fi
+          done
 
-          # Check all required checks
-          # Note: gh pr checks only supports state field, not conclusion
-          # state can be: failure, pending, success
-          CHECKS=$(gh pr checks $PR_NUMBER --json state,bucket)
-
-          FAILED_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "failure")] | length')
-          PENDING_CHECKS=$(echo "$CHECKS" | jq '[.[] | select(.state == "pending")] | length')
-
-          if [ "$FAILED_CHECKS" -gt 0 ]; then
-            echo "❌ Some checks failed ($FAILED_CHECKS failures)"
-            echo "ready=false" >> $GITHUB_OUTPUT
-            echo "reason=failed_checks" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          if [ "$PENDING_CHECKS" -gt 0 ]; then
-            echo "⏳ Some checks are still pending ($PENDING_CHECKS pending)"
-            echo "ready=false" >> $GITHUB_OUTPUT
-            echo "reason=pending_checks" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          echo "✅ All checks passed - ready to merge"
-          echo "ready=true" >> $GITHUB_OUTPUT
+          # Should not reach here, but just in case
+          echo "⚠️ Maximum retries exceeded"
+          echo "ready=false" >> $GITHUB_OUTPUT
+          echo "reason=max_retries" >> $GITHUB_OUTPUT
 
       - name: Enable auto-merge
         if: steps.pr.outputs.found == 'true' && steps.check.outputs.is_version_pr == 'true' && steps.status.outputs.ready == 'true'
@@ -183,6 +216,21 @@ jobs:
 
           *This message was generated by the Auto-Merge workflow.*"
 
+      - name: Comment on pending checks timeout
+        if: steps.pr.outputs.found == 'true' && steps.check.outputs.is_version_pr == 'true' && steps.status.outputs.ready == 'false' && steps.status.outputs.reason == 'pending_checks'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.pr.outputs.number }}"
+
+          gh pr comment $PR_NUMBER --body "⏳ **Auto-merge delayed**
+
+          This version bump PR still has pending checks after waiting.
+
+          The workflow will retry when checks complete. You can also manually merge once all checks pass.
+
+          *This message was generated by the Auto-Merge workflow.*"
+
       - name: Summary
         if: always()
         run: |
@@ -193,9 +241,11 @@ jobs:
           elif [ "${{ steps.status.outputs.ready }}" = "true" ]; then
             echo "✅ Auto-merge enabled for PR #${{ steps.pr.outputs.number }}"
           elif [ "${{ steps.status.outputs.reason }}" = "pending_checks" ]; then
-            echo "⏳ Waiting for checks to complete"
+            echo "⏳ Checks still pending after retries - will retry later"
           elif [ "${{ steps.status.outputs.reason }}" = "failed_checks" ]; then
             echo "❌ Checks failed - cannot auto-merge"
+          elif [ "${{ steps.status.outputs.reason }}" = "not_mergeable" ]; then
+            echo "⚠️ PR not mergeable after retries"
           else
             echo "⚠️ PR not ready to merge"
           fi
