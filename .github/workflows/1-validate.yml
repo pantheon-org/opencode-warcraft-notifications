@@ -57,7 +57,7 @@ jobs:
         run: bun run build
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@015f24e6818733317a2da2edd6290ab26238649a # v4.6.0
+        uses: codecov/codecov-action@af09b5e394c93991b95a5e7646aeb90c1917f78f # v5.5.1
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -73,7 +73,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@5681af892cd0f4997658498580b2388d1a8a88c0 # master
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -81,7 +81,7 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@6db8d6351fd0be61f9ed8ebd12ccd35dcec51fea # v3.27.5
+        uses: github/codeql-action/upload-sarif@f268e62a13468170ab6417f4075bbff92cb826f9 # v3.28.6
         if: always()
         continue-on-error: true
         with:
