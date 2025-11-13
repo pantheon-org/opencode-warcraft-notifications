@@ -24,6 +24,10 @@ package-lock.json
 .opencode-sounds/
 .context/
 
+# Session directories
+.session/
+.sessions/
+
 # Astro documentation build
 docs/node_modules/
 docs/.astro/
@@ -32,6 +36,7 @@ docs/dist/
 # Generated documentation artifacts (deployed to docs branch)
 dist/
 .astro/
+docs/dist/
 
 # Astro build directory (replaced by docs/)
 .astro-build/
@@ -44,3 +49,19 @@ STYLE_ANALYSIS.md
 
 # Temporary directories
 tmp_*/
+
+# Phase 1, 2, & 3 test files
+test-phase1.cjs
+test-phase2.cjs
+test-phase3.cjs
+test-style-extraction-*.json
+test-design-system-*.json
+test-extraction-summary-*.txt
+test-analysis-summary-*.txt
+test-themes-*/
+style-extraction-*.json
+design-system-*.json
+
+# Stripe test data (from Phase 2 & 3 testing)
+stripe-*.json
+stripe-*.txt
