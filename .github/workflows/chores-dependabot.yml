@@ -1,5 +1,6 @@
 name: Chores — Dependabot PR Management
 
+# Automated Dependabot PR management: merge passing, recreate failing
 on:
   schedule:
     # Run daily at 2:00 AM UTC to merge passing PRs and recreate failing ones
