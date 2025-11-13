@@ -41,3 +41,6 @@ MIGRATION_*.md
 DOCS_*.md
 DOCUMENTATION_*.md
 STYLE_ANALYSIS.md
+
+# Temporary directories
+tmp_*/
