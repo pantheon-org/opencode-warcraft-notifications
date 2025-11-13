@@ -214,18 +214,18 @@
 }
 
 .expressive-code .frame {
-  border: 1px solid var(--sl-color-gray-3);
+  border: 1px solid var(--sl-color-hairline);
   background: var(--sl-color-gray-1);
 }
 
 .expressive-code .frame.is-terminal {
-  background: #1a1f2c;
+  background: var(--sl-color-gray-2);
 }
 
 .expressive-code .copy {
   background: var(--sl-color-gray-2);
   color: var(--sl-color-gray-4);
-  border: 1px solid var(--sl-color-gray-3);
+  border: 1px solid var(--sl-color-hairline);
   border-radius: 0.25rem;
   padding: 0.25rem 0.5rem;
   font-size: var(--sl-text-xs, 0.75rem);
@@ -237,33 +237,14 @@
   border-color: var(--sl-color-accent);
 }
 
-/* Syntax highlighting colors */
-.expressive-code .ec-line .code {
-  color: #d8dee9;
-}
-
-.expressive-code .keyword {
-  color: #b48ead;
-}
-
-.expressive-code .string {
-  color: #a3be8c;
-}
-
-.expressive-code .number {
-  color: #d08770;
-}
-
-.expressive-code .function {
-  color: #88c0d0;
-}
-
-.expressive-code .comment {
-  color: #616e88;
-  font-style: italic;
-}
+/* Syntax highlighting is handled by Expressive Code themes (github-light/github-dark) */
+/* Let Expressive Code manage syntax colors based on theme */
 
 /* === Sidebar Navigation === */
+.sidebar-content a {
+  color: var(--sl-color-text);
+}
+
 .sidebar-content a[aria-current='page'] {
   background: var(--sl-color-accent-low);
   color: var(--sl-color-accent);
@@ -278,6 +259,10 @@
 }
 
 /* === Table of Contents === */
+.right-sidebar-panel a {
+  color: var(--sl-color-text);
+}
+
 .right-sidebar-panel a[aria-current='true'] {
   color: var(--sl-color-accent);
   font-weight: 600;

@@ -15,6 +15,12 @@ export default defineConfig({
         dark: './src/assets/logo-light.svg',
         replacesTitle: false,
       },
+      expressiveCode: {
+        themes: ['github-light', 'github-dark'],
+        styleOverrides: {
+          borderRadius: '8px',
+        },
+      },
       social: [
         {
           icon: 'github',

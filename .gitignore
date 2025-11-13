@@ -44,3 +44,19 @@ STYLE_ANALYSIS.md
 
 # Temporary directories
 tmp_*/
+
+# Phase 1, 2, & 3 test files
+test-phase1.cjs
+test-phase2.cjs
+test-phase3.cjs
+test-style-extraction-*.json
+test-design-system-*.json
+test-extraction-summary-*.txt
+test-analysis-summary-*.txt
+test-themes-*/
+style-extraction-*.json
+design-system-*.json
+
+# Stripe test data (from Phase 2 & 3 testing)
+stripe-*.json
+stripe-*.txt
