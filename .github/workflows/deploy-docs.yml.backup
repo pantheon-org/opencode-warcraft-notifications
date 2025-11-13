@@ -1,0 +1,87 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: deploy-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-docs:
+    name: Build and Deploy Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 'latest'
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-docs-${{ hashFiles('**/docs/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-docs-
+
+      - name: Install dependencies
+        run: |
+          cd docs
+          bun install --frozen-lockfile
+
+      - name: Build documentation
+        run: |
+          cd docs
+          bun run build
+          echo "✅ Documentation built successfully"
+
+      - name: Deploy to docs branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: docs
+          publish_dir: ./docs/dist
+          force_orphan: false
+          enable_jekyll: false
+          commit_message: 'docs: Deploy documentation from ${{ github.sha }}'
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Ensure GitHub Pages source is set to docs
+        env:
+          GITHUB_API: https://api.github.com
+        run: |
+          echo "Ensuring GitHub Pages source is 'docs' at path '/'..."
+          set -euo pipefail
+          repo="${{ github.repository }}"
+          # idempotent PUT to set Pages source; requires pages: write permission
+          curl -sS -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "$GITHUB_API/repos/$repo/pages" \
+            -d '{"source":{"branch":"docs","path":"/"}}' \
+          | sed -n '1,200p'
+      - name: Summary
+        run: |
+          echo "🎉 Documentation Deployment Complete!"
+          echo ""
+          echo "📚 Docs Branch: docs"
+          echo "🔗 Documentation: https://github.com/${{ github.repository }}/tree/docs"
+          echo "📝 Commit: ${{ github.sha }}"
+          echo ""
+          echo "✅ Deployment triggered by docs changes"
