@@ -2,7 +2,7 @@ name: Chores — Dependabot PR Management
 
 on:
   schedule:
-    # Run daily at 2:00 AM UTC to recreate failing Dependabot PRs
+    # Run daily at 2:00 AM UTC to merge passing PRs and recreate failing ones
     - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
@@ -11,10 +11,11 @@ on:
         required: true
         type: choice
         options:
+          - merge-passing
           - recreate-failing
           - rebase-all
           - close-stale
-        default: 'recreate-failing'
+        default: 'merge-passing'
       max_age_days:
         description: 'Maximum age in days for stale PRs (used with close-stale)'
         required: false
@@ -37,6 +38,70 @@ jobs:
 
       - name: Setup GitHub CLI
         run: gh --version
+
+      - name: Get passing Dependabot PRs
+        id: passing-prs
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.action == 'merge-passing' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔍 Checking for passing Dependabot PRs..."
+          
+          # Get all open Dependabot PRs with all checks passing
+          gh pr list \
+            --author app/dependabot \
+            --state open \
+            --json number,title,headRefName,statusCheckRollup,mergeable \
+            --jq '.[] | select(.statusCheckRollup != null) | select(.mergeable == "MERGEABLE") | select(.statusCheckRollup | all(.conclusion == "SUCCESS" or .conclusion == "NEUTRAL" or .conclusion == "SKIPPED")) | .number' > passing_prs.txt
+          
+          # Count passing PRs
+          PASSING_COUNT=$(wc -l < passing_prs.txt | tr -d ' ')
+          echo "passing_count=$PASSING_COUNT" >> $GITHUB_OUTPUT
+          
+          if [ "$PASSING_COUNT" -gt 0 ]; then
+            echo "📋 Found $PASSING_COUNT passing Dependabot PR(s) ready to merge"
+            cat passing_prs.txt
+          else
+            echo "✅ No passing Dependabot PRs found"
+          fi
+
+      - name: Auto-merge passing PRs
+        id: merge-prs
+        if: ${{ steps.passing-prs.outputs.passing_count > 0 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🚀 Auto-merging passing Dependabot PRs..."
+          
+          MERGED=0
+          FAILED=0
+          
+          while read -r pr_number; do
+            if [ -n "$pr_number" ]; then
+              PR_TITLE=$(gh pr view "$pr_number" --json title --jq '.title')
+              echo "Processing PR #$pr_number: $PR_TITLE"
+              
+              # Squash merge the PR
+              if gh pr merge "$pr_number" --squash --auto --delete-branch; then
+                echo "✅ Merged PR #$pr_number"
+                MERGED=$((MERGED + 1))
+              else
+                echo "❌ Failed to merge PR #$pr_number"
+                FAILED=$((FAILED + 1))
+              fi
+              
+              # Sleep to avoid rate limiting
+              sleep 2
+            fi
+          done < passing_prs.txt
+          
+          echo "merged_count=$MERGED" >> $GITHUB_OUTPUT
+          echo "failed_count=$FAILED" >> $GITHUB_OUTPUT
+          
+          echo ""
+          echo "📊 Summary:"
+          echo "  Merged: $MERGED"
+          echo "  Failed: $FAILED"
 
       - name: Get failing Dependabot PRs
         id: failing-prs
@@ -187,7 +252,7 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "**Action:** ${{ github.event.inputs.action }}" >> $GITHUB_STEP_SUMMARY
           else
-            echo "**Action:** Scheduled recreate-failing" >> $GITHUB_STEP_SUMMARY
+            echo "**Action:** Scheduled (merge-passing + recreate-failing)" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -209,14 +274,26 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Actions Performed" >> $GITHUB_STEP_SUMMARY
           
+          if [ "${{ steps.passing-prs.outputs.passing_count }}" != "" ]; then
+            echo "- Found ${{ steps.passing-prs.outputs.passing_count }} passing PR(s)" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.merge-prs.outputs.merged_count }}" != "" ]; then
+              echo "- ✅ Auto-merged ${{ steps.merge-prs.outputs.merged_count }} PR(s)" >> $GITHUB_STEP_SUMMARY
+              if [ "${{ steps.merge-prs.outputs.failed_count }}" != "0" ]; then
+                echo "- ❌ Failed to merge ${{ steps.merge-prs.outputs.failed_count }} PR(s)" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          fi
+          
           if [ "${{ steps.failing-prs.outputs.failing_count }}" != "" ]; then
-            echo "- Identified ${{ steps.failing-prs.outputs.failing_count }} failing PR(s)" >> $GITHUB_STEP_SUMMARY
-            echo "- Recreated failing PRs" >> $GITHUB_STEP_SUMMARY
+            echo "- Found ${{ steps.failing-prs.outputs.failing_count }} failing PR(s)" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.failing-prs.outputs.failing_count }}" != "0" ]; then
+              echo "- ♻️ Recreated failing PRs" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "*This workflow runs daily at 2:00 AM UTC to maintain Dependabot PRs.*" >> $GITHUB_STEP_SUMMARY
+          echo "*This workflow runs daily at 2:00 AM UTC to auto-merge passing PRs and recreate failing ones.*" >> $GITHUB_STEP_SUMMARY
 
       - name: Create issue on persistent failures
         if: failure()
