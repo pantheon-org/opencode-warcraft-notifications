@@ -339,12 +339,9 @@ If you encounter any issues with these changes:
 
 1. Check workflow run logs: `gh run list --workflow=<workflow-name> --limit 5`
 2. View specific run: `gh run view <run-id>`
-3. Revert changes if needed: `git checkout <backup-file>`
+3. View git history if needed: `git log --oneline --grep="workflow"`
 
-**Backup files created:**
-
-- `.github/workflows/chores-docs-regenerate.yml.backup`
-- `.github/workflows/3-auto-merge.yml.backup`
+**Note:** Backup files have been removed (PR #106). Use git history for rollback if needed.
 
 ---
 
