@@ -42,17 +42,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe5 # v2.0.1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 'latest'
 
       - name: Cache dependencies
-        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        uses: actions/cache@v4
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
@@ -291,7 +291,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.check_provider.outputs.provider_available == 'true' && steps.regenerate.outputs.has_changes == 'true' && (github.event.inputs.create_pr != 'false' || github.event_name == 'push')
-        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v6.1.0
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'docs: automated documentation regeneration'
