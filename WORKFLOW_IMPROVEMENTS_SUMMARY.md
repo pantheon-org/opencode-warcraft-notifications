@@ -10,11 +10,13 @@
 ### 1. ✅ Fixed OpenCode Timeout in `chores-docs-regenerate.yml`
 
 **Problem:**
+
 - OpenCode execution could hang indefinitely if prompts required input
 - Global npm install was not reproducible
 - No timeout protection for long-running AI operations
 
 **Solution:**
+
 - ✅ Added `timeout-minutes: 15` to the job step
 - ✅ Replaced `npm install -g @opencode-ai/cli@latest` with `npx --yes @opencode-ai/cli@latest`
 - ✅ Added explicit `timeout 900` command (15 minutes) as additional safeguard
@@ -22,12 +24,14 @@
 - ✅ Added diff stats output for better visibility of changes
 
 **Benefits:**
+
 - Prevents workflow from hanging for 30 minutes (job-level timeout)
 - Reproducible builds using npx instead of global install
 - Better error messages distinguishing timeout vs other failures
 - No more "non-interactive mode" surprises
 
 **Code Changes:**
+
 ```yaml
 # BEFORE
 - name: Install OpenCode
@@ -35,7 +39,7 @@
     npm install -g @opencode-ai/cli@latest
     opencode --no-interactive < prompt.txt || { echo "⚠️ warnings"; }
 
-# AFTER  
+# AFTER
 - name: Regenerate documentation with OpenCode
   timeout-minutes: 15
   run: |
@@ -54,23 +58,27 @@
 ### 2. ✅ Made PAT Owner Configurable in `3-auto-merge.yml`
 
 **Problem:**
+
 - Hard-coded username "thoroc" in workflow (line 90)
 - Not maintainable if PAT ownership changes
 - Poor practice to hard-code user-specific values
 
 **Solution:**
+
 - ✅ Created repository variable `WORKFLOW_PAT_OWNER` with value "thoroc"
 - ✅ Updated workflow to use `${{ vars.WORKFLOW_PAT_OWNER || 'thoroc' }}`
 - ✅ Added variable to PR details output for visibility
 - ✅ Updated comments to indicate configurability
 
 **Benefits:**
+
 - Easy to change PAT owner without modifying workflow file
 - Visible in GitHub Settings → Actions → Variables
 - Falls back to "thoroc" if variable not set (backwards compatible)
 - Better security practice
 
 **Code Changes:**
+
 ```yaml
 # BEFORE
 # Accept PRs from github-actions[bot] or the WORKFLOW_PAT user (thoroc)
@@ -85,6 +93,7 @@ if [[ "$PR_AUTHOR" == "$WORKFLOW_PAT_OWNER" ]]; then
 ```
 
 **Repository Variable Set:**
+
 ```bash
 $ gh variable list
 WORKFLOW_PAT_OWNER	thoroc	2025-11-13T00:46:36Z
@@ -95,11 +104,13 @@ WORKFLOW_PAT_OWNER	thoroc	2025-11-13T00:46:36Z
 ### 3. ✅ Added Retry Logic to `3-auto-merge.yml` Status Checks
 
 **Problem:**
+
 - Workflow could race with CI checks completing
 - Single check of mergeable status and pending checks
 - No resilience if checks complete shortly after first check
 
 **Solution:**
+
 - ✅ Implemented retry loop with configurable attempts (3 retries)
 - ✅ Added 30-second delay between retries
 - ✅ Retries both mergeable status and pending checks
@@ -108,12 +119,14 @@ WORKFLOW_PAT_OWNER	thoroc	2025-11-13T00:46:36Z
 - ✅ Improved logging with attempt numbers
 
 **Benefits:**
+
 - Handles timing issues with CI check completion
 - More reliable auto-merge behavior
 - Better user feedback with retry visibility
 - Reduces false negatives from timing races
 
 **Code Changes:**
+
 ```yaml
 # BEFORE
 MERGEABLE=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
@@ -129,9 +142,9 @@ ATTEMPT=1
 
 while [ $ATTEMPT -le $MAX_RETRIES ]; do
   echo "🔄 Attempt $ATTEMPT of $MAX_RETRIES..."
-  
+
   MERGEABLE=$(gh pr view $PR_NUMBER --json mergeable --jq '.mergeable')
-  
+
   if [ "$MERGEABLE" != "MERGEABLE" ]; then
     if [ $ATTEMPT -lt $MAX_RETRIES ]; then
       echo "⏳ Waiting ${RETRY_DELAY}s before retry..."
@@ -143,15 +156,16 @@ while [ $ATTEMPT -le $MAX_RETRIES ]; do
       exit 0
     fi
   fi
-  
+
   # Check pending/failed checks with same retry logic...
-  
+
   ATTEMPT=$((ATTEMPT + 1))
 done
 ```
 
 **New PR Comment Added:**
 When checks remain pending after retries, the workflow now adds:
+
 ```
 ⏳ **Auto-merge delayed**
 
@@ -164,27 +178,30 @@ The workflow will retry when checks complete. You can also manually merge once a
 
 ## 📊 Impact Summary
 
-| Item | Severity | Risk Reduced | User Impact |
-|------|----------|--------------|-------------|
-| OpenCode timeout | **HIGH** | Workflow hanging for 30min | Faster failure detection, no wasted CI time |
-| Configurable PAT owner | **MEDIUM** | Hard-coded credentials | Easy ownership transfer, better maintenance |
-| Retry logic | **HIGH** | Race conditions with CI | More reliable auto-merge, fewer manual interventions |
+| Item                   | Severity   | Risk Reduced               | User Impact                                          |
+| ---------------------- | ---------- | -------------------------- | ---------------------------------------------------- |
+| OpenCode timeout       | **HIGH**   | Workflow hanging for 30min | Faster failure detection, no wasted CI time          |
+| Configurable PAT owner | **MEDIUM** | Hard-coded credentials     | Easy ownership transfer, better maintenance          |
+| Retry logic            | **HIGH**   | Race conditions with CI    | More reliable auto-merge, fewer manual interventions |
 
 ---
 
 ## 🔧 Configuration Changes Required
 
 ### Repository Variables (Already Set)
+
 ```bash
 WORKFLOW_PAT_OWNER = "thoroc"
 ```
 
 **To change PAT owner in the future:**
+
 ```bash
 gh variable set WORKFLOW_PAT_OWNER --body "new-username"
 ```
 
 Or via GitHub UI:
+
 1. Go to repository Settings
 2. Navigate to Secrets and variables → Actions → Variables
 3. Update `WORKFLOW_PAT_OWNER` value
@@ -194,11 +211,13 @@ Or via GitHub UI:
 ## ✅ Testing Recommendations
 
 ### 1. Test Documentation Regeneration
+
 ```bash
 gh workflow run chores-docs-regenerate.yml -f ai_provider=anthropic -f create_pr=true
 ```
 
 **Expected behavior:**
+
 - Should complete within 15 minutes or timeout gracefully
 - Should use npx without global install
 - Should show clear timeout message if AI takes too long
@@ -206,6 +225,7 @@ gh workflow run chores-docs-regenerate.yml -f ai_provider=anthropic -f create_pr
 ### 2. Test Auto-Merge Retry Logic
 
 **Create a test version bump PR:**
+
 ```bash
 # Manually create a version bump branch
 git checkout -b version-bump/v1.0.0-test
@@ -216,6 +236,7 @@ git push origin version-bump/v1.0.0-test
 ```
 
 **Expected behavior:**
+
 - Workflow should retry 3 times if checks are pending
 - Should wait 30 seconds between retries
 - Should add helpful comments to PR
@@ -223,11 +244,13 @@ git push origin version-bump/v1.0.0-test
 ### 3. Test PAT Owner Configuration
 
 **Verify current setting:**
+
 ```bash
 gh variable list | grep WORKFLOW_PAT_OWNER
 ```
 
 **Test changing owner:**
+
 ```bash
 gh variable set WORKFLOW_PAT_OWNER --body "test-user"
 # Create a version bump PR
@@ -261,16 +284,19 @@ Add new troubleshooting entries:
 
 ```markdown
 ### OpenCode Timeout
+
 **Symptom**: Documentation regeneration workflow times out after 15 minutes
 
 **Cause**: AI provider taking too long to analyze codebase or generate docs
 
 **Solution**:
+
 1. Check AI provider status/quotas
 2. Reduce scope of documentation regeneration prompt
 3. Run manually with different provider: `gh workflow run chores-docs-regenerate.yml -f ai_provider=openai`
 
 ### Auto-Merge Retrying
+
 **Symptom**: Auto-merge workflow shows "retrying" messages
 
 **Cause**: Normal behavior - workflow waits for CI checks to complete
@@ -283,7 +309,7 @@ Add new troubleshooting entries:
 ## 🎉 Completion Status
 
 - ✅ **HIGH PRIORITY #1**: Fixed OpenCode timeout - COMPLETED
-- ✅ **HIGH PRIORITY #2**: Made PAT owner configurable - COMPLETED  
+- ✅ **HIGH PRIORITY #2**: Made PAT owner configurable - COMPLETED
 - ✅ **HIGH PRIORITY #3**: Added retry logic - COMPLETED
 - ✅ **BONUS**: Created repository variable - COMPLETED
 - ✅ **BONUS**: Improved error messages and logging - COMPLETED
@@ -293,11 +319,13 @@ Add new troubleshooting entries:
 ## 🚀 Next Steps (Optional - Lower Priority)
 
 ### Medium Priority Items
+
 1. Change cleanup default from dry_run=true to false in `6-cleanup.yml`
 2. Pin GitHub Actions to commit SHAs (security best practice)
 3. Add Dependabot for action version updates
 
-### Low Priority Items  
+### Low Priority Items
+
 1. Create reusable workflows for common patterns
 2. Add workflow testing/validation
 3. Implement staging environment deployments
@@ -314,6 +342,7 @@ If you encounter any issues with these changes:
 3. Revert changes if needed: `git checkout <backup-file>`
 
 **Backup files created:**
+
 - `.github/workflows/chores-docs-regenerate.yml.backup`
 - `.github/workflows/3-auto-merge.yml.backup`
 
