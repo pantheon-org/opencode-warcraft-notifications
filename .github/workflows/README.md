@@ -61,6 +61,11 @@ This directory contains the CI/CD pipeline for the project.
     - Actions: Verify repository settings
     - Purpose: Ensure squash merge strategy
 
+11. **[chores-dependabot.yml](chores-dependabot.yml)** - Dependabot PR Management
+    - Runs on: Schedule (daily at 2:00 AM UTC) or manual trigger
+    - Actions: Recreate failing PRs, rebase all PRs, close stale PRs
+    - Purpose: Automated maintenance of Dependabot pull requests
+
 ## Workflow Triggers
 
 ### Code Changes → Full Release Pipeline + Doc Regeneration
@@ -102,6 +107,11 @@ gh workflow run chores-docs-regenerate.yml -f ai_provider=anthropic -f create_pr
 
 # Or use the helper script (interactive):
 .github/scripts/trigger-docs-regeneration.sh
+
+# Manage Dependabot PRs
+gh workflow run chores-dependabot.yml -f action=recreate-failing  # Default: recreate failing PRs
+gh workflow run chores-dependabot.yml -f action=rebase-all        # Rebase all Dependabot PRs
+gh workflow run chores-dependabot.yml -f action=close-stale -f max_age_days=90  # Close PRs older than 90 days
 ```
 
 ## Path Filters
@@ -216,6 +226,54 @@ git tag -l "v*"
 
 # Manually trigger publish
 gh workflow run 5-publish.yml -f tag=v1.2.3
+```
+
+### Dependabot PRs Failing
+
+**Symptom**: Multiple Dependabot PRs are failing CI checks
+
+**Cause**: Could be one of:
+
+1. Dependency conflicts
+2. Breaking changes in updated packages
+3. Outdated PR needs rebase
+
+**Solution**:
+
+```bash
+# Check status of all Dependabot PRs
+gh pr list --author app/dependabot
+
+# Recreate all failing PRs (runs automatically daily at 2:00 AM UTC)
+gh workflow run chores-dependabot.yml -f action=recreate-failing
+
+# Rebase all Dependabot PRs
+gh workflow run chores-dependabot.yml -f action=rebase-all
+
+# Or manually trigger recreate on specific PR
+gh pr comment <PR#> --body "@dependabot recreate"
+
+# Or manually rebase specific PR
+gh pr comment <PR#> --body "@dependabot rebase"
+```
+
+### Too Many Stale Dependabot PRs
+
+**Symptom**: Many old Dependabot PRs accumulating
+
+**Cause**: PRs not being merged or closed
+
+**Solution**:
+
+```bash
+# Close PRs older than 90 days (default)
+gh workflow run chores-dependabot.yml -f action=close-stale
+
+# Close PRs older than 60 days
+gh workflow run chores-dependabot.yml -f action=close-stale -f max_age_days=60
+
+# Or manually close specific PR
+gh pr close <PR#> --comment "Closing stale PR"
 ```
 
 ## Testing Workflows Locally
