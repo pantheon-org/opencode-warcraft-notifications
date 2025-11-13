@@ -44,24 +44,44 @@ This directory contains the CI/CD pipeline for the project.
    - Purpose: Independent docs deployment (no version required)
    - Note: Docs also deploy as part of release pipeline (workflow 5)
 
-8. **[repo-config-check.yml](repo-config-check.yml)** - Repository Config Check
-   - Runs on: Schedule (weekly) or manual trigger
-   - Actions: Verify repository settings
-   - Purpose: Ensure squash merge strategy
+8. **[chores-docs-regenerate.yml](chores-docs-regenerate.yml)** - Documentation Regeneration
+   - Runs on: Push to main (`.github/**`, `src/**`) or manual trigger
+   - Actions: AI analysis → Update docs → Create PR
+   - Purpose: Automated documentation maintenance using OpenCode
+   - Note: Keeps docs in sync when code or workflows change
+   - See: [Documentation Regeneration Guide](../../docs/src/content/docs/github-workflows/docs-regeneration.md)
+
+9. **[chores-pages.yml](chores-pages.yml)** - GitHub Pages Check
+   - Runs on: Schedule (daily) or manual trigger
+   - Actions: Verify Pages configuration
+   - Purpose: Ensure Pages uses correct branch
+
+10. **[chores-repo-config.yml](chores-repo-config.yml)** - Repository Config Check
+    - Runs on: Schedule (weekly) or manual trigger
+    - Actions: Verify repository settings
+    - Purpose: Ensure squash merge strategy
 
 ## Workflow Triggers
 
-### Code Changes → Full Release Pipeline
+### Code Changes → Full Release Pipeline + Doc Regeneration
 
 ```
-Feature PR → [1] Validate → Merge to main → [2] Version Update →
+Feature PR → [1] Validate → Merge to main → [2] Version Update + [8] Doc Regeneration →
 [3] Auto-merge → [4] Create Tag → [5] Publish (npm + docs + release) → [6] Cleanup
 ```
+
+**Note**: Code changes in `.github/**` or `src/**` trigger doc regeneration in parallel with versioning.
 
 ### Documentation Changes → Immediate Deployment
 
 ```
 Docs PR → [1] Validate → Merge to main → [deploy-docs] Deploy to docs branch
+```
+
+### Workflow Changes → Documentation Update
+
+```
+Workflow PR → [1] Validate → Merge to main → [8] Doc Regeneration (analyzes new workflows)
 ```
 
 ### Manual Operations
@@ -75,6 +95,13 @@ gh workflow run deploy-docs.yml
 
 # Force version bump
 gh workflow run 2-version-update.yml -f version_type=minor
+
+# Regenerate documentation with AI
+gh workflow run chores-docs-regenerate.yml -f ai_provider=anthropic -f create_pr=true
+# Providers: anthropic, openai, google, github
+
+# Or use the helper script (interactive):
+.github/scripts/trigger-docs-regeneration.sh
 ```
 
 ## Path Filters
@@ -111,7 +138,16 @@ All workflows use concurrency groups to prevent parallel runs:
 - `WORKFLOW_PAT` - Personal Access Token for creating PRs and triggering workflows (required - owned by thoroc)
 - `NPM_TOKEN` - For publishing to npm registry
 
+**AI Documentation (at least one required):**
+
+- `ANTHROPIC_API_KEY` - For Anthropic Claude (recommended)
+- `OPENAI_API_KEY` - For OpenAI ChatGPT
+- `GOOGLE_API_KEY` - For Google Gemini
+- `GITHUB_TOKEN` - For GitHub Copilot (already available by default)
+
 **Note**: This repository requires `WORKFLOW_PAT` because GitHub Actions is not permitted to create pull requests. The auto-merge workflow is configured to accept version bump PRs from both `github-actions[bot]` and the WORKFLOW_PAT owner (`thoroc`).
+
+**AI Documentation**: At least one AI provider key is required for the documentation regeneration workflow. Choose based on your preference and available credits.
 
 ## Troubleshooting
 
