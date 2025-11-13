@@ -1,0 +1,122 @@
+name: 4. Create Tag (After Version Merge)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: create-tag-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  create-tag:
+    name: Create Git Tag from package.json Version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check if version bump commit
+        id: check
+        run: |
+          LATEST_COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+
+          # Only create tag for version bump commits (allows PR number suffix)
+          if [[ "$LATEST_COMMIT_MSG" =~ ^chore:\ bump\ version\ to\ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "✅ Version bump commit detected: $LATEST_COMMIT_MSG"
+            echo "is_version_bump=true" >> $GITHUB_OUTPUT
+          else
+            echo "ℹ️ Not a version bump commit: $LATEST_COMMIT_MSG"
+            echo "is_version_bump=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get version from package.json
+        id: version
+        if: steps.check.outputs.is_version_bump == 'true'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "📦 Package version: $VERSION"
+          echo "🏷️ Tag to create: $TAG"
+
+      - name: Check if tag already exists
+        id: tag-check
+        if: steps.check.outputs.is_version_bump == 'true'
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+
+          # Check local tags
+          if git tag -l "$TAG" | grep -q "$TAG"; then
+            echo "⚠️ Tag $TAG already exists locally"
+            echo "exists=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check remote tags
+          if git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
+            echo "⚠️ Tag $TAG already exists on remote"
+            echo "exists=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "✅ Tag $TAG does not exist"
+          echo "exists=false" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        if: steps.check.outputs.is_version_bump == 'true' && steps.tag-check.outputs.exists == 'false'
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Create annotated tag
+          git tag -a "$TAG" -m "Release $TAG
+
+          Version: $VERSION
+          Commit: ${{ github.sha }}
+
+          This tag triggers npm publishing and documentation deployment."
+
+          # Push tag
+          git push origin "$TAG"
+
+          echo "✅ Created and pushed tag $TAG"
+          echo "🚀 This will trigger the publish workflow"
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.check.outputs.is_version_bump }}" != "true" ]; then
+            echo "ℹ️ Not a version bump commit - no tag created"
+          elif [ "${{ steps.tag-check.outputs.exists }}" = "true" ]; then
+            echo "⚠️ Tag ${{ steps.version.outputs.tag }} already exists - skipped"
+          else
+            echo "✅ Tag ${{ steps.version.outputs.tag }} created successfully"
+            echo "📦 Version: ${{ steps.version.outputs.version }}"
+            echo "🏷️ Tag: ${{ steps.version.outputs.tag }}"
+            echo ""
+            echo "🔄 Next Steps (Automated):"
+            echo "  1. 📦 Publish to npm (workflow: 5-publish.yml)"
+            echo "  2. 📚 Deploy documentation (workflow: 5-publish.yml)"
+            echo "  3. 🧹 Cleanup old releases (workflow: 6-cleanup.yml)"
+          fi

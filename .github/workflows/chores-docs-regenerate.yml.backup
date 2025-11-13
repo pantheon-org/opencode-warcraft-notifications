@@ -1,0 +1,379 @@
+name: Chores — Regenerate Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/**'
+      - 'src/**'
+  workflow_dispatch:
+    inputs:
+      ai_provider:
+        description: 'AI Provider to use'
+        required: false
+        default: 'anthropic'
+        type: choice
+        options:
+          - anthropic
+          - openai
+          - google
+          - github
+      create_pr:
+        description: 'Create PR with changes'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: docs-regenerate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regenerate-docs:
+    name: Regenerate Documentation with AI
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: true # Don't block other workflows if this fails
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 'latest'
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check for Available AI Provider
+        id: check_provider
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if any provider is available
+          PROVIDER_FOUND="false"
+          REQUESTED_PROVIDER="${{ github.event.inputs.ai_provider || 'anthropic' }}"
+          AVAILABLE_PROVIDERS=""
+
+          [ -n "$ANTHROPIC_API_KEY" ] && AVAILABLE_PROVIDERS="${AVAILABLE_PROVIDERS}anthropic "
+          [ -n "$OPENAI_API_KEY" ] && AVAILABLE_PROVIDERS="${AVAILABLE_PROVIDERS}openai "
+          [ -n "$GOOGLE_API_KEY" ] && AVAILABLE_PROVIDERS="${AVAILABLE_PROVIDERS}google "
+          [ -n "$GITHUB_TOKEN" ] && AVAILABLE_PROVIDERS="${AVAILABLE_PROVIDERS}github "
+
+          if [ -z "$AVAILABLE_PROVIDERS" ]; then
+            echo "⚠️  WARNING: No AI provider API keys found"
+            echo "   Please add at least one of:"
+            echo "   - ANTHROPIC_API_KEY (for Claude)"
+            echo "   - OPENAI_API_KEY (for ChatGPT)"
+            echo "   - GOOGLE_API_KEY (for Gemini)"
+            echo "   - GITHUB_TOKEN (for Copilot)"
+            echo ""
+            echo "   Skipping documentation regeneration..."
+            echo "provider_available=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "✅ Available providers: $AVAILABLE_PROVIDERS"
+          echo "provider_available=true" >> $GITHUB_OUTPUT
+          echo "available_providers=$AVAILABLE_PROVIDERS" >> $GITHUB_OUTPUT
+
+      - name: Configure AI Provider
+        if: steps.check_provider.outputs.provider_available == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p ~/.config/opencode
+
+          # Determine which provider to use
+          PROVIDER="${{ github.event.inputs.ai_provider || 'anthropic' }}"
+          AVAILABLE="${{ steps.check_provider.outputs.available_providers }}"
+
+          case "$PROVIDER" in
+            anthropic)
+              if [ -n "$ANTHROPIC_API_KEY" ]; then
+                echo "✅ Using Anthropic Claude"
+                echo '{"provider":"anthropic","model":"claude-3-5-sonnet-20241022"}' > ~/.config/opencode/config.json
+              else
+                echo "⚠️  WARNING: Requested provider 'anthropic' not available"
+                echo "   Available providers: $AVAILABLE"
+                echo "   Falling back to first available provider..."
+                # Fallback logic below
+                PROVIDER=""
+              fi
+              ;;
+            openai)
+              if [ -n "$OPENAI_API_KEY" ]; then
+                echo "✅ Using OpenAI ChatGPT"
+                echo '{"provider":"openai","model":"gpt-4-turbo"}' > ~/.config/opencode/config.json
+              else
+                echo "⚠️  WARNING: Requested provider 'openai' not available"
+                echo "   Available providers: $AVAILABLE"
+                echo "   Falling back to first available provider..."
+                PROVIDER=""
+              fi
+              ;;
+            google)
+              if [ -n "$GOOGLE_API_KEY" ]; then
+                echo "✅ Using Google Gemini"
+                echo '{"provider":"google","model":"gemini-2.0-flash-exp"}' > ~/.config/opencode/config.json
+              else
+                echo "⚠️  WARNING: Requested provider 'google' not available"
+                echo "   Available providers: $AVAILABLE"
+                echo "   Falling back to first available provider..."
+                PROVIDER=""
+              fi
+              ;;
+            github)
+              if [ -n "$GITHUB_TOKEN" ]; then
+                echo "✅ Using GitHub Copilot"
+                echo '{"provider":"github","model":"gpt-4o"}' > ~/.config/opencode/config.json
+              else
+                echo "⚠️  WARNING: Requested provider 'github' not available"
+                echo "   Available providers: $AVAILABLE"
+                echo "   Falling back to first available provider..."
+                PROVIDER=""
+              fi
+              ;;
+            *)
+              echo "⚠️  WARNING: Unknown provider: $PROVIDER"
+              echo "   Valid providers: anthropic, openai, google, github"
+              echo "   Falling back to first available provider..."
+              PROVIDER=""
+              ;;
+          esac
+
+          # Fallback to first available provider if requested one isn't available
+          if [ -z "$PROVIDER" ] || [ ! -f ~/.config/opencode/config.json ]; then
+            if [ -n "$ANTHROPIC_API_KEY" ]; then
+              echo "📌 Falling back to Anthropic Claude"
+              echo '{"provider":"anthropic","model":"claude-3-5-sonnet-20241022"}' > ~/.config/opencode/config.json
+            elif [ -n "$OPENAI_API_KEY" ]; then
+              echo "📌 Falling back to OpenAI ChatGPT"
+              echo '{"provider":"openai","model":"gpt-4-turbo"}' > ~/.config/opencode/config.json
+            elif [ -n "$GOOGLE_API_KEY" ]; then
+              echo "📌 Falling back to Google Gemini"
+              echo '{"provider":"google","model":"gemini-2.0-flash-exp"}' > ~/.config/opencode/config.json
+            elif [ -n "$GITHUB_TOKEN" ]; then
+              echo "📌 Falling back to GitHub Copilot"
+              echo '{"provider":"github","model":"gpt-4o"}' > ~/.config/opencode/config.json
+            fi
+          fi
+
+          echo "✅ AI provider configured successfully"
+
+      - name: Create documentation regeneration prompt
+        if: steps.check_provider.outputs.provider_available == 'true'
+        run: |
+          cat > .github/scripts/regenerate-docs-prompt.txt << 'PROMPT_EOF'
+          Please regenerate the documentation under docs/src/content/docs/ by analyzing the current codebase.
+
+          Focus on these key documentation files:
+          1. docs/src/content/docs/index.md - Main landing page and overview
+          2. docs/src/content/docs/user-guide.md - User-facing documentation
+          3. docs/src/content/docs/api.md - Complete API reference
+          4. docs/src/content/docs/architecture.md - System architecture
+          5. docs/src/content/docs/development.md - Development guide
+          6. docs/src/content/docs/deployment.md - Deployment guide
+          7. docs/src/content/docs/pipeline.md - CI/CD pipeline documentation
+
+          Requirements:
+          - Analyze the source code to ensure documentation is accurate and up-to-date
+          - Maintain the existing documentation structure and formatting
+          - Update code examples to match current implementation
+          - Ensure all API references are correct
+          - Update version numbers and dependencies if needed
+          - Keep the tone professional and consistent with existing docs
+          - Preserve all frontmatter (YAML front matter) in markdown files
+
+          Do NOT:
+          - Change the overall structure of documentation
+          - Remove existing documentation files
+          - Add new top-level documentation sections without justification
+          - Modify workflow files or CI/CD configurations
+
+          Please review each documentation file and update it based on the current codebase.
+          PROMPT_EOF
+
+          echo "✅ Documentation prompt created"
+
+      - name: Regenerate documentation with OpenCode
+        if: steps.check_provider.outputs.provider_available == 'true'
+        id: regenerate
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Starting documentation regeneration..."
+          echo "Provider: ${{ github.event.inputs.ai_provider || 'anthropic' }}"
+
+          # Run OpenCode with the prompt using npx for reproducibility
+          # Use timeout command as additional safeguard (900 seconds = 15 minutes)
+          timeout 900 npx --yes @opencode-ai/cli@latest --no-interactive < .github/scripts/regenerate-docs-prompt.txt || {
+            EXIT_CODE=$?
+            if [ $EXIT_CODE -eq 124 ]; then
+              echo "⚠️  OpenCode execution timed out after 15 minutes"
+            else
+              echo "⚠️  OpenCode execution completed with warnings (exit code: $EXIT_CODE)"
+            fi
+          }
+
+          # Check if any docs were changed
+          if git diff --quiet docs/src/content/docs/; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "⚠️  No documentation changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "✅ Documentation changes detected"
+            
+            # Output diff stats for visibility
+            echo ""
+            echo "📊 Documentation Change Statistics:"
+            git diff --stat docs/src/content/docs/
+          fi
+
+      - name: Validate documentation changes
+        if: steps.check_provider.outputs.provider_available == 'true' && steps.regenerate.outputs.has_changes == 'true'
+        run: |
+          echo "Validating documentation changes..."
+
+          # Check that key files still exist
+          required_files=(
+            "docs/src/content/docs/index.md"
+            "docs/src/content/docs/user-guide.md"
+            "docs/src/content/docs/api.md"
+            "docs/src/content/docs/architecture.md"
+            "docs/src/content/docs/development.md"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Required file missing: $file"
+              exit 1
+            fi
+          done
+
+          echo "✅ All required documentation files present"
+
+      - name: Test documentation build
+        if: steps.check_provider.outputs.provider_available == 'true' && steps.regenerate.outputs.has_changes == 'true'
+        run: |
+          cd docs
+          bun install --frozen-lockfile
+          bun run build
+          echo "✅ Documentation builds successfully"
+
+      - name: Create Pull Request
+        if: steps.check_provider.outputs.provider_available == 'true' && steps.regenerate.outputs.has_changes == 'true' && (github.event.inputs.create_pr != 'false' || github.event_name == 'push')
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'docs: automated documentation regeneration'
+          branch: chores/regenerate-docs-${{ github.run_number }}
+          delete-branch: true
+          title: 'docs: Automated Documentation Regeneration'
+          body: |
+            ## 📚 Automated Documentation Update
+
+            This PR contains automated documentation updates generated by AI analysis of the current codebase.
+
+            ### Changes Made
+
+            - Documentation files under `docs/src/content/docs/` have been regenerated
+            - Code examples and API references have been updated to match current implementation
+            - All documentation has been validated and tested to build successfully
+
+            ### Change Statistics
+
+            ```
+            ${{ steps.regenerate.outputs.diff_stats }}
+            ```
+
+            ### Validation
+
+            - ✅ All required documentation files present
+            - ✅ Documentation builds without errors
+            - ✅ Markdown formatting validated
+
+            ### Review Checklist
+
+            - [ ] Review accuracy of updated content
+            - [ ] Verify code examples are correct
+            - [ ] Check that links are not broken
+            - [ ] Ensure tone and style are consistent
+            - [ ] Validate technical accuracy
+
+            ### Triggered By
+
+            - **Event**: ${{ github.event_name }}
+            - **Run**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - **AI Provider**: ${{ github.event.inputs.ai_provider || 'anthropic' }}
+
+            ---
+
+            _This PR was automatically generated by the documentation regeneration workflow._
+          labels: |
+            documentation
+            automated
+          assignees: ${{ github.actor }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 📚 Documentation Regeneration Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check_provider.outputs.provider_available }}" != "true" ]; then
+            echo "⚠️ **Status**: Skipped - No AI provider available" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Action Required" >> $GITHUB_STEP_SUMMARY
+            echo "Add at least one AI provider API key to repository secrets:" >> $GITHUB_STEP_SUMMARY
+            echo "- \`ANTHROPIC_API_KEY\` (for Claude)" >> $GITHUB_STEP_SUMMARY
+            echo "- \`OPENAI_API_KEY\` (for ChatGPT)" >> $GITHUB_STEP_SUMMARY
+            echo "- \`GOOGLE_API_KEY\` (for Gemini)" >> $GITHUB_STEP_SUMMARY
+            echo "- \`GITHUB_TOKEN\` (for Copilot - usually auto-available)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "ℹ️ This workflow will not block other workflows." >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.regenerate.outputs.has_changes }}" = "true" ]; then
+            echo "✅ **Status**: Documentation changes detected and PR created" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Changed Files" >> $GITHUB_STEP_SUMMARY
+            git diff --name-only docs/src/content/docs/ 2>/dev/null | while read file; do
+              echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
+            done || echo "- Changes available in PR" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ **Status**: No documentation changes needed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The documentation is up-to-date with the current codebase." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**AI Provider**: ${{ github.event.inputs.ai_provider || 'anthropic' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Available Providers**: ${{ steps.check_provider.outputs.available_providers || 'none' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY

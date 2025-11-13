@@ -1,0 +1,171 @@
+name: 2. Version Update (Create PR)
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Force version bump type'
+        required: false
+        type: choice
+        options:
+          - 'auto'
+          - 'major'
+          - 'minor'
+          - 'patch'
+        default: 'auto'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: version-update-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  analyze-and-create-pr:
+    name: Analyze Changes & Create Version PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check if workflow-generated commit
+        id: check-commit
+        run: |
+          LATEST_COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+
+          if [[ "$LATEST_COMMIT_MSG" =~ ^chore:\ bump\ version ]] || [[ "$LATEST_COMMIT_MSG" =~ ^chore:\ sync\ version ]] || [[ "$LATEST_COMMIT_MSG" =~ \[skip\ ci\] ]]; then
+            echo "⚠️ Workflow-generated commit detected: $LATEST_COMMIT_MSG"
+            echo "🛑 Skipping to prevent cycle"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Get commits since last tag
+        id: commits
+        if: steps.check-commit.outputs.skip == 'false'
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LATEST_TAG" ]; then
+            COMMITS=$(git log --oneline --no-merges)
+            echo "No previous tags found."
+          else
+            COMMITS=$(git log ${LATEST_TAG}..HEAD --oneline --no-merges)
+            echo "Analyzing commits since ${LATEST_TAG}"
+          fi
+
+          echo "$COMMITS" > commits.txt
+
+          if [ -z "$LATEST_TAG" ]; then
+            git diff --name-status HEAD~10 HEAD > changes.txt 2>/dev/null || git ls-files > changes.txt
+          else
+            git diff --name-status ${LATEST_TAG}..HEAD > changes.txt
+          fi
+
+          echo "commits_count=$(echo "$COMMITS" | wc -l)" >> $GITHUB_OUTPUT
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Analyze with conventional commits
+        id: analysis
+        if: steps.check-commit.outputs.skip == 'false'
+        run: |
+          VERSION_TYPE=$(.github/scripts/analyze-commits.sh commits.txt)
+          echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
+
+      - name: Calculate new version
+        id: version
+        if: steps.check-commit.outputs.skip == 'false' && steps.analysis.outputs.version_type != 'none'
+        run: |
+          LATEST_TAG="${{ steps.commits.outputs.latest_tag }}"
+
+          if [ -z "$LATEST_TAG" ]; then
+            CURRENT_VERSION="0.0.0"
+          else
+            CURRENT_VERSION=${LATEST_TAG#v}
+          fi
+
+          # Use manual input if provided
+          if [ "${{ github.event.inputs.version_type }}" != "auto" ] && [ -n "${{ github.event.inputs.version_type }}" ]; then
+            VERSION_TYPE="${{ github.event.inputs.version_type }}"
+          else
+            VERSION_TYPE="${{ steps.analysis.outputs.version_type }}"
+          fi
+
+          NEW_VERSION=$(.github/scripts/calculate-version.sh "$CURRENT_VERSION" "$VERSION_TYPE")
+
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "new=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "type=$VERSION_TYPE" >> $GITHUB_OUTPUT
+
+          echo "Version: $CURRENT_VERSION → $NEW_VERSION ($VERSION_TYPE)"
+
+      - name: Check if version PR already exists
+        id: check-pr
+        if: steps.check-commit.outputs.skip == 'false' && steps.analysis.outputs.version_type != 'none'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.new }}"
+          BRANCH_NAME="version-bump/v${NEW_VERSION}"
+
+          # Check if branch exists
+          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            echo "⚠️ Branch $BRANCH_NAME already exists"
+            echo "exists=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check if PR exists
+          PR_EXISTS=$(gh pr list --head "$BRANCH_NAME" --json number --jq 'length')
+          if [ "$PR_EXISTS" -gt 0 ]; then
+            echo "⚠️ PR for $BRANCH_NAME already exists"
+            echo "exists=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "exists=false" >> $GITHUB_OUTPUT
+
+      - name: Create version bump PR
+        if: steps.check-commit.outputs.skip == 'false' && steps.analysis.outputs.version_type != 'none' && steps.check-pr.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.new }}"
+          CURRENT_VERSION="${{ steps.version.outputs.current }}"
+          VERSION_TYPE="${{ steps.version.outputs.type }}"
+          BRANCH_NAME="version-bump/v${NEW_VERSION}"
+
+          .github/scripts/create-version-pr.sh "$NEW_VERSION" "$CURRENT_VERSION" "$VERSION_TYPE" "$BRANCH_NAME"
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.check-commit.outputs.skip }}" = "true" ]; then
+            echo "🛑 Skipped - workflow-generated commit detected"
+          elif [ "${{ steps.analysis.outputs.version_type }}" = "none" ]; then
+            echo "ℹ️ No version bump needed"
+          elif [ "${{ steps.check-pr.outputs.exists }}" = "true" ]; then
+            echo "ℹ️ Version bump PR already exists"
+          else
+            echo "✅ Version bump PR created successfully"
+            echo "📦 Version: ${{ steps.version.outputs.current }} → ${{ steps.version.outputs.new }}"
+            echo "🏷️ Type: ${{ steps.version.outputs.type }}"
+          fi
