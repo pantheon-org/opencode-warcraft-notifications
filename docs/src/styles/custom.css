@@ -223,9 +223,11 @@ strong {
    ============================================ */
 
 .header {
-  border-bottom: 1px solid var(--color-border-weak) !important;
+  gap: 0.75rem;
+  align-items: center;
   background-color: var(--sl-color-black);
-  border-color: var(--sl-color-border);
+  border-bottom: 1px solid var(--sl-color-hairline);
+  padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x);
 }
 
 body > .page > header a.site-title img {
