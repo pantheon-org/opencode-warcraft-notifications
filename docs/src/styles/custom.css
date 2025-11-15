@@ -472,7 +472,8 @@ ul.top-level a[aria-current='page'] > span {
   color: var(--color-text-weaker);
 }
 
-.right-sidebar-panel h2 {
+.right-sidebar-panel h2,
+#starlight__on-this-page {
   margin-top: 0.3125rem;
   font-weight: 600;
   color: var(--color-text-dimmed);
