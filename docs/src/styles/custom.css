@@ -485,10 +485,9 @@ ul.top-level a[aria-current='page'] > span {
 
 .right-sidebar-panel a {
   --pad-inline: 0px;
-  color: var(--sl-color-text-dimmed);
+  color: var(--color-text-weaker);
 }
 
-.right-sidebar-panel a,
 .right-sidebar-panel a:hover {
   color: var(--sl-color-text-dimmed);
 }
