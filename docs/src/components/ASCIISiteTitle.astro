@@ -1,59 +1,18 @@
 ---
-// ASCII-style blocky logo matching OpenCode.ai style
+import { blockyTextToSVG } from '../utils/blocky-text-to-svg';
+
+// Generate blocky pixel-art logo matching OpenCode.ai style
+const logoSVG = blockyTextToSVG('WARCRAFT', {
+	colorLight: '#F1ECEC',
+	colorMedium: '#B7B1B1',
+	colorDark: '#4B4646',
+	blockSize: 6,
+	charSpacing: 6,
+});
 ---
 
 <a href={`${import.meta.env.BASE_URL}`} class="site-title">
-	<svg width="280" height="42" viewBox="0 0 280 42" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
-		<!-- W -->
-		<path d="M6 6H12V36H6V6Z" fill="#F1ECEC"/>
-		<path d="M12 6H18V24H12V6Z" fill="#B7B1B1"/>
-		<path d="M18 18H24V36H18V18Z" fill="#4B4646"/>
-		<path d="M24 6H30V36H24V6Z" fill="#B7B1B1"/>
-		<path d="M30 18H36V36H30V18Z" fill="#4B4646"/>
-		<path d="M36 6H42V24H36V6Z" fill="#B7B1B1"/>
-		<path d="M42 6H48V36H42V6Z" fill="#F1ECEC"/>
-		
-		<!-- A -->
-		<path d="M54 12H60V36H54V12Z" fill="#F1ECEC"/>
-		<path d="M60 6H66V36H60V6Z" fill="#B7B1B1"/>
-		<path d="M66 12H72V36H66V12Z" fill="#F1ECEC"/>
-		<path d="M60 18H66V24H60V18Z" fill="#4B4646"/>
-		
-		<!-- R -->
-		<path d="M78 6H84V36H78V6Z" fill="#F1ECEC"/>
-		<path d="M84 6H90V12H84V6Z" fill="#B7B1B1"/>
-		<path d="M84 18H90V24H84V18Z" fill="#B7B1B1"/>
-		<path d="M90 12H96V18H90V12Z" fill="#4B4646"/>
-		<path d="M90 24H96V36H90V24Z" fill="#4B4646"/>
-		
-		<!-- C -->
-		<path d="M102 6H114V12H102V6Z" fill="#B7B1B1"/>
-		<path d="M102 12H108V30H102V12Z" fill="#F1ECEC"/>
-		<path d="M102 30H114V36H102V30Z" fill="#B7B1B1"/>
-		<path d="M108 18H114V24H108V18Z" fill="#4B4646"/>
-		
-		<!-- R -->
-		<path d="M120 6H126V36H120V6Z" fill="#F1ECEC"/>
-		<path d="M126 6H132V12H126V6Z" fill="#B7B1B1"/>
-		<path d="M126 18H132V24H126V18Z" fill="#B7B1B1"/>
-		<path d="M132 12H138V18H132V12Z" fill="#4B4646"/>
-		<path d="M132 24H138V36H132V24Z" fill="#4B4646"/>
-		
-		<!-- A -->
-		<path d="M144 12H150V36H144V12Z" fill="#F1ECEC"/>
-		<path d="M150 6H156V36H150V6Z" fill="#B7B1B1"/>
-		<path d="M156 12H162V36H156V12Z" fill="#F1ECEC"/>
-		<path d="M150 18H156V24H150V18Z" fill="#4B4646"/>
-		
-		<!-- F -->
-		<path d="M168 6H180V12H168V6Z" fill="#B7B1B1"/>
-		<path d="M168 12H174V36H168V12Z" fill="#F1ECEC"/>
-		<path d="M168 18H180V24H168V18Z" fill="#B7B1B1"/>
-		
-		<!-- T -->
-		<path d="M186 6H204V12H186V6Z" fill="#B7B1B1"/>
-		<path d="M192 12H198V36H192V12Z" fill="#F1ECEC"/>
-	</svg>
+	<div set:html={logoSVG} class="logo-container" />
 	<span class="sr-only">Warcraft Notifications</span>
 </a>
 
@@ -65,13 +24,13 @@
 		color: inherit;
 	}
 
-	.logo-svg {
+	.logo-container :global(svg) {
 		width: auto;
 		height: 2.5rem;
 	}
 
 	@media (min-width: 50rem) {
-		.logo-svg {
+		.logo-container :global(svg) {
 			height: 2.625rem;
 		}
 	}
