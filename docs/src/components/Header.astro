@@ -1,0 +1,50 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
+import Search from '@astrojs/starlight/components/Search.astro';
+import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
+import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+---
+
+<div class="header sl-flex">
+	<div class="title-wrapper sl-flex">
+		<SiteTitle {...Astro.props} />
+	</div>
+	
+	<div class="sl-hidden md:sl-flex right-group">
+		<div class="sl-flex social-icons">
+			<SocialIcons {...Astro.props} />
+		</div>
+		<Search {...Astro.props} />
+		<ThemeSelect {...Astro.props} />
+	</div>
+</div>
+
+<style>
+	.header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 1.5rem;
+		gap: 1rem;
+		width: 100%;
+		max-width: none;
+		margin: 0;
+		height: 3.5rem;
+		background-color: var(--sl-color-bg-nav);
+		border-bottom: 1px solid var(--sl-color-hairline);
+	}
+	
+	.title-wrapper {
+		flex: 0 0 auto;
+		order: 1;
+	}
+	
+	.right-group {
+		order: 2;
+		margin-left: auto;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+</style>

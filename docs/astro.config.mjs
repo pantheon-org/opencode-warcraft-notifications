@@ -16,16 +16,47 @@ export default defineConfig({
         replacesTitle: false,
       },
       expressiveCode: {
-        themes: ['github-light', 'github-dark'],
-        styleOverrides: {
-          borderRadius: '8px',
+        themes: ['github-dark', 'github-light'],
+        defaultProps: {
+          wrap: true,
         },
+        styleOverrides: {
+          borderRadius: '0.5rem',
+          codePaddingBlock: '1rem',
+          frames: {
+            shadowColor: 'transparent',
+          },
+        },
+      },
+      head: [
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'viewport',
+            content: 'width=device-width, initial-scale=1.0',
+          },
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'stylesheet',
+            href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap',
+          },
+        },
+      ],
+      components: {
+        Header: './src/components/Header.astro',
       },
       social: [
         {
           icon: 'github',
           label: 'GitHub',
           href: 'https://github.com/pantheon-org/opencode-warcraft-notifications',
+        },
+        {
+          icon: 'discord',
+          label: 'Discord',
+          href: 'https://discord.gg/opencode',
         },
       ],
       editLink: {
@@ -41,7 +72,7 @@ export default defineConfig({
       },
       sidebar: [
         {
-          label: 'Getting Started',
+          label: 'Intro',
           link: '/',
         },
         {
@@ -57,49 +88,46 @@ export default defineConfig({
           link: '/user-guide/',
         },
         {
-          label: 'Development',
-          collapsed: false,
-          items: [
-            { label: 'Development Guide', link: '/development/' },
-            { label: 'API Documentation', link: '/api/' },
-            { label: 'Architecture', link: '/architecture/' },
-            { label: 'Onboarding', link: '/onboarding/' },
-          ],
+          label: 'Troubleshooting',
+          link: '/troubleshooting/',
         },
         {
-          label: 'Deployment',
-          collapsed: false,
+          label: 'Usage',
           items: [
-            { label: 'Deployment Guide', link: '/deployment/' },
-            { label: 'CI/CD Pipeline', link: '/pipeline/' },
-            { label: 'Docs Branch Structure', link: '/docs-branch-structure/' },
-            { label: 'Docs Migration Plan', link: '/docs-migration-plan/' },
-          ],
-        },
-        {
-          label: 'GitHub Workflows',
-          collapsed: true,
-          items: [
-            { label: 'Overview', link: '/github-workflows/' },
-            { label: 'Setup Guide', link: '/github-workflows/setup-guide/' },
-            { label: 'Architecture Summary', link: '/github-workflows/architecture-summary/' },
-            { label: 'Cleanup Old Releases', link: '/github-workflows/cleanup-old-releases/' },
-            { label: 'Cycle Prevention Fix', link: '/github-workflows/cycle-prevention-fix/' },
-            { label: 'Workflows Overview', link: '/github-workflows/overview/' },
-            { label: 'Squash Merge Config', link: '/github-workflows/squash-merge-configuration/' },
-          ],
-        },
-        {
-          label: 'Configuration',
-          collapsed: true,
-          items: [
-            { label: 'Plugin Schema', link: '/schemas/' },
+            { label: 'Configuration', link: '/schemas/' },
             { label: 'Schema Validation', link: '/validate-schema/' },
           ],
         },
         {
-          label: 'Troubleshooting',
-          link: '/troubleshooting/',
+          label: 'Configure',
+          items: [
+            { label: 'API Documentation', link: '/api/' },
+            { label: 'Architecture', link: '/architecture/' },
+          ],
+        },
+        {
+          label: 'Develop',
+          items: [
+            { label: 'Development Guide', link: '/development/' },
+            { label: 'Onboarding', link: '/onboarding/' },
+            { label: 'Deployment', link: '/deployment/' },
+            { label: 'CI/CD Pipeline', link: '/pipeline/' },
+          ],
+        },
+        {
+          label: 'Workflows',
+          collapsed: true,
+          items: [
+            { label: 'Overview', link: '/github-workflows/' },
+            { label: 'Setup Guide', link: '/github-workflows/setup-guide/' },
+            { label: 'Architecture', link: '/github-workflows/architecture-summary/' },
+            { label: 'Cleanup Releases', link: '/github-workflows/cleanup-old-releases/' },
+            { label: 'Cycle Prevention', link: '/github-workflows/cycle-prevention-fix/' },
+            { label: 'Workflows Detail', link: '/github-workflows/overview/' },
+            { label: 'Squash Merge', link: '/github-workflows/squash-merge-configuration/' },
+            { label: 'Docs Structure', link: '/docs-branch-structure/' },
+            { label: 'Migration Plan', link: '/docs-migration-plan/' },
+          ],
         },
       ],
     }),
