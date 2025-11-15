@@ -477,7 +477,7 @@ ul.top-level a[aria-current='page'] > span {
   font-weight: 600;
   color: var(--color-text-dimmed);
   text-transform: uppercase;
-  font-size: var(--sl-text-code-sm);
+  font-size: var(--sl-text-xs);
   line-height: 1.4;
   letter-spacing: -0.5px;
 }
