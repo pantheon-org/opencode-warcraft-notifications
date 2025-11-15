@@ -485,11 +485,11 @@ ul.top-level a[aria-current='page'] > span {
 
 .right-sidebar-panel a {
   --pad-inline: 0px;
-  color: var(--color-text-weaker);
+  color: var(--sl-color-gray-3);
 }
 
 .right-sidebar-panel a:hover {
-  color: var(--sl-color-text-dimmed);
+  color: var(--sl-color-text);
 }
 
 .right-sidebar-panel a[aria-current='true'],
