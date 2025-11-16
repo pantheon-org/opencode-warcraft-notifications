@@ -40,23 +40,28 @@ export const textToBlocks = (
       continue;
     }
 
-    for (let row = 0; row < 7; row++) {
-      for (let col = 0; col < 4; col++) {
-        const cell = charData.rows[row][col];
+    // Determine the number of columns for this character by scanning its rows
+    const rowsObj = charData.rows;
+    const cols = Math.max(...Object.values(rowsObj).map((r) => r.length));
 
-        if (cell !== cellType.BLANK) {
-          const themeData = charData.theme[theme];
-          const color = getColorFromLetter(charData, theme, cell);
-          blocks.push({
-            x: xOffset + col * blockSize,
-            y: row * blockSize,
-            color,
-          });
-        }
+    for (let row = 0; row < 7; row++) {
+      for (let col = 0; col < cols; col++) {
+        const cell = rowsObj[row]?.[col];
+
+        // Skip undefined or blank cells
+        if (!cell || cell === cellType.BLANK) continue;
+
+        const color = getColorFromLetter(charData, theme, cell);
+        blocks.push({
+          x: xOffset + col * blockSize,
+          y: row * blockSize,
+          color,
+        });
       }
     }
 
-    xOffset += 4 * blockSize + charSpacing;
+    // charSpacing represents number of blank block columns between characters
+    xOffset += cols * blockSize + charSpacing * blockSize;
   }
 
   return blocks;
