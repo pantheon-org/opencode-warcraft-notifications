@@ -38,126 +38,129 @@ const DEFAULT_OPTIONS: Required<BlockyTextOptions> = {
  * Font definition: 7 rows x 4 cols per character (matching OpenCode.ai logo)
  * 0 = empty, 1 = light, 2 = medium, 3 = dark
  *
- * Grid based on OpenCode logo analysis:
- * - Height: 42px (7 rows × 6px blocks)
- * - Width per char: 24px (4 cols × 6px blocks)
- * - Character spacing: 6px
+ * Decoded directly from the actual OpenCode.ai logo SVG at:
+ * https://opencode.ai/docs/_astro/logo-dark.DOStV66V.svg
+ *
+ * Grid: 7 rows × 4 columns, 6px blocks
+ * - Height: 42px (7 rows × 6px)
+ * - Width: 24px per char (4 cols × 6px)
+ * - Spacing: 6px between characters
  */
 const FONT: Record<string, number[][]> = {
-  // Based on OpenCode logo letter 'O' (x:0-24, y:0-42)
+  // First O from OPENCODE (uses medium #B7B1B1)
   O: [
-    [0, 0, 0, 0], // Row 0 (y:0-6) - empty top
-    [0, 2, 2, 0], // Row 1 (y:6-12) - top border
-    [2, 0, 0, 2], // Row 2 (y:12-18) - sides
-    [2, 0, 3, 2], // Row 3 (y:18-24) - left side + dark center
-    [2, 3, 0, 2], // Row 4 (y:24-30) - dark left + right side
-    [2, 0, 0, 2], // Row 5 (y:30-36) - sides
-    [0, 2, 2, 0], // Row 6 (y:36-42) - bottom border
+    [0, 0, 0, 0], // Row 0
+    [2, 2, 2, 2], // Row 1
+    [2, 2, 2, 2], // Row 2
+    [2, 3, 3, 2], // Row 3
+    [2, 3, 3, 2], // Row 4
+    [2, 2, 2, 2], // Row 5
+    [0, 0, 0, 0], // Row 6
   ],
-  // Based on OpenCode logo letter 'P' (x:30-54)
+  // P from OPENCODE (uses medium #B7B1B1)
   P: [
-    [0, 0, 0, 0], // Row 0 - empty top
-    [0, 2, 2, 0], // Row 1 - top of P
-    [2, 0, 0, 2], // Row 2 - P bowl
-    [2, 0, 3, 0], // Row 3 - P bowl with dark
-    [2, 2, 2, 0], // Row 4 - P middle bar
-    [2, 0, 0, 0], // Row 5 - P stem
-    [2, 0, 0, 0], // Row 6 - P stem extends below
+    [0, 0, 0, 0], // Row 0
+    [2, 2, 2, 2], // Row 1
+    [2, 2, 2, 2], // Row 2
+    [2, 3, 3, 2], // Row 3
+    [2, 3, 3, 2], // Row 4
+    [2, 2, 2, 2], // Row 5
+    [2, 2, 2, 2], // Row 6 - extends down
   ],
-  // Based on OpenCode logo letter 'E' (x:60-84)
+  // First E from OPENCODE (uses medium #B7B1B1) - Classic E shape
   E: [
-    [0, 0, 0, 0], // Row 0 - empty top
-    [0, 2, 2, 0], // Row 1 - top bar
-    [2, 0, 0, 0], // Row 2 - left side
-    [2, 0, 0, 0], // Row 3 - left side
-    [2, 2, 3, 0], // Row 4 - middle bar with dark
-    [2, 0, 0, 0], // Row 5 - left side
-    [0, 2, 2, 0], // Row 6 - bottom bar
+    [0, 0, 0, 0], // Row 0
+    [2, 2, 2, 2], // Row 1 - top bar
+    [2, 2, 2, 0], // Row 2 - left + partial top
+    [2, 0, 0, 0], // Row 3 - left bar only
+    [2, 3, 3, 3], // Row 4 - left + dark middle bar
+    [2, 2, 2, 2], // Row 5 - left + bottom section
+    [2, 2, 2, 2], // Row 6 - full bottom bar
   ],
-  // Based on OpenCode logo letter 'N' (x:90-114)
+  // N from OPENCODE (uses medium #B7B1B1) - Two pillars with dark center
   N: [
-    [0, 0, 0, 0], // Row 0 - empty top
-    [0, 2, 0, 2], // Row 1 - top of both sides
-    [2, 0, 0, 2], // Row 2 - both sides
-    [2, 0, 3, 2], // Row 3 - left, dark middle, right
-    [2, 3, 0, 2], // Row 4 - left, dark middle, right
-    [2, 0, 0, 2], // Row 5 - both sides
-    [2, 0, 0, 2], // Row 6 - both sides extend
+    [0, 0, 0, 0], // Row 0
+    [2, 2, 2, 0], // Row 1 - top without right col
+    [2, 2, 2, 2], // Row 2 - all four columns
+    [2, 3, 3, 2], // Row 3 - left/right medium, center dark
+    [2, 3, 3, 2], // Row 4
+    [2, 3, 3, 2], // Row 5
+    [0, 0, 0, 0], // Row 6
   ],
-  // Based on OpenCode logo letter 'C' (x:120-144) - uses light color
+  // C from OPENCODE (uses light #F1ECEC)
   C: [
-    [0, 0, 0, 0], // Row 0 - empty top
-    [0, 1, 1, 0], // Row 1 - top bar (light)
-    [1, 0, 0, 0], // Row 2 - left side
-    [1, 0, 3, 0], // Row 3 - left side with dark
-    [1, 3, 0, 0], // Row 4 - left side with dark
-    [1, 0, 0, 0], // Row 5 - left side
-    [0, 1, 1, 0], // Row 6 - bottom bar
+    [0, 0, 0, 0], // Row 0
+    [1, 1, 1, 1], // Row 1
+    [1, 1, 1, 1], // Row 2
+    [1, 3, 3, 3], // Row 3
+    [1, 3, 3, 3], // Row 4
+    [1, 1, 1, 1], // Row 5
+    [0, 0, 0, 0], // Row 6
   ],
-  // Based on OpenCode logo letter 'D' (x:180-204) - uses light color
+  // D from OPENCODE (uses light #F1ECEC)
   D: [
-    [0, 0, 0, 0], // Row 0 - empty top (extends above)
-    [0, 1, 1, 0], // Row 1 - top curve
-    [1, 0, 0, 1], // Row 2 - sides
-    [1, 0, 3, 1], // Row 3 - left, dark center, right
-    [1, 3, 0, 1], // Row 4 - dark left, right
-    [1, 0, 0, 1], // Row 5 - sides
-    [0, 1, 1, 0], // Row 6 - bottom curve
+    [1, 1, 1, 1], // Row 0 - extends above
+    [1, 1, 1, 1], // Row 1
+    [1, 1, 1, 1], // Row 2
+    [1, 3, 3, 1], // Row 3
+    [1, 3, 3, 1], // Row 4
+    [1, 1, 1, 1], // Row 5
+    [0, 0, 0, 0], // Row 6
   ],
-  // Placeholder for other letters (using simplified 4-column grid)
+  // Custom letters for WARCRAFT (inspired by OpenCode style)
   A: [
     [0, 0, 0, 0],
-    [0, 2, 2, 0],
-    [2, 0, 0, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
     [2, 3, 3, 2],
-    [2, 0, 0, 2],
-    [2, 0, 0, 2],
-    [2, 0, 0, 2],
+    [2, 3, 3, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
   ],
   F: [
     [0, 0, 0, 0],
-    [2, 2, 2, 0],
-    [2, 0, 0, 0],
-    [2, 0, 0, 0],
-    [2, 2, 2, 0],
-    [2, 0, 0, 0],
-    [2, 0, 0, 0],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [3, 3, 3, 0],
+    [3, 3, 3, 0],
+    [3, 3, 3, 0],
   ],
   I: [
     [0, 0, 0, 0],
-    [0, 2, 2, 0],
-    [0, 2, 0, 0],
-    [0, 2, 0, 0],
-    [0, 2, 0, 0],
-    [0, 2, 0, 0],
-    [0, 2, 2, 0],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [0, 0, 0, 0],
   ],
   R: [
     [0, 0, 0, 0],
-    [0, 2, 2, 0],
-    [2, 0, 0, 2],
-    [2, 2, 2, 0],
-    [2, 0, 2, 0],
-    [2, 0, 0, 2],
-    [2, 0, 0, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [2, 3, 3, 2],
+    [2, 3, 3, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
   ],
   T: [
     [0, 0, 0, 0],
+    [3, 3, 3, 3],
+    [3, 3, 3, 3],
     [2, 2, 2, 2],
-    [0, 2, 2, 0],
-    [0, 2, 2, 0],
-    [0, 2, 2, 0],
-    [0, 2, 2, 0],
-    [0, 2, 2, 0],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
+    [0, 0, 0, 0],
   ],
   W: [
     [0, 0, 0, 0],
-    [2, 0, 0, 2],
-    [2, 0, 0, 2],
-    [2, 0, 3, 2],
-    [2, 3, 0, 2],
     [2, 2, 2, 2],
-    [2, 0, 0, 2],
+    [2, 2, 2, 2],
+    [2, 3, 3, 2],
+    [2, 3, 3, 2],
+    [2, 2, 2, 2],
+    [2, 2, 2, 2],
   ],
   ' ': [
     [0, 0, 0, 0],
