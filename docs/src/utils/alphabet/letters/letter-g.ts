@@ -1,9 +1,9 @@
 import { darkTheme, lightTheme, themeType } from '../theme';
-import { cellType, type LetterData } from './types';
+import { type Glyph } from './types';
 
 /**
  * Letter G representation
- * @type {LetterData}
+ * @type {Glyph}
  *
  * +---+---+---+---+
  * | 0 | 0 | 0 | 0 |
@@ -24,15 +24,15 @@ import { cellType, type LetterData } from './types';
  * Example usage:
  * const blocks = textToBlocks('G');
  */
-export const letterG: LetterData = {
+export const letterG: Glyph = {
   rows: {
-    0: [cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK],
-    1: [cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY],
-    2: [cellType.PRIMARY, cellType.BLANK, cellType.BLANK, cellType.PRIMARY],
-    3: [cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY],
-    4: [cellType.SECONDARY, cellType.SECONDARY, cellType.SECONDARY, cellType.PRIMARY],
-    5: [cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY],
-    6: [cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK],
+    0: [0, 0, 0, 0],
+    1: [1, 1, 1, 1],
+    2: [1, 0, 0, 1],
+    3: [1, 1, 1, 1],
+    4: [0, 0, 0, 1],
+    5: [1, 1, 1, 1],
+    6: [0, 0, 0, 0],
   },
   theme: {
     [themeType.LIGHT]: lightTheme,

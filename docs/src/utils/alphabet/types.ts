@@ -1,4 +1,4 @@
-import type { LetterData, LetterName } from './letters/types';
+import type { Glyph, LetterName } from './letters/types';
 import { letterA } from "./letters/letter-a";
 import { letterB } from "./letters/letter-b";
 import { letterC } from "./letters/letter-c";
@@ -27,7 +27,7 @@ import { letterY } from "./letters/letter-y";
 import { letterZ } from "./letters/letter-z";
 
 export type Alphabet = {
-  [key in LetterName]: LetterData;
+  [key in LetterName]: Glyph;
 };
 
 export const ALPHABET: Alphabet = {
@@ -58,3 +58,12 @@ export const ALPHABET: Alphabet = {
     Y: letterY,
     Z: letterZ,
 };
+
+
+
+/**
+ * Get available characters in the font
+ */
+export const getAvailableCharacters = (): string[] => {
+  return Object.keys(ALPHABET);
+}

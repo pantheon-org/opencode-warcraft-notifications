@@ -1,35 +1,38 @@
 import { darkTheme, lightTheme, themeType } from '../theme';
-import { cellType, type LetterData } from './types';
+import { type Glyph } from './types';
 
 /**
  * Letter T representation
- * @type {LetterData}
- * 
+ * @type {Glyph}
+ *
  * +---+---+---+---+
- * |   |   |   |   | 0
+ * | 0 | 1 | 0 | 0 |
  * +---+---+---+---+
- * | 1 | 1 | 1 |   | 1
+ * | 1 | 1 | 1 | 1 |
  * +---+---+---+---+
- * |   | 1 |   |   | 2
+ * | 0 | 1 | 0 | 0 |
  * +---+---+---+---+
- * |   | 1 |   |   | 3
+ * | 0 | 1 | 0 | 0 |
  * +---+---+---+---+
- * |   | 1 |   |   | 4
+ * | 0 | 1 | 0 | 0 |
  * +---+---+---+---+
- * |   | 1 |   |   | 5
+ * | 0 | 1 | 1 | 0 |
  * +---+---+---+---+
- * |   |   |   |   | 6
+ * | 0 | 0 | 0 | 0 |
  * +---+---+---+---+
+ *
+ * Example usage:
+ * const blocks = textToBlocks('T');
  */
-export const letterT: LetterData = {
+export const letterT: Glyph = {
   rows: {
-    0: [cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK],
-    1: [cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY, cellType.BLANK],
-    2: [cellType.BLANK, cellType.PRIMARY, cellType.BLANK, cellType.BLANK],
-    3: [cellType.BLANK, cellType.PRIMARY, cellType.BLANK, cellType.BLANK],
-    4: [cellType.BLANK, cellType.PRIMARY, cellType.BLANK, cellType.BLANK],
-    5: [cellType.BLANK, cellType.PRIMARY, cellType.BLANK, cellType.BLANK],
-    6: [cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK],
+    0: [0, 1, 0, 0],
+    1: [1, 1, 1, 1],
+    2: [0, 1, 0, 0],
+    3: [0, 1, 0, 0],
+    4: [0, 1, 0, 0],
+    5: [0, 1, 1, 0],
+    6: [0, 0, 0, 0],
   },
   theme: {
     [themeType.LIGHT]: lightTheme,

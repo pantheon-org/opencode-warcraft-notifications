@@ -18,8 +18,8 @@ describe('themeType values', () => {
 
 describe('getColorFromLetter function', () => {
   it('should return correct colors based on cell type and theme', () => {
-    // Mock LetterData
-    const mockLetterData = {
+    // Mock Glyph
+    const mockGlyph = {
       rows: [],
       theme: {
         [themeType.LIGHT]: {
@@ -36,13 +36,13 @@ describe('getColorFromLetter function', () => {
     };
 
     // Test LIGHT theme
-    expect(getColorFromLetter(mockLetterData, themeType.LIGHT, cellType.PRIMARY)).toBe('#000000');
-    expect(getColorFromLetter(mockLetterData, themeType.LIGHT, cellType.SECONDARY)).toBe('#9d9d9dff');
-    expect(getColorFromLetter(mockLetterData, themeType.LIGHT, cellType.BLANK)).toBe('#FFFFFF');
+    expect(getColorFromLetter(mockGlyph, themeType.LIGHT, cellType.PRIMARY)).toBe('#000000');
+    expect(getColorFromLetter(mockGlyph, themeType.LIGHT, cellType.SECONDARY)).toBe('#9d9d9dff');
+    expect(getColorFromLetter(mockGlyph, themeType.LIGHT, cellType.BLANK)).toBe('#FFFFFF');
 
     // Test DARK theme
-    expect(getColorFromLetter(mockLetterData, themeType.DARK, cellType.PRIMARY)).toBe('#FFFFFF');
-    expect(getColorFromLetter(mockLetterData, themeType.DARK, cellType.SECONDARY)).toBe('#626262ff');
-    expect(getColorFromLetter(mockLetterData, themeType.DARK, cellType.BLANK)).toBe('#000000');
+    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.PRIMARY)).toBe('#FFFFFF');
+    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.SECONDARY)).toBe('#626262ff');
+    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.BLANK)).toBe('#000000');
   });
 });

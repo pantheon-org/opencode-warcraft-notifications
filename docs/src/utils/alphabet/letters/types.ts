@@ -6,12 +6,10 @@ export const cellType = {
   SECONDARY: 'secondary',
 } as const;
 export type CellType = (typeof cellType)[keyof typeof cellType];
-// row is 3, 4 or 5 cells wide
-export type DataRow = Array<CellType>;
-
-export type LetterData = {
-  // rows is 7 rows tall
-  rows: Record<number, DataRow>;
+// rows is a record mapping row index (0-6) to an array of numbers (0 or 1)
+// each row array should have length between 1 and 5
+export type Glyph = {
+  rows: Record<number, number[]>;
   theme: Record<ThemeType, Theme>;
 };
 

@@ -1,19 +1,38 @@
 import { darkTheme, lightTheme, themeType } from '../theme';
-import { cellType, type LetterData } from './types';
+import { type Glyph } from './types';
 
 /**
  * Letter K representation
- * @type {LetterData}
+ * @type {Glyph}
+ *
+ * +---+---+---+---+
+ * | 1 | 0 | 0 | 0 |
+ * +---+---+---+---+
+ * | 1 | 0 | 0 | 1 |
+ * +---+---+---+---+
+ * | 1 | 0 | 1 | 0 |
+ * +---+---+---+---+
+ * | 1 | 1 | 0 | 0 |
+ * +---+---+---+---+
+ * | 1 | 0 | 1 | 0 |
+ * +---+---+---+---+
+ * | 1 | 0 | 0 | 1 |
+ * +---+---+---+---+
+ * | 0 | 0 | 0 | 0 |
+ * +---+---+---+---+
+ *
+ * Example usage:
+ * const blocks = textToBlocks('K');
  */
-export const letterK: LetterData = {
+export const letterK: Glyph = {
   rows: {
-    0: [cellType.PRIMARY, cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK],
-    1: [cellType.PRIMARY, cellType.BLANK, cellType.BLANK, cellType.PRIMARY, cellType.BLANK],
-    2: [cellType.PRIMARY, cellType.BLANK, cellType.PRIMARY, cellType.BLANK, cellType.BLANK],
-    3: [cellType.PRIMARY, cellType.PRIMARY, cellType.SECONDARY, cellType.SECONDARY, cellType.SECONDARY],
-    4: [cellType.PRIMARY, cellType.SECONDARY, cellType.PRIMARY, cellType.SECONDARY, cellType.SECONDARY],
-    5: [cellType.PRIMARY, cellType.SECONDARY, cellType.SECONDARY, cellType.PRIMARY, cellType.SECONDARY],
-    6: [cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK],
+    0: [1, 0, 0, 0],
+    1: [1, 0, 0, 1],
+    2: [1, 0, 1, 0],
+    3: [1, 1, 0, 0],
+    4: [1, 0, 1, 0],
+    5: [1, 0, 0, 1],
+    6: [0, 0, 0, 0],
   },
   theme: {
     [themeType.LIGHT]: lightTheme,

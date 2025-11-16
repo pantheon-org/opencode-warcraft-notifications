@@ -1,4 +1,4 @@
-import { cellType, type LetterData } from "./letters/types";
+import { cellType, type Glyph } from "./letters/types";
 
 export const themeType = {
     LIGHT: 'light',
@@ -24,8 +24,8 @@ export const darkTheme: Theme = {
     secondaryColor: '#626262ff',
 };
 
-export const getColorFromLetter = (letterData: LetterData, theme: ThemeType, cell: cellType): string => {
-    const themeData = letterData.theme[theme];
+export const getColorFromLetter = (Glyph: Glyph, theme: ThemeType, cell: cellType): string => {
+    const themeData = Glyph.theme[theme];
     switch (cell) {
         case cellType.PRIMARY:
             return themeData.primaryColor;
