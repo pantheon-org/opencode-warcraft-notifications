@@ -4,7 +4,7 @@ import { cellType, type LetterData } from './types';
 /**
  * Letter B representation
  * @type {LetterData}
- * 
+ *
  * +---+---+---+---+
  * | 1 | 0 | 0 | 0 |
  * +---+---+---+---+
@@ -12,14 +12,17 @@ import { cellType, type LetterData } from './types';
  * +---+---+---+---+
  * | 1 | 0 | 0 | 1 |
  * +---+---+---+---+
- * | 1 | 2 | 2 | 1 |
+ * | 1 | 0 | 0 | 1 |
  * +---+---+---+---+
- * | 1 | 2 | 2 | 1 |
+ * | 1 | 0 | 0 | 1 |
  * +---+---+---+---+
  * | 1 | 1 | 1 | 1 |
  * +---+---+---+---+
  * | 0 | 0 | 0 | 0 |
  * +---+---+---+---+
+ *
+ * Example usage:
+ * const blocks = textToBlocks('B');
  */
 export const letterB: LetterData = {
   rows: {

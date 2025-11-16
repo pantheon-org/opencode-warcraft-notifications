@@ -4,31 +4,34 @@ import { cellType, type LetterData } from './types';
 /**
  * Letter C representation
  * @type {LetterData}
- * 
+ *
  * +---+---+---+---+
- * |   |   |   |   | 0
+ * | 0 | 0 | 0 | 0 |
  * +---+---+---+---+
- * | 1 | 1 | 1 | 1 | 1
+ * | 1 | 1 | 1 | 1 |
  * +---+---+---+---+
- * | 1 |   |   |   | 2
+ * | 1 | 0 | 0 | 0 |
  * +---+---+---+---+
- * | 1 |   |   |   | 3
+ * | 1 | 0 | 0 | 0 |
  * +---+---+---+---+
- * | 1 |   |   |   | 4
+ * | 1 | 0 | 0 | 0 |
  * +---+---+---+---+
- * | 1 | 1 | 1 | 1 | 5
+ * | 1 | 1 | 1 | 1 |
  * +---+---+---+---+
- * |   |   |   |   | 6
+ * | 0 | 0 | 0 | 0 |
  * +---+---+---+---+
+ *
+ * Example usage:
+ * const blocks = textToBlocks('C');
  */
 export const letterC: LetterData = {
   rows: {
     0: [cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK],
-    1: [cellType.BLANK, cellType.PRIMARY, cellType.BLANK, cellType.BLANK],
-    2: [cellType.PRIMARY, cellType.BLANK, cellType.PRIMARY, cellType.BLANK],
-    3: [cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY, cellType.BLANK],
-    4: [cellType.PRIMARY, cellType.BLANK, cellType.PRIMARY, cellType.BLANK],
-    5: [cellType.PRIMARY, cellType.BLANK, cellType.PRIMARY, cellType.BLANK],
+    1: [cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY],
+    2: [cellType.PRIMARY, cellType.BLANK, cellType.BLANK, cellType.BLANK],
+    3: [cellType.PRIMARY, cellType.SECONDARY, cellType.SECONDARY, cellType.SECONDARY],
+    4: [cellType.PRIMARY, cellType.SECONDARY, cellType.SECONDARY, cellType.SECONDARY],
+    5: [cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY, cellType.PRIMARY],
     6: [cellType.BLANK, cellType.BLANK, cellType.BLANK, cellType.BLANK],
   },
   theme: {
