@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocky Alphabet - 7x3-5 Grid</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .letter-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+        .letter-card:hover {
+            transform: translateY(-5px);
+            border-color: #666;
+        }
+        .letter-card svg {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+        .letter-label {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Blocky Alphabet - 7 Row Grid</h1>
+        
+        <div style="text-align: center; margin-bottom: 40px;">
+            <input type="text" id="wordInput" placeholder="Type a word to preview..." 
+                   style="padding: 12px 20px; font-size: 1.2em; border-radius: 8px; border: 2px solid #333; background: #1a1a1a; color: #fff; width: 300px; max-width: 90%;">
+        </div>
+        
+        <div id="wordPreview" style="background: #1a1a1a; border: 2px solid #333; border-radius: 12px; padding: 30px; margin-bottom: 40px; text-align: center; min-height: 100px; display: none;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 2px; flex-wrap: wrap;"></div>
+        </div>
+        
+        <div class="alphabet-grid" id="alphabetGrid"></div>
+    </div>
+
+    <script>
+        const cellSize = 10;
+        
+        function createBlock(col, row, fill = "#ffffff") {
+            return `<rect x="${col * cellSize}" y="${row * cellSize}" width="${cellSize}" height="${cellSize}" fill="${fill}"/>`;
+        }
+
+        function createLetter(grid, cols) {
+            let svg = `<svg viewBox="0 0 ${cols * cellSize} ${7 * cellSize}" xmlns="http://www.w3.org/2000/svg">`;
+            
+            // Add secondary color (grey) background for rows 3-5 (3 rows in the middle)
+            for (let row = 3; row < 6; row++) {
+                for (let col = 0; col < cols; col++) {
+                    if (grid[row][col] !== 1) { // Don't override primary color
+                        svg += createBlock(col, row, "#333333");
+                    }
+                }
+            }
+            
+            // Add blocks based on grid values
+            // 0 = default background (transparent/black)
+            // 1 = primary color (white)
+            // 2 = secondary color (grey) - already handled above for rows 3-5
+            for (let row = 0; row < 7; row++) {
+                for (let col = 0; col < cols; col++) {
+                    if (grid[row][col] === 1) {
+                        svg += createBlock(col, row, "#ffffff");
+                    }
+                }
+            }
+            svg += '</svg>';
+            return svg;
+        }
+
+                const letters = {
+            'a': createLetter([[0,0,0,0],[1,1,1,1],[0,0,0,1],[1,1,1,1],[1,0,0,1],[1,1,1,1],[0,0,0,0]], 4),
+            'b': createLetter([[1,0,0,0],[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,1],[0,0,0,0]], 4),
+            'c': createLetter([[0,0,0,0],[1,1,1,1],[1,0,0,0],[1,0,0,0],[1,0,0,0],[1,1,1,1],[0,0,0,0]], 4),
+            'd': createLetter([[0,0,0,1],[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,1],[0,0,0,0]], 4),
+            'e': createLetter([[0,0,0,0],[1,1,1,1],[1,0,0,1],[1,1,1,1],[1,0,0,0],[1,1,1,1],[0,0,0,0]], 4),
+            'f': createLetter([[0,1,1],[0,1,0],[1,1,1],[0,1,0],[0,1,0],[0,1,0],[0,0,0]], 3),
+            'g': createLetter([[0,0,0,0],[1,1,1,1],[1,0,0,1],[1,1,1,1],[0,0,0,1],[1,1,1,1],[0,0,0,0]], 4),
+            'h': createLetter([[1,0,0,0],[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[0,0,0,0]], 4),
+            'i': createLetter([[1],[0],[1],[1],[1],[1],[0]], 1),
+            'j': createLetter([[0,0,0],[1,1,1],[0,0,1],[0,0,1],[1,0,1],[1,1,1],[0,0,0]], 3),
+            'k': createLetter([[1,0,0,0,0],[1,0,0,1,0],[1,0,1,0,0],[1,1,0,0,0],[1,0,1,0,0],[1,0,0,1,0],[0,0,0,0,0]], 4),
+            'l': createLetter([[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,1,1],[0,0,0]], 3),
+            'm': createLetter([[0,0,0,0,0],[1,1,1,1,1],[1,0,1,0,1],[1,0,1,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,0,0,0,0]], 5),
+            'n': createLetter([[0,0,0,0],[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[0,0,0,0]], 4),
+            'o': createLetter([[0,0,0,0],[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,1],[0,0,0,0]], 4),
+            'p': createLetter([[0,0,0,0],[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,1],[1,0,0,0]], 4),
+            'q': createLetter([[0,0,0,0],[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,1],[0,0,0,1]], 4),
+            'r': createLetter([[0,0,0,0],[1,0,0,0],[1,1,1,1],[1,0,0,1],[1,0,0,0],[1,0,0,0],[0,0,0,0]], 4),
+            's': createLetter([[0,0,0,0],[1,1,1,1],[1,0,0,0],[1,1,1,1],[0,0,0,1],[1,1,1,1],[0,0,0,0]], 4),
+            't': createLetter([[0,1,0],[0,1,0],[1,1,1],[0,1,0],[0,1,0],[0,1,1],[0,0,0]], 3),
+            'u': createLetter([[0,0,0,0],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,1],[0,0,0,0]], 4),
+            'v': createLetter([[0,0,0,0,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,0,0,0,0]], 5),
+            'w': createLetter([[0,0,0,0,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,1,0,1],[1,0,1,0,1],[1,1,1,1,1],[0,0,0,0,0]], 5),
+            'x': createLetter([[0,0,0,0,0],[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1],[0,0,0,0,0]], 5),
+            'y': createLetter([[0,0,0,0],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,1],[0,0,0,1]], 4),
+            'z': createLetter([[0,0,0,0,0],[1,1,1,1,1],[0,0,0,1,0],[0,0,1,0,0],[0,1,0,0,0],[1,1,1,1,1],[0,0,0,0,0]], 5)
+        };
+
+        const grid = document.getElementById('alphabetGrid');
+        const wordInput = document.getElementById('wordInput');
+        const wordPreview = document.getElementById('wordPreview');
+        
+        // Render alphabet grid
+        Object.keys(letters).forEach(letter => {
+            const card = document.createElement('div');
+            card.className = 'letter-card';
+            card.innerHTML = `
+                ${letters[letter]}
+                <div class="letter-label">${letter}</div>
+            `;
+            grid.appendChild(card);
+        });
+        
+        // Word preview functionality
+        wordInput.addEventListener('input', (e) => {
+            const word = e.target.value.toLowerCase();
+            const previewContainer = wordPreview.querySelector('div');
+            
+            if (word.length === 0) {
+                wordPreview.style.display = 'none';
+                return;
+            }
+            
+            wordPreview.style.display = 'block';
+            previewContainer.innerHTML = '';
+            
+            for (let char of word) {
+                if (letters[char]) {
+                    const letterDiv = document.createElement('div');
+                    letterDiv.innerHTML = letters[char];
+                    letterDiv.style.display = 'inline-block';
+                    letterDiv.querySelector('svg').style.height = '80px';
+                    letterDiv.querySelector('svg').style.width = 'auto';
+                    previewContainer.appendChild(letterDiv);
+                } else if (char === ' ') {
+                    const space = document.createElement('div');
+                    space.style.width = '20px';
+                    space.style.display = 'inline-block';
+                    previewContainer.appendChild(space);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
