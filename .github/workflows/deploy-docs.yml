@@ -60,6 +60,12 @@ jobs:
           bun run build
           echo "✅ Documentation built successfully"
 
+      - name: Verify internal links
+        run: |
+          cd pages
+          bun run verify
+          echo "✅ All internal links verified"
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
@@ -91,4 +97,5 @@ jobs:
           echo "1. 📄 Source docs from \`./docs/\`" >> $GITHUB_STEP_SUMMARY
           echo "2. 🔄 Transform to \`./pages/src/content/docs/\`" >> $GITHUB_STEP_SUMMARY
           echo "3. 🏗️  Build Astro site to \`./pages/dist/\`" >> $GITHUB_STEP_SUMMARY
-          echo "4. 🚀 Deploy to GitHub Pages via Actions" >> $GITHUB_STEP_SUMMARY
+          echo "4. 🔗 Fix and verify internal links" >> $GITHUB_STEP_SUMMARY
+          echo "5. 🚀 Deploy to GitHub Pages via Actions" >> $GITHUB_STEP_SUMMARY

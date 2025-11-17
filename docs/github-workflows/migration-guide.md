@@ -325,7 +325,7 @@ After migration, monitor these for 1-2 weeks:
 
 - [Workflow Documentation](/github-workflows/sequential-orchestration)
 - [Script Documentation](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/.github/scripts/README.md)
-- [Contributing Guide](/contributing)
+- [Contributing Guide](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/CONTRIBUTING.md)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 
 ---
