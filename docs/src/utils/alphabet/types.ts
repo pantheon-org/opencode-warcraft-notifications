@@ -25,6 +25,12 @@ import { letterW } from './letters/letter-w';
 import { letterX } from './letters/letter-x';
 import { letterY } from './letters/letter-y';
 import { letterZ } from './letters/letter-z';
+import { symbolHyphen } from './symbols/symbol-hyphen';
+import { symbolPipe } from './symbols/symbol-pipe';
+import { symbolApostrophe } from './symbols/symbol-apostrophe';
+import { symbolQuote } from './symbols/symbol-quote';
+import { symbolQuestion } from './symbols/symbol-question';
+import { symbolExclamation } from './symbols/symbol-exclamation';
 
 /**
  * Cell type constants for defining the visual appearance of glyph cells.
@@ -230,8 +236,36 @@ export type LetterName =
   | 'Y'
   | 'Z';
 
+/**
+ * Union type of all available symbol names.
+ *
+ * This type represents the complete set of symbols available in the blocky text
+ * system. Symbols include punctuation marks and special characters that can be
+ * used alongside letters for complete text rendering.
+ *
+ * @example
+ * ```typescript
+ * import { SYMBOLS } from './types';
+ * import type { SymbolName } from './types';
+ *
+ * const symbol: SymbolName = '-';
+ * const glyph = SYMBOLS[symbol]; // Returns the Glyph for hyphen
+ * ```
+ *
+ * @see {@link Glyph} for the structure of each symbol definition
+ * @see SYMBOLS constant for the complete symbol-to-glyph mapping
+ */
+export type SymbolName = '-' | '|' | "'" | '"' | '?' | '!';
+
 export type Alphabet = {
   [key in LetterName]: Glyph;
+};
+
+/**
+ * Type for the symbols collection mapping symbol characters to their glyphs.
+ */
+export type Symbols = {
+  [key in SymbolName]: Glyph;
 };
 
 export const ALPHABET: Alphabet = {
@@ -264,8 +298,56 @@ export const ALPHABET: Alphabet = {
 };
 
 /**
- * Get available characters in the font
+ * Collection of symbol glyphs for punctuation and special characters.
+ *
+ * This object maps symbol characters to their glyph definitions, allowing
+ * symbols to be rendered alongside letters in the blocky text system.
+ *
+ * Available symbols:
+ * - `-` (hyphen): Horizontal line for compound words
+ * - `|` (pipe): Vertical line for separators
+ * - `'` (apostrophe): Single quote mark for contractions
+ * - `"` (quote): Double quote marks for quoted text
+ * - `?` (question): Question mark for interrogatives
+ * - `!` (exclamation): Exclamation point for emphasis
+ *
+ * @example
+ * ```typescript
+ * import { SYMBOLS } from './types';
+ *
+ * const hyphen = SYMBOLS['-'];
+ * const question = SYMBOLS['?'];
+ * ```
+ *
+ * @see {@link Glyph} for the structure of symbol definitions
+ * @see {@link SymbolName} for the type of available symbols
+ */
+export const SYMBOLS: Symbols = {
+  '-': symbolHyphen,
+  '|': symbolPipe,
+  "'": symbolApostrophe,
+  '"': symbolQuote,
+  '?': symbolQuestion,
+  '!': symbolExclamation,
+};
+
+/**
+ * Get available characters in the font (letters only)
  */
 export const getAvailableCharacters = (): string[] => {
   return Object.keys(ALPHABET);
+};
+
+/**
+ * Get available symbols in the font
+ */
+export const getAvailableSymbols = (): string[] => {
+  return Object.keys(SYMBOLS);
+};
+
+/**
+ * Get all available characters (letters and symbols combined)
+ */
+export const getAllAvailableCharacters = (): string[] => {
+  return [...Object.keys(ALPHABET), ...Object.keys(SYMBOLS)];
 };
