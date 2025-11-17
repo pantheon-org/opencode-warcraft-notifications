@@ -28,18 +28,18 @@ package-lock.json
 .session/
 .sessions/
 
-# Astro documentation build
-docs/node_modules/
-docs/.astro/
-docs/dist/
+# Astro documentation build (pages directory)
+pages/node_modules/
+pages/.astro/
+pages/dist/
+pages/src/content/docs/
+
+# Old docs directory (will be removed after migration)
+old-docs/
 
 # Generated documentation artifacts (deployed to docs branch)
 dist/
 .astro/
-docs/dist/
-
-# Astro build directory (replaced by docs/)
-.astro-build/
 
 # Migration and implementation documentation (internal only, not for publication)
 MIGRATION_*.md

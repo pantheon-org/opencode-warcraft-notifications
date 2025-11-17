@@ -1,0 +1,18 @@
+# Astro build outputs
+dist/
+.astro/
+
+# Generated content (from transformation)
+src/content/docs/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Environment
+.env*
+
+# MacOS
+.DS_Store

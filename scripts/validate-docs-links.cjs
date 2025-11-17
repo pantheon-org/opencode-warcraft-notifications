@@ -21,7 +21,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const DOCS_DIR = path.join(__dirname, '../docs/src/content/docs');
+const DOCS_DIR = path.join(__dirname, '../docs');
 const DOCS_ROOT = path.join(__dirname, '../docs');
 
 // Colors for terminal output
