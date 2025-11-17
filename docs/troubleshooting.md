@@ -3,8 +3,6 @@ title: 'Troubleshooting'
 description: 'Common issues and solutions'
 ---
 
-# Troubleshooting Guide
-
 Comprehensive troubleshooting index for the Warcraft II Notifications Plugin.
 
 ## Quick Navigation

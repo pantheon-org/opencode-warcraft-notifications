@@ -3,8 +3,6 @@ title: Documentation Regeneration Workflow
 description: Automated documentation regeneration using AI
 ---
 
-# Documentation Regeneration Workflow
-
 ## Overview
 
 The **Documentation Regeneration Workflow** (`chores-docs-regenerate.yml`) automatically regenerates documentation by analyzing the current codebase using AI (OpenCode). This ensures documentation stays in sync with code changes.

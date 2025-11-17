@@ -3,8 +3,6 @@ title: 'Cleanup Old Releases Workflow'
 description: '**File -** `.github/workflows/cleanup-old-releases.yml`'
 ---
 
-# Cleanup Old Releases Workflow
-
 **File:** `.github/workflows/cleanup-old-releases.yml`  
 **Purpose:** Automatically maintain a limited number of releases to prevent repository bloat
 

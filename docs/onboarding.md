@@ -3,8 +3,6 @@ title: 'Onboarding'
 description: 'New contributor onboarding guide'
 ---
 
-# Onboarding Guide
-
 Welcome to the Warcraft II Notifications Plugin for OpenCode! This guide will help you get up to speed quickly, whether you're a new contributor, maintainer, or team member.
 
 ## Table of Contents

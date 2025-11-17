@@ -3,8 +3,6 @@ title: 'GitHub Actions Workflows Documentation'
 description: 'This document provides comprehensive documentation for all GitHub Actions workflows in this repository.'
 ---
 
-# GitHub Actions Workflows Documentation
-
 This document provides comprehensive documentation for all GitHub Actions workflows in this repository.
 
 > **📚 For detailed workflow information, see the [Workflow README](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/.github/workflows/README.md) in the repository.**

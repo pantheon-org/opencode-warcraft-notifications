@@ -3,8 +3,6 @@ title: Documentation Branch Structure
 description: Specification of how documentation files are organized across main and docs branches
 ---
 
-# Documentation Branch Structure
-
 This document details the branch structure for documentation deployment in the Warcraft II Notifications Plugin repository.
 
 ## Overview

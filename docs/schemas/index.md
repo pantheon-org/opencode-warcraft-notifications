@@ -3,8 +3,6 @@ title: 'Plugin Configuration Schemas'
 description: 'This directory contains configuration schemas and examples for the Warcraft II Alliance and Horde notifications plugin.'
 ---
 
-# Plugin Configuration Schemas
-
 This directory contains configuration schemas and examples for the Warcraft II Alliance and Horde notifications plugin.
 
 ## Files

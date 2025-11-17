@@ -3,8 +3,6 @@ title: GitHub Workflows - Sequential Orchestration
 description: Complete guide to the automated release workflow system using sequential orchestration
 ---
 
-# GitHub Workflows - Sequential Orchestration
-
 ## Overview
 
 This repository uses a **sequential orchestrated workflow** to automate releases following semantic versioning principles.

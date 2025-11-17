@@ -3,8 +3,6 @@ title: 'Deployment Guide'
 description: 'Installation and deployment instructions'
 ---
 
-# Deployment Guide
-
 ## Overview
 
 This guide covers deployment, installation, configuration, and operational aspects of the Warcraft II Notifications Plugin for OpenCode.

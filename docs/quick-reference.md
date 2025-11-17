@@ -3,8 +3,6 @@ title: 'Quick Reference'
 description: 'Quick reference guide for common tasks and commands'
 ---
 
-# Quick Reference Guide
-
 ## Installation & Setup
 
 ### Install Plugin

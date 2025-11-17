@@ -3,8 +3,6 @@ title: Workflow Migration Guide
 description: Guide for migrating from old workflow structure to new sequential orchestration
 ---
 
-# Workflow Migration Guide
-
 ## Migration Date: 2025-11-11
 
 This guide documents the migration from the old workflow structure to the new orchestrated workflow system.
