@@ -1,50 +1,49 @@
 [36mScanning documentation...[0m
 [34mFound 25 markdown files[0m
 
-  Checking: src/content/docs/api.md
-  Checking: src/content/docs/architecture.md
-  Checking: src/content/docs/deployment.md
-  Checking: src/content/docs/development.md
-  Checking: src/content/docs/docs-branch-structure.md
-  Checking: src/content/docs/docs-migration-plan.md
-  Checking: src/content/docs/documentation-map.md
-  Checking: src/content/docs/github-workflows/architecture-summary.md
-  Checking: src/content/docs/github-workflows/cleanup-old-releases.md
-  Checking: src/content/docs/github-workflows/cycle-prevention-fix.md
-  Checking: src/content/docs/github-workflows/docs-regeneration.md
-  Checking: src/content/docs/github-workflows/index.md
-  Checking: src/content/docs/github-workflows/migration-guide.md
-  Checking: src/content/docs/github-workflows/overview.md
-  Checking: src/content/docs/github-workflows/sequential-orchestration.md
-  Checking: src/content/docs/github-workflows/setup-guide.md
-  Checking: src/content/docs/github-workflows/squash-merge-configuration.md
-  Checking: src/content/docs/index.md
-  Checking: src/content/docs/onboarding.md
-  Checking: src/content/docs/pipeline.md
-  Checking: src/content/docs/quick-reference.md
-  Checking: src/content/docs/schemas/index.md
-  Checking: src/content/docs/troubleshooting.md
-  Checking: src/content/docs/user-guide.md
-  Checking: src/content/docs/validate-schema.md
-
+Checking: src/content/docs/api.md
+Checking: src/content/docs/architecture.md
+Checking: src/content/docs/deployment.md
+Checking: src/content/docs/development.md
+Checking: src/content/docs/docs-branch-structure.md
+Checking: src/content/docs/docs-migration-plan.md
+Checking: src/content/docs/documentation-map.md
+Checking: src/content/docs/github-workflows/architecture-summary.md
+Checking: src/content/docs/github-workflows/cleanup-old-releases.md
+Checking: src/content/docs/github-workflows/cycle-prevention-fix.md
+Checking: src/content/docs/github-workflows/docs-regeneration.md
+Checking: src/content/docs/github-workflows/index.md
+Checking: src/content/docs/github-workflows/migration-guide.md
+Checking: src/content/docs/github-workflows/overview.md
+Checking: src/content/docs/github-workflows/sequential-orchestration.md
+Checking: src/content/docs/github-workflows/setup-guide.md
+Checking: src/content/docs/github-workflows/squash-merge-configuration.md
+Checking: src/content/docs/index.md
+Checking: src/content/docs/onboarding.md
+Checking: src/content/docs/pipeline.md
+Checking: src/content/docs/quick-reference.md
+Checking: src/content/docs/schemas/index.md
+Checking: src/content/docs/troubleshooting.md
+Checking: src/content/docs/user-guide.md
+Checking: src/content/docs/validate-schema.md
 
 ================================================================================
 [36mDocumentation Link Validation Report[0m
 ================================================================================
 
 [34mSummary:[0m
-  Total files scanned:    25
-  Total links found:      431
-  Valid links:            [32m368[0m
-  Broken links:           [31m63[0m
-  External links:         96
+Total files scanned: 25
+Total links found: 431
+Valid links: [32m368[0m
+Broken links: [31m63[0m
+External links: 96
 
 [31mBroken Links:[0m
 
-  [33msrc/content/docs/documentation-map.md[0m
-    Line 16: [31m/[0m
-      Reason: File not found
-      Target: src/content/docs.md
+[33msrc/content/docs/documentation-map.md[0m
+Line 16: [31m/[0m
+Reason: File not found
+Target: src/content/docs.md
 
     Line 32: [31m/github-workflows[0m
       Reason: File not found
@@ -162,10 +161,10 @@
       Reason: File not found
       Target: src/content/docs/mailto:support@pantheon-ai.com.md
 
-  [33msrc/content/docs/github-workflows/docs-regeneration.md[0m
-    Line 490: [31m./pipeline.md[0m
-      Reason: File not found
-      Target: src/content/docs/github-workflows/pipeline.md
+[33msrc/content/docs/github-workflows/docs-regeneration.md[0m
+Line 490: [31m./pipeline.md[0m
+Reason: File not found
+Target: src/content/docs/github-workflows/pipeline.md
 
     Line 491: [31m./docs-branch-structure.md[0m
       Reason: File not found
@@ -179,15 +178,15 @@
       Reason: File not found
       Target: src/content/docs/github-workflows/development.md
 
-  [33msrc/content/docs/github-workflows/migration-guide.md[0m
-    Line 328: [31m/contributing[0m
-      Reason: File not found
-      Target: src/content/docs/contributing.md
+[33msrc/content/docs/github-workflows/migration-guide.md[0m
+Line 328: [31m/contributing[0m
+Reason: File not found
+Target: src/content/docs/contributing.md
 
-  [33msrc/content/docs/index.md[0m
-    Line 56: [31m/github-workflows[0m
-      Reason: File not found
-      Target: src/content/docs/github-workflows.md
+[33msrc/content/docs/index.md[0m
+Line 56: [31m/github-workflows[0m
+Reason: File not found
+Target: src/content/docs/github-workflows.md
 
     Line 60: [31m/[0m
       Reason: File not found
@@ -221,21 +220,21 @@
       Reason: File not found
       Target: src/content/docs/github-workflows.md
 
-  [33msrc/content/docs/onboarding.md[0m
-    Line 12: [31m#welcome[0m
-      Reason: Anchor not found
-      Target: src/content/docs/onboarding.md
-      Anchor: #welcome
+[33msrc/content/docs/onboarding.md[0m
+Line 12: [31m#welcome[0m
+Reason: Anchor not found
+Target: src/content/docs/onboarding.md
+Anchor: #welcome
 
     Line 313: [31m./github-workflows/README.md[0m
       Reason: File not found
       Target: src/content/docs/github-workflows/README.md
 
-  [33msrc/content/docs/pipeline.md[0m
-    Line 29: [31m#validate-pr-workflow[0m
-      Reason: Anchor not found
-      Target: src/content/docs/pipeline.md
-      Anchor: #validate-pr-workflow
+[33msrc/content/docs/pipeline.md[0m
+Line 29: [31m#validate-pr-workflow[0m
+Reason: Anchor not found
+Target: src/content/docs/pipeline.md
+Anchor: #validate-pr-workflow
 
     Line 30: [31m#version-update-workflow[0m
       Reason: Anchor not found
@@ -270,11 +269,11 @@
       Reason: File not found
       Target: src/content/docs/docs/squash-merge-configuration.md
 
-  [33msrc/content/docs/troubleshooting.md[0m
-    Line 23: [31m/user-guide#no-sound-playing[0m
-      Reason: Anchor not found
-      Target: src/content/docs/user-guide.md
-      Anchor: #no-sound-playing
+[33msrc/content/docs/troubleshooting.md[0m
+Line 23: [31m/user-guide#no-sound-playing[0m
+Reason: Anchor not found
+Target: src/content/docs/user-guide.md
+Anchor: #no-sound-playing
 
     Line 24: [31m/user-guide#wrong-faction-sounds[0m
       Reason: Anchor not found
@@ -331,102 +330,101 @@
       Target: src/content/docs/pipeline.md
       Anchor: #auto-merge-troubleshooting
 
-  [33msrc/content/docs/user-guide.md[0m
-    Line 14: [31m#quick-start[0m
-      Reason: Anchor not found
-      Target: src/content/docs/user-guide.md
-      Anchor: #quick-start
+[33msrc/content/docs/user-guide.md[0m
+Line 14: [31m#quick-start[0m
+Reason: Anchor not found
+Target: src/content/docs/user-guide.md
+Anchor: #quick-start
 
-  [33msrc/content/docs/validate-schema.md[0m
-    Line 450: [31m./schemas/README.md[0m
-      Reason: File not found
-      Target: src/content/docs/schemas/README.md
+[33msrc/content/docs/validate-schema.md[0m
+Line 450: [31m./schemas/README.md[0m
+Reason: File not found
+Target: src/content/docs/schemas/README.md
 
 [31mMissing Files (13):[0m
 
-  [31m✗[0m src/content/docs.md
-  [31m✗[0m src/content/docs/github-workflows.md
-  [31m✗[0m src/content/docs/schemas.md
-  [31m✗[0m src/content/docs/mailto:support@pantheon-ai.com.md
-  [31m✗[0m src/content/docs/github-workflows/pipeline.md
-  [31m✗[0m src/content/docs/github-workflows/docs-branch-structure.md
-  [31m✗[0m src/content/docs/github-workflows/deploy-docs.md
-  [31m✗[0m src/content/docs/github-workflows/development.md
-  [31m✗[0m src/content/docs/contributing.md
-  [31m✗[0m src/content/docs/github-workflows/README.md
-  [31m✗[0m src/content/docs/${npmUrl}.md
-  [31m✗[0m src/content/docs/docs/squash-merge-configuration.md
-  [31m✗[0m src/content/docs/schemas/README.md
+[31m✗[0m src/content/docs.md
+[31m✗[0m src/content/docs/github-workflows.md
+[31m✗[0m src/content/docs/schemas.md
+[31m✗[0m src/content/docs/mailto:support@pantheon-ai.com.md
+[31m✗[0m src/content/docs/github-workflows/pipeline.md
+[31m✗[0m src/content/docs/github-workflows/docs-branch-structure.md
+[31m✗[0m src/content/docs/github-workflows/deploy-docs.md
+[31m✗[0m src/content/docs/github-workflows/development.md
+[31m✗[0m src/content/docs/contributing.md
+[31m✗[0m src/content/docs/github-workflows/README.md
+[31m✗[0m src/content/docs/${npmUrl}.md
+[31m✗[0m src/content/docs/docs/squash-merge-configuration.md
+[31m✗[0m src/content/docs/schemas/README.md
 
 [33mMissing Anchors:[0m
 
-  [33msrc/content/docs/user-guide.md[0m
-    #faction-selection
-    #updating-the-plugin
-    #no-sound-playing
-    #wrong-faction-sounds
-    #sound-files-missing
-    #quick-start
+[33msrc/content/docs/user-guide.md[0m
+#faction-selection
+#updating-the-plugin
+#no-sound-playing
+#wrong-faction-sounds
+#sound-files-missing
+#quick-start
 
-  [33msrc/content/docs/architecture.md[0m
-    #module-dependencies
-    #sound-data-module
-    #bundled-sounds-module
+[33msrc/content/docs/architecture.md[0m
+#module-dependencies
+#sound-data-module
+#bundled-sounds-module
 
-  [33msrc/content/docs/deployment.md[0m
-    #sound-file-management
-    #configuration-management
-    #backup-recovery
-    #cicd-integration
-    #installation-fails
-    #sound-files-missing
-    #configuration-not-loading
-    #platform-specific-troubleshooting
+[33msrc/content/docs/deployment.md[0m
+#sound-file-management
+#configuration-management
+#backup-recovery
+#cicd-integration
+#installation-fails
+#sound-files-missing
+#configuration-not-loading
+#platform-specific-troubleshooting
 
-  [33msrc/content/docs/github-workflows/overview.md[0m
-    #smart-version-bump
-    #release-publish
-    #auto-merge-bot
+[33msrc/content/docs/github-workflows/overview.md[0m
+#smart-version-bump
+#release-publish
+#auto-merge-bot
 
-  [33msrc/content/docs/onboarding.md[0m
-    #environment-setup
-    #welcome
+[33msrc/content/docs/onboarding.md[0m
+#environment-setup
+#welcome
 
-  [33msrc/content/docs/development.md[0m
-    #test-coverage
-    #tests-failing
+[33msrc/content/docs/development.md[0m
+#test-coverage
+#tests-failing
 
-  [33msrc/content/docs/troubleshooting.md[0m
-    #common-issues
+[33msrc/content/docs/troubleshooting.md[0m
+#common-issues
 
-  [33msrc/content/docs/pipeline.md[0m
-    #validate-pr-workflow
-    #version-update-workflow
-    #auto-merge-workflow
-    #create-tag-workflow
-    #publish-release-workflow
-    #cleanup-workflow
-    #workflow-failures
-    #version-bump-issues
-    #deployment-failures
-    #auto-merge-troubleshooting
+[33msrc/content/docs/pipeline.md[0m
+#validate-pr-workflow
+#version-update-workflow
+#auto-merge-workflow
+#create-tag-workflow
+#publish-release-workflow
+#cleanup-workflow
+#workflow-failures
+#version-bump-issues
+#deployment-failures
+#auto-merge-troubleshooting
 
 [34mExternal Links Summary:[0m
-  Total: 96
+Total: 96
 
-  Top domains:
-    github.com: 47
-    opencode.ai: 7
-    bun.sh: 6
-    www.typescriptlang.org: 6
-    img.shields.io: 5
-    pantheon-org.github.io: 3
-    eslint.org: 2
-    prettier.io: 2
-    www.npmjs.com: 2
-    www.conventionalcommits.org: 2
+Top domains:
+github.com: 47
+opencode.ai: 7
+bun.sh: 6
+www.typescriptlang.org: 6
+img.shields.io: 5
+pantheon-org.github.io: 3
+eslint.org: 2
+prettier.io: 2
+www.npmjs.com: 2
+www.conventionalcommits.org: 2
 
 ================================================================================
 [31m✗ Found 63 broken link(s)[0m
 ================================================================================
-

@@ -134,8 +134,8 @@ This document provides a comprehensive map of all documentation available for th
 
 ### Installation & Setup
 
-| Document                           | Section                                             | Description           |
-| ---------------------------------- | --------------------------------------------------- | --------------------- |
+| Document                          | Section                                            | Description           |
+| --------------------------------- | -------------------------------------------------- | --------------------- |
 | [User Guide](/user-guide)         | [Installation](/user-guide#installation)           | End-user installation |
 | [Development Guide](/development) | [Getting Started](/development#getting-started)    | Developer setup       |
 | [Deployment Guide](/deployment)   | [Installation](/deployment#installation)           | Production deployment |
@@ -143,8 +143,8 @@ This document provides a comprehensive map of all documentation available for th
 
 ### Configuration
 
-| Document                          | Section                                                           | Description              |
-| --------------------------------- | ----------------------------------------------------------------- | ------------------------ |
+| Document                         | Section                                                          | Description              |
+| -------------------------------- | ---------------------------------------------------------------- | ------------------------ |
 | [User Guide](/user-guide)        | [Configuration](/user-guide#configuration)                       | User configuration guide |
 | [API Documentation](/api)        | [Plugin Configuration](/api#plugin-configuration-module)         | Configuration API        |
 | [Schema Documentation](/schemas) | [Schema Reference](/schemas)                                     | JSON schema details      |
@@ -152,8 +152,8 @@ This document provides a comprehensive map of all documentation available for th
 
 ### Architecture & Design
 
-| Document                       | Section                                                         | Description        |
-| ------------------------------ | --------------------------------------------------------------- | ------------------ |
+| Document                      | Section                                                        | Description        |
+| ----------------------------- | -------------------------------------------------------------- | ------------------ |
 | [Architecture](/architecture) | [System Architecture](/architecture#system-architecture)       | High-level design  |
 | [Architecture](/architecture) | [Component Architecture](/architecture#component-architecture) | Module details     |
 | [Architecture](/architecture) | [Data Flow](/architecture#data-flow)                           | Data flow diagrams |
@@ -161,8 +161,8 @@ This document provides a comprehensive map of all documentation available for th
 
 ### Testing
 
-| Document                           | Section                                              | Description           |
-| ---------------------------------- | ---------------------------------------------------- | --------------------- |
+| Document                          | Section                                             | Description           |
+| --------------------------------- | --------------------------------------------------- | --------------------- |
 | [Development Guide](/development) | [Testing](/development#testing)                     | Testing strategies    |
 | [Development Guide](/development) | [Unit Tests](/development#unit-tests)               | Unit testing guide    |
 | [Development Guide](/development) | [Integration Tests](/development#integration-tests) | Integration testing   |
@@ -170,8 +170,8 @@ This document provides a comprehensive map of all documentation available for th
 
 ### CI/CD & Automation
 
-| Document                               | Section                                            | Description           |
-| -------------------------------------- | -------------------------------------------------- | --------------------- |
+| Document                              | Section                                           | Description           |
+| ------------------------------------- | ------------------------------------------------- | --------------------- |
 | [Pipeline Documentation](/pipeline)   | [Overview](/pipeline#overview)                    | Pipeline architecture |
 | [GitHub Workflows](/github-workflows) | [Workflows](/github-workflows/overview)           | Workflow details      |
 | [GitHub Workflows](/github-workflows) | [Setup Guide](/github-workflows/setup-guide)      | Workflow setup        |
@@ -179,8 +179,8 @@ This document provides a comprehensive map of all documentation available for th
 
 ### Troubleshooting
 
-| Document                                   | Section                                          | Description                |
-| ------------------------------------------ | ------------------------------------------------ | -------------------------- |
+| Document                                  | Section                                         | Description                |
+| ----------------------------------------- | ----------------------------------------------- | -------------------------- |
 | [Troubleshooting Guide](/troubleshooting) | [Common Issues](/troubleshooting#common-issues) | General problems           |
 | [User Guide](/user-guide)                 | [Troubleshooting](/user-guide#troubleshooting)  | User issues                |
 | [Deployment Guide](/deployment)           | [Troubleshooting](/deployment#troubleshooting)  | Deployment issues          |
