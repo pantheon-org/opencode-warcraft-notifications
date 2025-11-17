@@ -1,4 +1,3 @@
-import { darkTheme, lightTheme, themeType } from '../theme';
 import { type Glyph } from './types';
 
 /**
@@ -33,9 +32,5 @@ export const letterY: Glyph = {
     4: [1, 1, 1, 1],
     5: [0, 0, 0, 1],
     6: [0, 0, 0, 1],
-  },
-  theme: {
-    [themeType.LIGHT]: lightTheme,
-    [themeType.DARK]: darkTheme,
   },
 };

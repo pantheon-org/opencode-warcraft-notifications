@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'bun:test';
 import { ALPHABET } from './types';
 import { cellType } from './letters/types';
-import { getColorFromLetter, themeType } from './theme';
+import { getColorFromLetter, themeType, darkTheme } from './theme';
 
 describe('ALPHABET structure', () => {
   it('should contain 26 letters A-Z', () => {
@@ -13,10 +13,9 @@ describe('ALPHABET structure', () => {
 });
 
 describe('Glyph consistency', () => {
-  it('each letter should have 7 rows and theme entries', () => {
+  it('each letter should have 7 rows and valid cell values', () => {
     Object.entries(ALPHABET).forEach(([name, data]) => {
       expect(data).toHaveProperty('rows');
-      expect(data).toHaveProperty('theme');
       for (let r = 0; r < 7; r++) {
         expect(Array.isArray(data.rows[r])).toBe(true);
         // each cell should be one of the cellType values or numeric 0/1
@@ -28,14 +27,12 @@ describe('Glyph consistency', () => {
           expect(validValue || validNumber).toBe(true);
         });
       }
-      expect(data.theme).toHaveProperty(themeType.LIGHT);
-      expect(data.theme).toHaveProperty(themeType.DARK);
     });
   });
 });
 
 describe('Color mapping with actual letter data', () => {
-  it('getColorFromLetter returns matching theme colors for primary/secondary/blank', () => {
+  it('getColorFromLetter returns matching global theme colors for primary/secondary/blank', () => {
     const sampleLetter = ALPHABET.A; // use A as a representative
     // find a primary cell
     let foundPrimary = false;
@@ -53,17 +50,17 @@ describe('Color mapping with actual letter data', () => {
         }
         if (!foundPrimary && cell === cellType.PRIMARY) {
           const col = getColorFromLetter(sampleLetter, themeType.DARK, cell);
-          expect(col).toBe(sampleLetter.theme[themeType.DARK].primaryColor);
+          expect(col).toBe(darkTheme.primaryColor);
           foundPrimary = true;
         }
         if (!foundSecondary && cell === cellType.SECONDARY) {
           const col = getColorFromLetter(sampleLetter, themeType.DARK, cell);
-          expect(col).toBe(sampleLetter.theme[themeType.DARK].secondaryColor);
+          expect(col).toBe(darkTheme.secondaryColor);
           foundSecondary = true;
         }
         if (!foundBlank && cell === cellType.BLANK) {
           const col = getColorFromLetter(sampleLetter, themeType.DARK, cell);
-          expect(col).toBe(sampleLetter.theme[themeType.DARK].backgroundColor);
+          expect(col).toBe(darkTheme.backgroundColor);
           foundBlank = true;
         }
         if (foundPrimary && foundSecondary && foundBlank) break;
