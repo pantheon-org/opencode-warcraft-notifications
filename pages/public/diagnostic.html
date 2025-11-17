@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browser Diagnostic Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background: #d4edda; }
+        .fail { background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>GitHub Pages Diagnostic Test</h1>
+    <div id="results"></div>
+    <script>
+        const tests = [];
+        
+        // Test 1: Can load page
+        tests.push({ name: 'Page loads', pass: true });
+        
+        // Test 2: JavaScript works
+        tests.push({ name: 'JavaScript works', pass: typeof document !== 'undefined' });
+        
+        // Test 3: Can fetch development page
+        fetch('/opencode-warcraft-notifications/development/')
+            .then(r => { 
+                tests.push({ 
+                    name: `Development page loads (${r.status})`, 
+                    pass: r.status === 200 
+                });
+                return r.text();
+            })
+            .then(html => {
+                const hasContent = html.includes('Best Practices') && html.includes('Resources');
+                tests.push({ 
+                    name: 'Development page has full content', 
+                    pass: hasContent,
+                    detail: `Found: ${hasContent ? 'Yes' : 'No'}, Size: ${html.length} bytes`
+                });
+                displayResults();
+            })
+            .catch(e => {
+                tests.push({ name: 'Development page fetch', pass: false, detail: e.message });
+                displayResults();
+            });
+        
+        function displayResults() {
+            const div = document.getElementById('results');
+            div.innerHTML = tests.map(t => `
+                <div class="test ${t.pass ? 'pass' : 'fail'}">
+                    <strong>${t.pass ? '✓' : '✗'} ${t.name}</strong>
+                    ${t.detail ? `<br><small>${t.detail}</small>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Display initial results
+        setTimeout(displayResults, 100);
+    </script>
+    
+    <h2>Manual Checks</h2>
+    <ul>
+        <li>Open Browser DevTools (F12)</li>
+        <li>Check Console for JavaScript errors</li>
+        <li>Check Network tab for failed requests</li>
+        <li>Try hard refresh: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)</li>
+        <li>Try opening in incognito/private mode</li>
+    </ul>
+</body>
+</html>

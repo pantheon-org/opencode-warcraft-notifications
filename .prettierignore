@@ -7,3 +7,4 @@ data
 
 tmp_docs_remote/
 docs/dist/
+.tmp/
