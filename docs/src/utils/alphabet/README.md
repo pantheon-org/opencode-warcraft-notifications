@@ -6,8 +6,8 @@ This directory contains the complete glyph system for the blocky text rendering 
 
 The glyph system consists of:
 
-- **26 Letters (A-Z)**: Uppercase alphabet characters ([`letters/`](./letters/))
-- **6 Symbols**: Punctuation and special characters ([`symbols/`](./symbols/))
+- **26 Letters (A-Z)**: Uppercase alphabet characters ([`glyphs/letters/`](./glyphs/letters/))
+- **6 Symbols**: Punctuation and special characters ([`glyphs/symbols/`](./glyphs/symbols/))
 - **Type System**: TypeScript definitions for glyphs and characters ([`types.ts`](./types.ts))
 - **Rendering Engine**: Conversion utilities from text to visual blocks ([`block.ts`](./block.ts))
 - **Theme System**: Color schemes for light and dark modes ([`theme.ts`](./theme.ts))
@@ -57,12 +57,12 @@ alphabet/
 ├── types.ts                     # Core type definitions and exports
 ├── block.ts                     # Rendering utilities
 ├── theme.ts                     # Color theme definitions
-├── letters/                     # Letter glyphs (A-Z)
+├── glyphs/letters/                     # Letter glyphs (A-Z)
 │   ├── README.md               # Letter-specific documentation
 │   ├── letter-a.ts
 │   ├── letter-b.ts
 │   └── ... (26 total)
-└── symbols/                     # Symbol glyphs
+└── glyphs/symbols/                     # Symbol glyphs
     ├── README.md               # Symbol-specific documentation
     ├── symbol-hyphen.ts
     ├── symbol-pipe.ts
@@ -84,7 +84,7 @@ All uppercase letters A-Z are available. Letters vary in width:
 | **Regular** | A, B, C, D, E, F, G, H, K, L, N, O, P, Q, R, S, T, U, V, X, Y, Z | 3-4     |
 | **Wide**    | M, W                                                             | 5       |
 
-See [`letters/README.md`](./letters/README.md) for detailed letter documentation.
+See [`glyphs/letters/README.md`](./glyphs/letters/README.md) for detailed letter documentation.
 
 ### Symbols (6 characters)
 
@@ -97,7 +97,7 @@ See [`letters/README.md`](./letters/README.md) for detailed letter documentation
 | `?`    | Question    | 4     | Question mark for interrogatives   |
 | `!`    | Exclamation | 1     | Exclamation point for emphasis     |
 
-See [`symbols/README.md`](./symbols/README.md) for detailed symbol documentation.
+See [`glyphs/symbols/README.md`](./glyphs/symbols/README.md) for detailed symbol documentation.
 
 ## Quick Start
 
@@ -274,8 +274,8 @@ Sample renderings using these glyphs:
 ## Related Documentation
 
 - **[`/docs/BLOCKY-TEXT-README.md`](../../../BLOCKY-TEXT-README.md)**: Complete system documentation
-- **[`letters/README.md`](./letters/README.md)**: Letter-specific documentation (A-Z)
-- **[`symbols/README.md`](./symbols/README.md)**: Symbol-specific documentation
+- **[`glyphs/letters/README.md`](./glyphs/letters/README.md)**: Letter-specific documentation (A-Z)
+- **[`glyphs/symbols/README.md`](./glyphs/symbols/README.md)**: Symbol-specific documentation
 - **[`block.ts`](./block.ts)**: Rendering implementation details
 - **[`theme.ts`](./theme.ts)**: Color theme system
 
