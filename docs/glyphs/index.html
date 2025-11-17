@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blocky Alphabet - Complete Glyph Reference</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      line-height: 1.6;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #333;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #F1ECEC;
+    }
+    
+    .subtitle {
+      color: #B7B1B1;
+      font-size: 1.1rem;
+    }
+    
+    h2 {
+      font-size: 2rem;
+      margin: 3rem 0 1.5rem 0;
+      color: #F1ECEC;
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.5rem;
+    }
+    
+    .glyph-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .glyph-card {
+      background: #252525;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .glyph-card:hover {
+      transform: translateY(-4px);
+      border-color: #F1ECEC;
+      box-shadow: 0 4px 12px rgba(241, 236, 236, 0.1);
+    }
+    
+    .glyph-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .glyph-char {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #F1ECEC;
+    }
+    
+    .glyph-width {
+      font-size: 0.875rem;
+      color: #B7B1B1;
+      background: #1a1a1a;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+    }
+    
+    .glyph-preview {
+      background: #1a1a1a;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .glyph-grid-display {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      background: #1a1a1a;
+      padding: 0.75rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      color: #B7B1B1;
+    }
+    
+    .controls {
+      background: #252525;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .controls label {
+      color: #F1ECEC;
+      font-weight: 500;
+    }
+    
+    .controls input[type="number"] {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: #e0e0e0;
+      padding: 0.5rem;
+      border-radius: 4px;
+      width: 80px;
+    }
+    
+    .controls button {
+      background: #F1ECEC;
+      color: #1a1a1a;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+    
+    .controls button:hover {
+      background: #B7B1B1;
+    }
+    
+    .info-box {
+      background: #252525;
+      border-left: 4px solid #F1ECEC;
+      padding: 1rem 1.5rem;
+      margin: 2rem 0;
+      border-radius: 4px;
+    }
+    
+    .info-box h3 {
+      color: #F1ECEC;
+      margin-bottom: 0.5rem;
+    }
+    
+    .info-box ul {
+      list-style-position: inside;
+      color: #B7B1B1;
+    }
+    
+    code {
+      background: #1a1a1a;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #F1ECEC;
+    }
+    
+    .legend {
+      display: flex;
+      gap: 2rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .legend-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎨 Blocky Alphabet</h1>
+      <p class="subtitle">Complete Glyph Reference — Letters & Symbols</p>
+    </header>
+
+    <div class="info-box">
+      <h3>About This System</h3>
+      <ul>
+        <li>7-row grid system for consistent character heights</li>
+        <li>Variable width: 1-5 columns depending on character</li>
+        <li>Three-color palette: Primary, Secondary, Tertiary</li>
+        <li>Supports A-Z letters and 6 punctuation symbols</li>
+      </ul>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-box" style="background: #F1ECEC;"></div>
+        <span>Primary (rows 0-2, 6)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box" style="background: #B7B1B1;"></div>
+        <span>Secondary (rows 3-5)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box" style="background: #4B4646;"></div>
+        <span>Tertiary (shading)</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label>
+        Block Size:
+        <input type="number" id="blockSize" value="12" min="4" max="24">
+      </label>
+      <button onclick="updatePreview()">Update Preview</button>
+    </div>
+
+    <h2>📝 Letters (A-Z)</h2>
+    <div class="glyph-grid" id="letters"></div>
+
+    <h2>🔣 Symbols</h2>
+    <div class="glyph-grid" id="symbols"></div>
+
+    <div class="info-box">
+      <h3>Usage Example</h3>
+      <code>
+        import { blockyTextToSVG } from './utils/alphabet';<br>
+        const svg = blockyTextToSVG('HELLO WORLD');
+      </code>
+    </div>
+  </div>
+
+  <script>
+    // Glyph data will be loaded here
+    const glyphData = {
+      letters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+      symbols: [
+        { char: '-', name: 'Hyphen', width: 3 },
+        { char: '|', name: 'Pipe', width: 1 },
+        { char: "'", name: 'Apostrophe', width: 1 },
+        { char: '"', name: 'Quote', width: 2 },
+        { char: '?', name: 'Question', width: 4 },
+        { char: '!', name: 'Exclamation', width: 1 }
+      ]
+    };
+
+    function createGlyphCard(char, isSymbol = false) {
+      const card = document.createElement('div');
+      card.className = 'glyph-card';
+      
+      const header = document.createElement('div');
+      header.className = 'glyph-header';
+      
+      const charSpan = document.createElement('span');
+      charSpan.className = 'glyph-char';
+      charSpan.textContent = isSymbol ? char.name : char;
+      
+      const widthSpan = document.createElement('span');
+      widthSpan.className = 'glyph-width';
+      widthSpan.textContent = isSymbol ? `${char.width} col` : '3-5 cols';
+      
+      header.appendChild(charSpan);
+      header.appendChild(widthSpan);
+      
+      const preview = document.createElement('div');
+      preview.className = 'glyph-preview';
+      preview.innerHTML = `<span style="font-size: 3rem; font-weight: bold; color: #F1ECEC;">${isSymbol ? char.char : char}</span>`;
+      
+      const grid = document.createElement('div');
+      grid.className = 'glyph-grid-display';
+      grid.textContent = 'Click to view ASCII grid';
+      grid.style.cursor = 'pointer';
+      grid.onclick = () => alert(`ASCII grid for "${isSymbol ? char.char : char}" would be shown here`);
+      
+      card.appendChild(header);
+      card.appendChild(preview);
+      card.appendChild(grid);
+      
+      return card;
+    }
+
+    function renderGlyphs() {
+      const lettersContainer = document.getElementById('letters');
+      const symbolsContainer = document.getElementById('symbols');
+      
+      lettersContainer.innerHTML = '';
+      symbolsContainer.innerHTML = '';
+      
+      glyphData.letters.forEach(letter => {
+        lettersContainer.appendChild(createGlyphCard(letter, false));
+      });
+      
+      glyphData.symbols.forEach(symbol => {
+        symbolsContainer.appendChild(createGlyphCard(symbol, true));
+      });
+    }
+
+    function updatePreview() {
+      const blockSize = document.getElementById('blockSize').value;
+      console.log('Updating preview with block size:', blockSize);
+      // In a real implementation, this would regenerate SVGs
+      alert(`Preview would be updated with block size: ${blockSize}px`);
+    }
+
+    // Initialize
+    renderGlyphs();
+  </script>
+</body>
+</html>
