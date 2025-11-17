@@ -48,9 +48,9 @@ describe('calculateWidth', () => {
       theme: 'light' as const,
     };
     const width = calculateWidth('ABC', options);
-    // Calculation: width = n * (4*blockSize + charSpacing) - charSpacing
-    // For n=3, blockSize=6, charSpacing=1 => 3*(24+1)-1 = 74
-    expect(width).toBe(74);
+    // Calculation: width = (cols*blockSize + charSpacing*blockSize) for each char, minus final charSpacing
+    // A=4cols, B=4cols, C=4cols: (4*6+1*6) + (4*6+1*6) + (4*6) = 30+30+24 = 84
+    expect(width).toBe(84);
   });
 
   it('should calculate width correctly with custom options', () => {
@@ -60,8 +60,8 @@ describe('calculateWidth', () => {
       theme: 'dark' as const,
     };
     const width = calculateWidth('AB', options);
-    // Calculation: 2*(4*8 + 2) - 2 = 66
-    expect(width).toBe(66);
+    // Calculation: A=4cols, B=4cols: (4*8+2*8) + (4*8) = 48+32 = 80
+    expect(width).toBe(80);
   });
 });
 
