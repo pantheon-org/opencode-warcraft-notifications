@@ -3,8 +3,6 @@ title: Documentation Deployment Migration Plan
 description: Step-by-step guide for migrating to the docs branch deployment workflow
 ---
 
-# Documentation Deployment Migration Plan
-
 This document provides a comprehensive, step-by-step plan for migrating the documentation deployment from the current setup to the new **docs branch workflow**.
 
 ## Migration Overview

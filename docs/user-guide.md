@@ -3,8 +3,6 @@ title: 'User Guide'
 description: 'Installation, configuration, and usage guide'
 ---
 
-# User Guide
-
 ## Overview
 
 Welcome to the Warcraft II Notifications Plugin for OpenCode! This guide will help you get started, configure the plugin to your preferences, and troubleshoot common issues.

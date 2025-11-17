@@ -3,8 +3,6 @@ title: 'GitHub Workflows Setup Guide'
 description: 'This document explains the streamlined GitHub Actions workflow setup for automated testing, intelligent versioning, and publishing.'
 ---
 
-# GitHub Workflows Setup Guide
-
 This document explains the streamlined GitHub Actions workflow setup for automated testing, intelligent versioning, and publishing.
 
 > 📖 **For detailed workflow documentation including step-by-step breakdowns, troubleshooting, and configuration details, see [GitHub Workflows Overview](./overview.md)**

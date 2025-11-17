@@ -3,8 +3,6 @@ title: 'CI/CD Pipeline'
 description: 'Automated release pipeline documentation'
 ---
 
-# CI/CD Pipeline Documentation
-
 > **📚 Note:** For the most current workflow documentation, see [GitHub Workflows Overview](/github-workflows/overview/). This document provides detailed technical reference for the CI/CD pipeline.
 
 ## Overview

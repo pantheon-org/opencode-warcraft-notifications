@@ -3,8 +3,6 @@ title: 'Documentation Map'
 description: 'Complete navigation guide for all project documentation'
 ---
 
-# Documentation Map
-
 ## Overview
 
 This document provides a comprehensive map of all documentation available for the Warcraft II Notifications Plugin. Use this guide to quickly find the information you need.

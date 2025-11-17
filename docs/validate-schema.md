@@ -3,8 +3,6 @@ title: 'Schema Validation'
 description: 'JSON schema validation guide'
 ---
 
-# Schema Validation Guide
-
 ## Overview
 
 This guide explains how to validate plugin configuration files against the JSON schema to ensure correct configuration syntax and values.

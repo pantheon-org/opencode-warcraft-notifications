@@ -3,8 +3,6 @@ title: 'Development Guide'
 description: 'Development setup and contributing'
 ---
 
-# Development Guide
-
 ## Overview
 
 This guide provides comprehensive information for developers working on the Warcraft II Notifications Plugin. It covers setup, development workflows, testing strategies, and contribution guidelines.

@@ -3,8 +3,6 @@ title: 'API Documentation'
 description: 'Complete API reference for the plugin'
 ---
 
-# API Documentation
-
 ## Overview
 
 This document provides comprehensive API documentation for the Warcraft II Notifications Plugin. The plugin exposes several modules with public APIs for sound management, configuration, and notification handling.

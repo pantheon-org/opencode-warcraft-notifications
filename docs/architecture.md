@@ -3,8 +3,6 @@ title: 'Architecture'
 description: 'System architecture and design'
 ---
 
-# Architecture Documentation
-
 ## Overview
 
 The Warcraft II Notifications Plugin is an OpenCode plugin that enhances the development experience by playing authentic Warcraft II unit sounds when the IDE session goes idle. The plugin is built with TypeScript and uses the Bun runtime for optimal performance.
