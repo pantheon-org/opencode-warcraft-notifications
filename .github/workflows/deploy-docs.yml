@@ -48,6 +48,12 @@ jobs:
           cd pages
           bun install --frozen-lockfile
 
+      - name: Install Playwright browsers
+        run: |
+          cd pages
+          bunx playwright install --with-deps chromium
+          echo "✅ Playwright browsers installed"
+
       - name: Transform documentation
         run: |
           cd pages
