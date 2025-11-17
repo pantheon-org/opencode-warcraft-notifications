@@ -6,19 +6,22 @@ on:
     paths:
       - 'docs/**'
       - 'pages/**'
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
+  id-token: write
 
 concurrency:
-  group: deploy-docs-${{ github.ref }}
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  deploy-docs:
-    name: Build and Deploy Documentation
+  build:
+    name: Build Documentation
     runs-on: ubuntu-latest
 
     steps:
@@ -57,39 +60,35 @@ jobs:
           bun run build
           echo "✅ Documentation built successfully"
 
-      - name: Deploy to docs branch
-        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: docs
-          publish_dir: ./pages/dist
-          force_orphan: false
-          enable_jekyll: false
-          commit_message: 'docs: Deploy documentation from ${{ github.sha }}'
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          path: ./pages/dist
 
-      - name: Ensure GitHub Pages source is set to docs
-        env:
-          GITHUB_API: https://api.github.com
-        run: |
-          echo "Ensuring GitHub Pages source is 'docs' at path '/'..."
-          set -euo pipefail
-          repo="${{ github.repository }}"
-          # idempotent PUT to set Pages source; requires pages: write permission
-          curl -sS -X PUT \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "$GITHUB_API/repos/$repo/pages" \
-            -d '{"source":{"branch":"docs","path":"/"}}' \
-          | sed -n '1,200p'
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2e6aed7e0febac5b3c0c03e # v4.0.5
+
       - name: Summary
         run: |
-          echo "🎉 Documentation Deployment Complete!"
-          echo ""
-          echo "📚 Docs Branch: docs"
-          echo "🔗 Documentation: https://github.com/${{ github.repository }}/tree/docs"
-          echo "🌐 GitHub Pages: https://pantheon-org.github.io/opencode-warcraft-notifications/"
-          echo "📝 Commit: ${{ github.sha }}"
-          echo ""
-          echo "📂 Source: ./docs/ → Transform → ./pages/src/content/docs/ → Build → ./pages/dist/ → Deploy to docs branch"
+          echo "## 🎉 Documentation Deployment Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Build Process" >> $GITHUB_STEP_SUMMARY
+          echo "1. 📄 Source docs from \`./docs/\`" >> $GITHUB_STEP_SUMMARY
+          echo "2. 🔄 Transform to \`./pages/src/content/docs/\`" >> $GITHUB_STEP_SUMMARY
+          echo "3. 🏗️  Build Astro site to \`./pages/dist/\`" >> $GITHUB_STEP_SUMMARY
+          echo "4. 🚀 Deploy to GitHub Pages via Actions" >> $GITHUB_STEP_SUMMARY

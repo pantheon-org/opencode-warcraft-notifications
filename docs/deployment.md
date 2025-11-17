@@ -812,105 +812,60 @@ The project documentation is automatically deployed to GitHub Pages at:
 
 #### Deployment Architecture
 
-The documentation uses a **two-branch deployment workflow**:
+The documentation uses **GitHub Actions native deployment**:
 
 ```mermaid
 graph TB
-    A[Push to main branch] --> B{Changed docs/** ?}
-    B -->|Yes| C[Trigger deploy-docs.yml]
-    B -->|No| D[Skip deployment]
-    C --> E[Checkout main branch]
-    E --> F[Setup Bun runtime]
-    F --> G[Install dependencies]
-    G --> H[Build with Astro]
-    H --> I[Generate docs/dist/]
-    I --> J[Deploy to docs branch]
-    J --> K[GitHub Pages serves docs branch]
+    A[Trigger Event] --> B{Event Type?}
+    B -->|Push to main| C[docs/** changed?]
+    B -->|Release published| D[Build Documentation]
+    B -->|Manual dispatch| D
+    C -->|Yes| D
+    C -->|No| E[Skip deployment]
+    D --> F[Checkout main branch]
+    F --> G[Setup Bun runtime]
+    G --> H[Install dependencies]
+    H --> I[Transform docs]
+    I --> J[Build with Astro]
+    J --> K[Upload Pages artifact]
+    K --> L[Deploy to GitHub Pages]
+    L --> M[Site live at pages URL]
 
-    style C fill:#4caf50
-    style J fill:#2196f3
-    style K fill:#ff9800
+    style D fill:#4caf50
+    style L fill:#2196f3
+    style M fill:#ff9800
 ```
 
-**Branch Structure**:
+**Key Benefits**:
 
-- **`main` branch**: Contains source markdown files and build configuration
-- **`docs` branch**: Contains generated static site artifacts (auto-generated)
+- **No branch management**: No need to maintain a separate `docs` or `gh-pages` branch
+- **Automatic on releases**: Documentation updates with every release
+- **Artifact-based**: Uses GitHub's native Pages deployment
+- **Concurrent safe**: Built-in concurrency control prevents conflicts
 
-This separation ensures:
+**Deployment Sources**:
 
-- Version control tracks only meaningful source changes
-- Generated artifacts don't pollute main branch history
-- Documentation builds and deploys automatically via CI/CD
-
-For complete branch structure details, see [Docs Branch Structure](/docs-branch-structure/).
+- `./docs/` - Source markdown documentation files on `main` branch
+- `./pages/` - Astro static site generator configuration
+- Builds are completely ephemeral - no tracking of generated artifacts
 
 #### Automatic Deployment
 
 Documentation is automatically deployed when:
 
-- Changes are pushed to `main` branch in the `docs/**` directory
-- Workflow file `.github/workflows/deploy-docs.yml` is modified
+- **Releases are published** - Documentation updates with each release
+- Changes are pushed to `main` branch in the `docs/**` or `pages/**` directories
 - Manual workflow dispatch is triggered
 
 **Workflow**: `.github/workflows/deploy-docs.yml`
-
-```yaml
-name: Deploy Documentation to GitHub Pages
-
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'docs/**'
-      - '.github/workflows/deploy-docs.yml'
-  workflow_dispatch:
-
-permissions:
-  contents: write # Required for pushing to docs branch
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source branch
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: |
-          cd docs
-          bun install
-
-      - name: Transform and build with Astro
-        run: |
-          cd docs
-          bun run build
-
-      - name: Deploy to docs branch
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: docs
-          publish_dir: ./docs/dist
-          force_orphan: false
-          enable_jekyll: false
-          commit_message: 'docs: Deploy documentation from commit ${{ github.sha }}'
-```
 
 **Key Features**:
 
 - **Static Site Generator**: Astro with Starlight theme
 - **Build Tool**: Bun (fast package management and builds)
-- **Deployment Action**: `peaceiris/actions-gh-pages@v4`
-- **Target Branch**: `docs` (orphan branch, auto-created)
-- **Concurrency Control**: Prevents overlapping deployments
+- **Deployment Method**: GitHub Actions native Pages deployment
+- **Concurrency Control**: Single `pages` group prevents overlapping deployments
+- **Permissions**: Minimal required permissions (contents: read, pages: write, id-token: write)
 
 #### Manual Deployment
 
@@ -928,14 +883,15 @@ To manually trigger documentation deployment:
 **Required**: Repository administrator must configure GitHub Pages:
 
 1. Go to repository **Settings** → **Pages**
-2. Under **Source**, select:
-   - Source: **Deploy from a branch**
-3. Under **Branch**, select:
-   - Branch: **docs**
-   - Directory: **/ (root)**
-4. Click **Save**
+2. Under **Build and deployment**, select:
+   - Source: **GitHub Actions**
+3. **Save** (if required)
 
-**Important**: The `docs` branch is automatically created by the workflow on first run. If it doesn't exist yet, trigger the workflow manually.
+**Important**:
+
+- No branch selection is needed - deployment uses Actions artifacts
+- First deployment creates the `github-pages` environment automatically
+- The workflow requires `pages: write` and `id-token: write` permissions
 
 #### Verification
 
@@ -948,9 +904,8 @@ curl -I https://pantheon-org.github.io/opencode-warcraft-notifications/ | grep "
 # Open in browser
 open https://pantheon-org.github.io/opencode-warcraft-notifications/
 
-# Verify docs branch exists
-git fetch --all
-git branch -a | grep docs
+# Check deployment status
+gh api repos/:owner/:repo/pages/deployments --jq '.[0] | {status, environment, created_at}'
 ```
 
 **Verification Checklist**:
@@ -962,18 +917,27 @@ git branch -a | grep docs
 - [ ] Images and assets load correctly
 - [ ] CSS styling is applied
 - [ ] Mobile view renders correctly
+- [ ] `github-pages` environment shows successful deployment
 
 #### Build Process
 
-The documentation build process consists of:
+The documentation build process consists of two jobs:
 
-1. **Transform**: `transform-docs.js` processes source markdown files
+**Job 1: Build**
+
+1. **Transform**: `pages/transform-docs.js` syncs `./docs/` → `./pages/src/content/docs/`
 2. **Build**: Astro compiles markdown to HTML with Starlight theme
-3. **Output**: Static site generated in `docs/dist/`
-4. **Deploy**: Contents of `docs/dist/` pushed to `docs` branch
-5. **Serve**: GitHub Pages serves from `docs` branch
+3. **Output**: Static site generated in `./pages/dist/`
+4. **Upload**: Build artifacts uploaded as Pages artifact
 
-**Build Configuration**: `docs/astro.config.mjs`
+**Job 2: Deploy**
+
+1. **Download**: Retrieve Pages artifact from build job
+2. **Deploy**: GitHub Actions deploys to Pages service
+3. **Environment**: Creates/updates `github-pages` environment
+4. **Serve**: GitHub Pages serves the deployed artifact
+
+**Build Configuration**: `pages/astro.config.mjs`
 
 ```javascript
 export default defineConfig({
@@ -994,47 +958,54 @@ export default defineConfig({
 
 **Site not accessible**:
 
-1. Verify GitHub Pages is configured to use `docs` branch (Settings → Pages)
+1. Verify GitHub Pages source is set to **GitHub Actions** (Settings → Pages → Source)
 2. Check workflow run status in Actions tab
-3. Ensure `docs` branch exists: `git branch -a | grep docs`
-4. Verify workflow has `contents: write` permission
-5. Wait 5-10 minutes for DNS propagation
+3. Verify deployment to `github-pages` environment succeeded
+4. Check workflow has required permissions (`pages: write`, `id-token: write`)
+5. Wait 2-5 minutes for deployment to complete
 
 **Build failures**:
 
-1. Check workflow logs in Actions tab
+1. Check workflow logs in Actions tab (both build and deploy jobs)
 2. Review Astro build output for errors
 3. Verify all markdown files have valid frontmatter
 4. Check for broken internal links
-5. Ensure dependencies are up to date
+5. Ensure dependencies are up to date in `pages/bun.lock`
 
 **Content not updating**:
 
 1. Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)
-2. Verify changes were committed to `docs/**` on main branch
+2. Verify changes were committed to `docs/**` or `pages/**` on main branch
 3. Check workflow was triggered (Actions tab)
-4. Verify `docs` branch has new commits
-5. Wait for GitHub Pages deployment to complete (1-2 minutes)
+4. Verify both build and deploy jobs completed successfully
+5. Check deployment environment shows latest deployment
 
-**Docs branch not created**:
+**Permissions errors**:
 
-1. Manually trigger workflow (Actions → Deploy Documentation → Run workflow)
-2. Check workflow logs for permission errors
-3. Verify `GITHUB_TOKEN` has write access
-4. Check repository Actions permissions (Settings → Actions → General)
+1. Go to Settings → Actions → General
+2. Under "Workflow permissions", ensure:
+   - "Read and write permissions" is selected, OR
+   - Pages deployment permissions are explicitly granted
+3. Manually trigger workflow to retry
 
 **Build artifacts in main branch**:
 
-If you see `dist/` or `.astro/` directories in `git status` on main branch:
+Build artifacts should never appear in the main branch. If you see `dist/` or `.astro/`:
 
 ```bash
-# Remove from tracking
-git rm -r --cached dist/ docs/dist/ docs/.astro/ .astro/
+# Ensure .gitignore contains build artifacts
+echo "dist/" >> .gitignore
+echo ".astro/" >> .gitignore
+echo "pages/dist/" >> .gitignore
+echo "pages/.astro/" >> .gitignore
+
+# Remove from tracking if accidentally committed
+git rm -r --cached dist/ pages/dist/ pages/.astro/ .astro/ 2>/dev/null || true
 git commit -m "chore: Remove build artifacts from version control"
 git push origin main
 
 # Clean local working directory
-rm -rf dist/ docs/dist/ docs/.astro/ .astro/
+rm -rf dist/ pages/dist/ pages/.astro/ .astro/
 ```
 
 #### Monitoring
@@ -1042,17 +1013,45 @@ rm -rf dist/ docs/dist/ docs/.astro/ .astro/
 Monitor documentation deployment health:
 
 - **Workflow status**: [GitHub Actions](https://github.com/pantheon-org/opencode-warcraft-notifications/actions/workflows/deploy-docs.yml)
-- **Deployment history**: [Deployments](https://github.com/pantheon-org/opencode-warcraft-notifications/deployments)
+- **Deployment history**: [Environments → github-pages](https://github.com/pantheon-org/opencode-warcraft-notifications/deployments/github-pages)
 - **Site availability**: Regular HTTP 200 checks
-- **Build time**: Typical deployment takes 2-5 minutes
-- **Docs branch commits**: Track deployment history
+- **Build time**: Typical deployment takes 2-5 minutes (build + deploy)
+- **Artifact retention**: Build artifacts retained for 90 days
+
+**Monitoring Commands**:
+
+```bash
+# Check latest deployment status
+gh api repos/:owner/:repo/pages/deployments --jq '.[0]'
+
+# Check workflow runs
+gh run list --workflow=deploy-docs.yml --limit 5
+
+# View environment deployments
+gh api repos/:owner/:repo/environments/github-pages/deployments --jq '.[]| {created_at, environment, state}'
+```
+
+#### Migrating from Branch-Based Deployment
+
+If you previously used the `docs` branch deployment method:
+
+1. **Keep existing docs branch** (optional) - It won't interfere with Actions deployment
+2. **Update Pages source**: Settings → Pages → Source → **GitHub Actions**
+3. **First Actions deployment**: Manually trigger the workflow
+4. **Delete docs branch** (optional): `git push origin --delete docs` after verifying new deployment works
+
+**Benefits of Migration**:
+
+- No branch to maintain or track
+- Better concurrency control
+- Cleaner git history
+- Native GitHub Pages integration
 
 #### Related Documentation
 
-- [Docs Branch Structure](/docs-branch-structure/) - Complete branch organization specification
-- [Docs Migration Plan](/docs-migration-plan/) - Migration guide from old workflow
 - [CI/CD Pipeline](/pipeline/) - Complete pipeline documentation
 - [Development Guide](/development/) - Local documentation development
+- [GitHub Workflows](/github-workflows/) - Workflow architecture and details
 
 ---
 
