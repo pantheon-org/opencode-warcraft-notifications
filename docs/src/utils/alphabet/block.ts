@@ -18,8 +18,8 @@ export type Block = {
 
 const DEFAULT_BLOCKY_TEXT_OPTIONS: Required<BlockyTextOptions> = {
   theme: themeType.LIGHT,
-  blockSize: 20,
-  charSpacing: 5,
+  blockSize: 6, // OpenCode.ai uses 6px blocks
+  charSpacing: 1, // 1 block spacing = 6px with blockSize=6
 };
 
 export const textToBlocks = (
@@ -54,10 +54,15 @@ export const textToBlocks = (
         const raw = rowArr[col];
         let cellValue: any = raw;
 
-        // If numeric rows (0/1), convert to cellType
+        // If numeric rows (0/1/2/3), convert to cellType
         if (typeof raw === 'number') {
           if (raw === 1) {
+            // Auto-assign based on row: rows 3-5 use SECONDARY, others use PRIMARY
             cellValue = row >= 3 && row <= 5 ? cellType.SECONDARY : cellType.PRIMARY;
+          } else if (raw === 2) {
+            cellValue = cellType.SECONDARY;
+          } else if (raw === 3) {
+            cellValue = cellType.TERTIARY;
           } else {
             cellValue = cellType.BLANK;
           }
@@ -86,9 +91,26 @@ export const textToBlocks = (
  * Calculate the width of the rendered text
  */
 export const calculateWidth = (text: string, options: Required<BlockyTextOptions>): number => {
-  const charCount = text.length;
-  // Each character is 4 blocks wide (24px with blockSize=6)
-  return charCount * (4 * options.blockSize + options.charSpacing) - options.charSpacing;
+  const { blockSize, charSpacing } = options;
+  let totalWidth = 0;
+
+  for (const char of text.toUpperCase()) {
+    const charData = ALPHABET[char as keyof typeof ALPHABET];
+    if (!charData) {
+      // For missing characters, assume 4-column width
+      totalWidth += 4 * blockSize + charSpacing * blockSize;
+      continue;
+    }
+
+    // Calculate actual column width for this character
+    const rowsObj = charData.rows as Record<number, any[]>;
+    const cols = Math.max(...Object.values(rowsObj).map((r) => (Array.isArray(r) ? r.length : 0)));
+
+    totalWidth += cols * blockSize + charSpacing * blockSize;
+  }
+
+  // Remove trailing charSpacing
+  return totalWidth - charSpacing * blockSize;
 };
 
 /**

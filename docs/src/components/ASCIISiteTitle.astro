@@ -1,13 +1,12 @@
 ---
-import { blockyTextToSVG } from '../utils/blocky-text-to-svg';
+import { blockyTextToSVG } from '../utils/alphabet';
 
-// Generate blocky pixel-art logo matching OpenCode.ai style
+// Generate blocky pixel-art logo using the new alphabet module
+// Note: Using 'light' theme with adjusted blockSize and charSpacing
 const logoSVG = blockyTextToSVG('WARCRAFT', {
-	colorLight: '#F1ECEC',
-	colorMedium: '#B7B1B1',
-	colorDark: '#4B4646',
+	theme: 'light',
 	blockSize: 6,
-	charSpacing: 6,
+	charSpacing: 1, // In block units (1 block = 6px spacing)
 });
 ---
 

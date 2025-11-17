@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test';
-import { blockyTextToSVG, getAvailableCharacters } from './blocky-text-to-svg';
+import { blockyTextToSVG, getAllAvailableCharacters } from './alphabet';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -91,7 +91,7 @@ describe('OpenCode Logo Comparison', () => {
 
   it('should support all letters in OPENCODE', () => {
     const openCodeLetters = ['O', 'P', 'E', 'N', 'C', 'O', 'D', 'E'];
-    const availableChars = getAvailableCharacters();
+    const availableChars = getAllAvailableCharacters();
 
     openCodeLetters.forEach((letter) => {
       expect(availableChars).toContain(letter);

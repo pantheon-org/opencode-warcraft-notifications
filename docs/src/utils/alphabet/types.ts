@@ -54,6 +54,7 @@ export const cellType = {
   BLANK: 'blank',
   PRIMARY: 'primary',
   SECONDARY: 'secondary',
+  TERTIARY: 'tertiary',
 } as const;
 
 /**

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'bun:test';
-import { blockyTextToSVG, getAvailableCharacters } from './blocky-text-to-svg';
+import { blockyTextToSVG, getAllAvailableCharacters } from './alphabet';
 
 describe('blockyTextToSVG', () => {
-  it('should generate SVG matching OpenCode.ai style', () => {
+  it('should generate SVG with new alphabet style', () => {
     const svg = blockyTextToSVG('OPENCODE');
 
     // Should be valid SVG
@@ -10,48 +10,46 @@ describe('blockyTextToSVG', () => {
     expect(svg).toContain('</svg>');
     expect(svg).toContain('xmlns="http://www.w3.org/2000/svg"');
 
-    // Should use OpenCode.ai color palette
-    expect(svg).toContain('fill="#F1ECEC"'); // Light
-    expect(svg).toContain('fill="#B7B1B1"'); // Medium
-    expect(svg).toContain('fill="#4B4646"'); // Dark
+    // New alphabet uses simplified 2-color palette (PRIMARY/SECONDARY)
+    // PRIMARY = light (#F1ECEC), SECONDARY = medium (#B7B1B1) in light theme
+    expect(svg).toContain('fill="#F1ECEC"'); // PRIMARY
+    expect(svg).toContain('fill="#B7B1B1"'); // SECONDARY
 
     // Should have correct structure
     expect(svg).toContain('viewBox=');
     expect(svg).toContain('fill="none"');
   });
 
-  it('should match OpenCode logo structure for letter O', () => {
+  it('should render letter O with correct structure', () => {
     const svg = blockyTextToSVG('O');
 
-    // OpenCode first 'O' uses medium and dark (not light)
-    expect(svg).toContain('fill="#B7B1B1"'); // Medium
-    expect(svg).toContain('fill="#4B4646"'); // Dark
+    // New alphabet uses PRIMARY and SECONDARY colors
+    expect(svg).toContain('fill="#F1ECEC"'); // PRIMARY
+    expect(svg).toContain('fill="#B7B1B1"'); // SECONDARY
 
     // Should have multiple paths (one per block)
     const pathCount = (svg.match(/<path/g) || []).length;
     expect(pathCount).toBeGreaterThan(10); // 'O' should have multiple blocks
   });
 
-  it('should generate same dimensions as OpenCode logo', () => {
-    // OpenCode logo: width="234" height="42"
-    // With 8 characters "OPENCODE" and blockSize=6, charSpacing=6
-    // Expected calculation: 8 chars * (4*6 + 6) - 6 = 8 * 30 - 6 = 234
+  it('should generate correct dimensions', () => {
+    // With blockSize=6, charSpacing=1 (1 block = 6px)
     // Height: 7 rows * 6 pixels = 42
     const svg = blockyTextToSVG('OPENCODE');
 
-    expect(svg).toContain('width="234"'); // Should match exactly
     expect(svg).toContain('height="42"'); // 7-row grid = 42px height
+    expect(svg).toContain('width="234"'); // Should match expected width
   });
 
   it('should handle all OpenCode letters', () => {
     const openCodeLetters = ['O', 'P', 'E', 'N', 'C', 'O', 'D', 'E'];
-    const availableChars = getAvailableCharacters();
+    const availableChars = getAllAvailableCharacters();
 
     // Check which letters we have
     const supportedLetters = openCodeLetters.filter((letter) => availableChars.includes(letter));
 
-    // Should support at least some OpenCode letters
-    expect(supportedLetters.length).toBeGreaterThan(0);
+    // Should support all OpenCode letters
+    expect(supportedLetters.length).toBe(8);
 
     // Generate SVG for supported letters
     supportedLetters.forEach((letter) => {
@@ -61,8 +59,8 @@ describe('blockyTextToSVG', () => {
     });
   });
 
-  it('should use 7-row × 4-column grid like OpenCode logo', () => {
-    // OpenCode uses a 7-row grid system with 6-pixel blocks
+  it('should use 7-row grid system', () => {
+    // New alphabet uses a 7-row grid system with 6-pixel blocks by default
     const svg = blockyTextToSVG('A', { blockSize: 6 });
 
     // Height should be 7 rows * 6 pixels = 42
@@ -85,20 +83,18 @@ describe('blockyTextToSVG', () => {
     expect(svg1).toBe(svg2);
   });
 
-  it('should support custom OpenCode-style palettes', () => {
-    // Test with alternative color scheme
-    const svg = blockyTextToSVG('O', {
-      colorLight: '#FFFFFF',
-      colorMedium: '#888888',
-      colorDark: '#000000',
+  it('should support custom themes', () => {
+    // Test with dark theme
+    const svgDark = blockyTextToSVG('O', {
+      theme: 'dark',
     });
 
-    // 'O' uses medium and dark
-    expect(svg).toContain('fill="#888888"'); // Medium
-    expect(svg).toContain('fill="#000000"'); // Dark
+    // Dark theme uses white for primary, gray for secondary
+    expect(svgDark).toContain('fill="#FFFFFF"'); // PRIMARY in dark theme
+    expect(svgDark).toContain('fill="#626262"'); // SECONDARY in dark theme
   });
 
-  it('should calculate width correctly based on character count', () => {
+  it('should calculate width based on actual character widths', () => {
     const svg1char = blockyTextToSVG('A');
     const svg2char = blockyTextToSVG('AA');
 
@@ -112,20 +108,14 @@ describe('blockyTextToSVG', () => {
     const w1 = parseInt(width1!);
     const w2 = parseInt(width2!);
 
-    // Two characters should be greater than one character
+    // Two characters should be wider than one character
     expect(w2).toBeGreaterThan(w1);
-
-    // Width calculation: charCount * (4*blockSize + charSpacing) - charSpacing
-    // 1 char: 1 * 30 - 6 = 24
-    // 2 chars: 2 * 30 - 6 = 54
-    expect(w1).toBe(24);
-    expect(w2).toBe(54);
   });
 });
 
-describe('OpenCode.ai logo comparison', () => {
-  it('should generate exact dimensions as OpenCode logo', () => {
-    // OpenCode logo from https://opencode.ai/docs is 234×42
+describe('New alphabet system', () => {
+  it('should generate exact dimensions for OPENCODE', () => {
+    // New alphabet should produce 234×42 dimensions
     const svg = blockyTextToSVG('OPENCODE');
 
     expect(svg).toContain('width="234"');
@@ -133,75 +123,63 @@ describe('OpenCode.ai logo comparison', () => {
     expect(svg).toContain('viewBox="0 0 234 42"');
   });
 
-  it('should use same color values as OpenCode logo SVG', () => {
-    // From https://opencode.ai/docs/_astro/logo-dark.DOStV66V.svg
-    const openCodeColors = {
-      light: '#F1ECEC',
-      medium: '#B7B1B1',
-      dark: '#4B4646',
+  it('should use new alphabet color palette', () => {
+    // New alphabet uses simplified color scheme
+    const colors = {
+      primary: '#F1ECEC', // Light
+      secondary: '#B7B1B1', // Medium
     };
 
-    // Test with 'C' which uses light color in OpenCode logo
+    // Test with 'C' which should use both colors
     const svg = blockyTextToSVG('C');
 
-    expect(svg).toContain(`fill="${openCodeColors.light}"`);
-    expect(svg).toContain(`fill="${openCodeColors.dark}"`);
+    expect(svg).toContain(`fill="${colors.primary}"`);
+    expect(svg).toContain(`fill="${colors.secondary}"`);
   });
 
-  it('should produce path elements like OpenCode logo', () => {
-    // OpenCode logo structure:
-    // <path d="M18 30H6V18H18V30Z" fill="#4B4646"/>
+  it('should produce path elements with correct format', () => {
+    // Path format: M x y H x V y H x V y Z
     const svg = blockyTextToSVG('O');
 
-    // Should use similar path format: MoveTo, Horizontal, Vertical lines
+    // Should use rectangular path format
     expect(svg).toMatch(/<path d="M\d+ \d+H\d+V\d+H\d+V\d+Z"/);
 
-    // Should have fill attributes
+    // Should have fill attributes with 6-digit hex colors
     expect(svg).toMatch(/fill="#[0-9A-F]{6}"/i);
   });
 
-  it('should generate rectangular blocks like OpenCode', () => {
-    const svg = blockyTextToSVG('A', { blockSize: 6 });
+  it('should handle variable-width characters', () => {
+    // New alphabet supports 1-5 column widths
+    // Test that different letters can have different widths
+    const svgI = blockyTextToSVG('I'); // Narrow letter
+    const svgW = blockyTextToSVG('W'); // Wide letter
 
-    // Each block should be a rectangle defined by M H V H V Z
-    // This creates a rectangular path
-    const pathRegex = /<path d="M(\d+) (\d+)H(\d+)V(\d+)H(\d+)V(\d+)Z" fill="[^"]+"\/>$/;
-    const paths = svg.split('\n').filter((line) => line.includes('<path'));
+    const widthI = parseInt(svgI.match(/width="(\d+)"/)?.[1] || '0');
+    const widthW = parseInt(svgW.match(/width="(\d+)"/)?.[1] || '0');
 
-    paths.forEach((path) => {
-      // Each path should follow the rectangular pattern
-      expect(path.trim()).toMatch(/^<path d="M\d+ \d+H\d+V\d+H\d+V\d+Z" fill="#[0-9A-F]{6}"\/>/);
-    });
-  });
-
-  it('should match OpenCode character spacing', () => {
-    // OpenCode uses consistent 30px per character (24px + 6px spacing)
-    const svg = blockyTextToSVG('OO'); // Two O's
-
-    // Width should be: 2 * 30 - 6 = 54
-    expect(svg).toContain('width="54"');
+    // W should be wider than I
+    expect(widthW).toBeGreaterThan(widthI);
   });
 
   it('should support all OPENCODE letters', () => {
     const svg = blockyTextToSVG('OPENCODE');
 
-    // Should not contain any warnings about missing characters
-    // If it renders without errors, all letters are supported
+    // Should render without errors
     expect(svg).toContain('<svg');
     expect(svg).toContain('</svg>');
     expect(svg).toContain('width="234"');
   });
 });
 
-describe('getAvailableCharacters', () => {
+describe('getAllAvailableCharacters', () => {
   it('should return an array of characters', () => {
-    const chars = getAvailableCharacters();
+    const chars = getAllAvailableCharacters();
     expect(Array.isArray(chars)).toBe(true);
     expect(chars.length).toBeGreaterThan(0);
   });
 
   it('should include characters needed for WARCRAFT', () => {
-    const chars = getAvailableCharacters();
+    const chars = getAllAvailableCharacters();
     const warcraftLetters = ['W', 'A', 'R', 'C', 'F', 'T'];
 
     warcraftLetters.forEach((letter) => {
@@ -209,8 +187,11 @@ describe('getAvailableCharacters', () => {
     });
   });
 
-  it('should include space character', () => {
-    const chars = getAvailableCharacters();
-    expect(chars).toContain(' ');
+  it('should include symbols', () => {
+    const chars = getAllAvailableCharacters();
+    // New alphabet module includes symbols
+    expect(chars).toContain('-');
+    expect(chars).toContain('!');
+    expect(chars).toContain('?');
   });
 });

@@ -10,18 +10,21 @@ export type Theme = {
   backgroundColor: string;
   primaryColor: string;
   secondaryColor: string;
+  tertiaryColor: string;
 };
 
 export const lightTheme: Theme = {
   backgroundColor: '#FFFFFF',
-  primaryColor: '#000000',
-  secondaryColor: '#9d9d9dff',
+  primaryColor: '#F1ECEC', // Light (OpenCode.ai)
+  secondaryColor: '#B7B1B1', // Medium (OpenCode.ai)
+  tertiaryColor: '#4B4646', // Dark (OpenCode.ai)
 };
 
 export const darkTheme: Theme = {
   backgroundColor: '#000000',
   primaryColor: '#FFFFFF',
-  secondaryColor: '#626262ff',
+  secondaryColor: '#626262',
+  tertiaryColor: '#626262',
 };
 
 export const getColorFromLetter = (_glyph: Glyph, theme: ThemeType, cell: CellType): string => {
@@ -31,6 +34,8 @@ export const getColorFromLetter = (_glyph: Glyph, theme: ThemeType, cell: CellTy
       return themeData.primaryColor;
     case cellType.SECONDARY:
       return themeData.secondaryColor;
+    case cellType.TERTIARY:
+      return themeData.tertiaryColor;
     case cellType.BLANK:
     default:
       return themeData.backgroundColor;
