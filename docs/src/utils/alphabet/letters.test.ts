@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { ALPHABET } from './types';
-import { cellType } from './letters/types';
+import { cellType } from './types';
 import { getColorFromLetter, themeType, darkTheme } from './theme';
 
 describe('ALPHABET structure', () => {

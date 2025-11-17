@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test';
-import { ALPHABET } from '../types';
+import { ALPHABET } from './types';
 
 describe('Letter row widths', () => {
   it('each letter has 7 rows and each row length is between 1 and 5', () => {

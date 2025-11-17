@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { getColorFromLetter, themeType } from './theme';
-import { cellType } from './letters/types';
+import { cellType } from './types';
 
 describe('themeType', () => {
   it('should have LIGHT and DARK properties', () => {

@@ -1,4 +1,4 @@
-import { type Glyph } from './types';
+import { type Glyph } from '../types';
 
 /**
  * Glyph definition for the letter 'F'.

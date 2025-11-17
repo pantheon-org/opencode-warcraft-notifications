@@ -1,4 +1,4 @@
-import { cellType } from './letters/types';
+import { cellType } from './types';
 import { getColorFromLetter, themeType, type ThemeType } from './theme';
 import { ALPHABET } from './types';
 
@@ -89,7 +89,7 @@ export const calculateWidth = (text: string, options: Required<BlockyTextOptions
   const charCount = text.length;
   // Each character is 4 blocks wide (24px with blockSize=6)
   return charCount * (4 * options.blockSize + options.charSpacing) - options.charSpacing;
-}
+};
 
 /**
  * Generate SVG path elements from blocks
@@ -101,7 +101,7 @@ export const blocksToSVGPaths = (blocks: Block[], blockSize: number): string => 
         `<path d="M${block.x} ${block.y}H${block.x + blockSize}V${block.y + blockSize}H${block.x}V${block.y}Z" fill="${block.color}"/>`,
     )
     .join('\n\t\t');
-}
+};
 
 /**
  * Convert text to blocky pixel-art SVG
@@ -124,4 +124,4 @@ export const blockyTextToSVG = (text: string, options: BlockyTextOptions = {}): 
   return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
     ${blocksToSVGPaths(blocks, opts.blockSize)}
   </svg>`;
-}
+};

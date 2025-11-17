@@ -1,4 +1,4 @@
-import { cellType, type Glyph, type CellType } from './letters/types';
+import { cellType, type Glyph, type CellType } from './types';
 
 export const themeType = {
   LIGHT: 'light',
