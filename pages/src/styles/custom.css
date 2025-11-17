@@ -935,3 +935,27 @@ site-search > button > kbd {
     display: none;
   }
 }
+
+/* ============================================
+   BADGES - ENSURE HORIZONTAL LAYOUT
+   ============================================ */
+
+/* Force badges to display inline */
+.sl-markdown-content p:has(> a > img[src*='shields.io']) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Badge links should be inline-flex */
+.sl-markdown-content p > a:has(> img[src*='shields.io']) {
+  display: inline-flex;
+  text-decoration: none !important;
+}
+
+/* Badge images should maintain their size */
+.sl-markdown-content p > a > img[src*='shields.io'] {
+  margin: 0;
+  vertical-align: middle;
+}
