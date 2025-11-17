@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'pages/**'
   workflow_dispatch:
 
 permissions:
@@ -35,18 +36,24 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-docs-${{ hashFiles('**/docs/bun.lock') }}
+          key: ${{ runner.os }}-bun-pages-${{ hashFiles('**/pages/bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-bun-docs-
+            ${{ runner.os }}-bun-pages-
 
       - name: Install dependencies
         run: |
-          cd docs
+          cd pages
           bun install --frozen-lockfile
+
+      - name: Transform documentation
+        run: |
+          cd pages
+          node transform-docs.js
+          echo "✅ Documentation transformed from ./docs/ to ./pages/src/content/docs/"
 
       - name: Build documentation
         run: |
-          cd docs
+          cd pages
           bun run build
           echo "✅ Documentation built successfully"
 
@@ -55,7 +62,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: docs
-          publish_dir: ./docs/dist
+          publish_dir: ./pages/dist
           force_orphan: false
           enable_jekyll: false
           commit_message: 'docs: Deploy documentation from ${{ github.sha }}'
@@ -82,6 +89,7 @@ jobs:
           echo ""
           echo "📚 Docs Branch: docs"
           echo "🔗 Documentation: https://github.com/${{ github.repository }}/tree/docs"
+          echo "🌐 GitHub Pages: https://pantheon-org.github.io/opencode-warcraft-notifications/"
           echo "📝 Commit: ${{ github.sha }}"
           echo ""
-          echo "✅ Deployment triggered by docs changes"
+          echo "📂 Source: ./docs/ → Transform → ./pages/src/content/docs/ → Build → ./pages/dist/ → Deploy to docs branch"

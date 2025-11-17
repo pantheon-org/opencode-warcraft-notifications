@@ -263,6 +263,41 @@ bun run type-check
 bun run lint
 ```
 
+### Documentation Workflow
+
+This project uses a two-directory approach for documentation:
+
+- **`./docs/`** - Source documentation (markdown files)
+- **`./pages/`** - Astro Starlight build configuration
+
+To work with documentation:
+
+```bash
+# Transform docs from source to build directory
+bun run pages:transform
+
+# Start development server with live reload
+bun run pages:dev
+
+# Build static site for production
+bun run pages:build
+
+# Preview production build
+bun run pages:preview
+```
+
+**Documentation Flow:**
+
+1. Edit markdown files in `./docs/`
+2. Run `bun run pages:transform` to copy to `./pages/src/content/docs/`
+3. Run `bun run pages:build` to generate static site in `./pages/dist/`
+4. GitHub Actions automatically deploys to `docs` branch → GitHub Pages
+
+For more details, see:
+
+- [Documentation Source README](docs/README.md)
+- [Architecture Reference](.context/features/ARCHITECTURE-REFERENCE.md)
+
 ### Debugging
 
 To debug the plugin and see detailed logging:
@@ -314,7 +349,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **Issues**: [GitHub Issues](https://github.com/pantheon-org/opencode-warcraft-notifications/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/pantheon-org/opencode-warcraft-notifications/discussions)
 - **Documentation**: [Live Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/)
-- **Source Docs**: [Documentation Source](docs/src/content/docs/)
+- **Source Docs**: [Documentation Source](docs/)
 
 ---
 
