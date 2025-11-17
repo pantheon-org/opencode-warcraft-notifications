@@ -13,7 +13,7 @@ description: 'Warcraft II Notifications Plugin for OpenCode'
 
 This plugin plays authentic Warcraft II unit audio clips from both Alliance and Horde factions when your OpenCode session goes idle, bringing back memories of commanding orcs, knights, trolls, and mages in the classic RTS game.
 
-[Quick Start](#quick-start) • [Documentation](/) • [Contributing](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/CONTRIBUTING.md)
+[Quick Start](#quick-start) • [Documentation](/index) • [Contributing](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/CONTRIBUTING.md)
 
 </div>
 
@@ -40,20 +40,20 @@ This project includes comprehensive documentation for all users:
 
 ### For Users
 
-- **[User Guide](/user-guide/)** - Installation, configuration, and usage
-- **[FAQ](/user-guide/#faq)** - Common questions and answers
+- **[User Guide](/user-guide)** - Installation, configuration, and usage
+- **[FAQ](/user-guide#faq)** - Common questions and answers
 
 ### For Developers
 
-- **[Development Guide](/development/)** - Setup, workflow, and contributing
-- **[API Documentation](/api/)** - Complete technical reference
-- **[Architecture](/architecture/)** - System design and components
+- **[Development Guide](/development)** - Setup, workflow, and contributing
+- **[API Documentation](/api)** - Complete technical reference
+- **[Architecture](/architecture)** - System design and components
 
 ### For Operations
 
-- **[Deployment Guide](/deployment/)** - Installation and operations
-- **[CI/CD Pipeline](/pipeline/)** - Complete pipeline technical reference
-- **[GitHub Workflows](/github-workflows/)** - CI/CD setup guides
+- **[Deployment Guide](/deployment)** - Installation and operations
+- **[CI/CD Pipeline](/pipeline)** - Complete pipeline technical reference
+- **[GitHub Workflows](/github-workflows)** - CI/CD setup guides
 
 ### Complete Documentation
 
@@ -87,8 +87,8 @@ On first run, the plugin automatically copies bundled WAV files to your local pl
 ### Next Steps
 
 - **Configure factions**: See [Configuration](#configuration) below
-- **Customize sounds**: See [User Guide - Customization](/user-guide/#customization)
-- **Troubleshoot**: See [User Guide - Troubleshooting](/user-guide/#troubleshooting)
+- **Customize sounds**: See [User Guide - Customization](/user-guide#customization)
+- **Troubleshoot**: See [User Guide - Troubleshooting](/user-guide#troubleshooting)
 
 ## Configuration
 
@@ -141,9 +141,9 @@ You can customize where sound files are stored:
 
 For complete configuration options and examples, see:
 
-- **[User Guide - Configuration](/user-guide/#configuration)**
-- **[API Documentation - Configuration](/api/#plugin-configuration-module)**
-- **[Schemas Documentation](/schemas/)**
+- **[User Guide - Configuration](/user-guide#configuration)**
+- **[API Documentation - Configuration](/api#plugin-configuration-module)**
+- **[Schemas Documentation](/schemas)**
 
 ## How It Works
 
@@ -166,8 +166,8 @@ The plugin includes 100+ authentic sounds from both factions, including:
 
 For the complete list of sounds and examples, see:
 
-- **[User Guide - Sound Factions](/user-guide/#sound-factions)**
-- **[Architecture - Sound Data](/architecture/#sound-data-module)**
+- **[User Guide - Sound Factions](/user-guide#sound-factions)**
+- **[Architecture - Sound Data](/architecture#sound-data-module)**
 
 ## Platform Support
 
@@ -177,8 +177,8 @@ For the complete list of sounds and examples, see:
 
 For detailed platform-specific setup and troubleshooting, see:
 
-- [User Guide - Installation](/user-guide/#installation)
-- [Deployment Guide - Platform-Specific Setup](/deployment/#platform-specific-setup)
+- [User Guide - Installation](/user-guide#installation)
+- [Deployment Guide - Platform-Specific Setup](/deployment#platform-specific-setup)
 
 ## Sound Sources
 
@@ -191,8 +191,8 @@ All sound files are bundled with the plugin from Warcraft II archives. The plugi
 
 For technical details, see:
 
-- **[Architecture - Bundled Sounds](/architecture/#bundled-sounds-module)**
-- **[Deployment - Sound Management](/deployment/#sound-file-management)**
+- **[Architecture - Bundled Sounds](/architecture#bundled-sounds-module)**
+- **[Deployment - Sound Management](/deployment#sound-file-management)**
 
 ## Updating
 
@@ -211,11 +211,11 @@ echo "Plugin update script finished successfully.")
 opencode  # Reinstalls latest
 ```
 
-For more details, see the [User Guide - Updating](/user-guide/#updating-the-plugin).
+For more details, see the [User Guide - Updating](/user-guide#updating-the-plugin).
 
 ## Development
 
-For development instructions, see the [Development Guide](/development/).
+For development instructions, see the [Development Guide](/development).
 
 Quick start:
 
@@ -230,7 +230,7 @@ bun run type-check
 bun run lint
 ```
 
-See the [Development Guide](/development/) for complete development workflow, testing strategies, and contributing guidelines.
+See the [Development Guide](/development) for complete development workflow, testing strategies, and contributing guidelines.
 
 ---
 
@@ -238,35 +238,35 @@ See the [Development Guide](/development/) for complete development workflow, te
 
 Having issues? Check these resources:
 
-- **[User Guide - Troubleshooting](/user-guide/#troubleshooting)** - Common issues and solutions
-- **[User Guide - FAQ](/user-guide/#faq)** - Frequently asked questions
-- **[Deployment Guide - Troubleshooting](/deployment/#troubleshooting)** - Deployment and configuration issues
+- **[User Guide - Troubleshooting](/user-guide#troubleshooting)** - Common issues and solutions
+- **[User Guide - FAQ](/user-guide#faq)** - Frequently asked questions
+- **[Deployment Guide - Troubleshooting](/deployment#troubleshooting)** - Deployment and configuration issues
 
 ## Contributing
 
 We welcome contributions! Please see:
 
 - **[Contributing Guide](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/CONTRIBUTING.md)** - How to contribute
-- **[Development Guide](/development/)** - Development setup and workflow
-- **[Onboarding Guide](/onboarding/)** - New contributor onboarding
-- **[Architecture Documentation](/architecture/)** - System design
-- **[API Documentation](/api/)** - Technical reference
+- **[Development Guide](/development)** - Development setup and workflow
+- **[Onboarding Guide](/onboarding)** - New contributor onboarding
+- **[Architecture Documentation](/architecture)** - System design
+- **[API Documentation](/api)** - Technical reference
 
 ## License
 
-MIT License - see [LICENSE](../LICENSE) file for details.
+MIT License - see [LICENSE](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/LICENSE) file for details.
 
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/pantheon-org/opencode-warcraft-notifications/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/pantheon-org/opencode-warcraft-notifications/discussions)
-- **Documentation**: [Documentation Index](/)
+- **Documentation**: [Documentation Index](/index)
 - **Live Docs**: [GitHub Pages](https://pantheon-org.github.io/opencode-warcraft-notifications/)
-- **Security**: [Security Policy](../SECURITY.md)
+- **Security**: [Security Policy](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/SECURITY.md)
 
 ---
 
 _"Work complete!"_ - Warcraft II Peasant  
 _"Zug zug!"_ - Warcraft II Orc
 
-> **Note:** This plugin uses an advanced AI-powered workflow system for automated versioning, publishing, and auto-merging. See [GitHub Workflows Documentation](/github-workflows/) for details.
+> **Note:** This plugin uses an advanced AI-powered workflow system for automated versioning, publishing, and auto-merging. See [GitHub Workflows Documentation](/github-workflows) for details.

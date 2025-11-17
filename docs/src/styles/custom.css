@@ -1,15 +1,937 @@
 /**
- * Warcraft Notifications Documentation - OpenCode Minimal Styling
- * 
- * This stylesheet provides minimal customization to match OpenCode.ai/docs exactly.
- * OpenCode uses Starlight's default styling with minimal overrides.
+ * OpenCode Docs Theme - Exact Replication
+ * Extracted from https://opencode.ai/docs
+ * Using exact colors, typography, and spacing from their CSS
  */
 
-/* OpenCode uses Starlight defaults - this file is intentionally minimal */
+/* ============================================
+   CORE VARIABLES - EXACT FROM OPENCODE
+   ============================================ */
 
-/* Only override: Ensure smooth scrolling (optional, respects prefers-reduced-motion) */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
+:root {
+  /* OpenCode Font Stack - IBM Plex Mono */
+  --__sl-font: 'IBM Plex Mono', var(--sl-font-system-mono);
+
+  /* OpenCode Line Heights */
+  --sl-line-height: 1.6875;
+  --sl-line-height-headings: 1.2;
+
+  /* OpenCode Typography Sizes (exact from their CSS) */
+  --sl-text-2xs: 0.75rem;
+  --sl-text-xs: 0.8125rem;
+  --sl-text-sm: 0.875rem;
+  --sl-text-base: 1rem;
+  --sl-text-lg: 1.125rem;
+  --sl-text-xl: 1.25rem;
+  --sl-text-2xl: 1.375rem;
+  --sl-text-3xl: 1.5625rem;
+  --sl-text-4xl: 1.875rem;
+  --sl-text-5xl: 2.5rem;
+  --sl-text-6xl: 3.25rem;
+
+  /* OpenCode Heading Sizes */
+  --sl-text-h1: 2rem;
+  --sl-text-h2: var(--sl-text-4xl);
+  --sl-text-h3: 1.5rem;
+  --sl-text-h4: var(--sl-text-xl);
+  --sl-text-h5: var(--sl-text-lg);
+
+  /* OpenCode Spacing */
+  --paragraph-spacing: 1.375rem;
+  --sl-nav-gap: 40px;
+
+  /* Light Mode Colors - Exact HSL from OpenCode */
+  --sl-color-bg: hsl(0, 20%, 99%);
+  --sl-color-gray-5: hsl(0, 1%, 85%);
+  --sl-color-text: hsl(0, 1%, 39%);
+  --sl-border-color: hsl(0, 1%, 85%);
+  --sl-color-hairline-shade: hsl(0, 1%, 85%);
+
+  --color-background: hsl(0, 20%, 99%);
+  --color-background-weak: hsl(0, 8%, 97%);
+  --color-background-weak-hover: hsl(0, 8%, 94%);
+  --color-background-strong: hsl(0, 5%, 12%);
+  --color-background-strong-hover: hsl(0, 5%, 18%);
+  --color-background-interactive: hsl(62, 84%, 88%);
+  --color-background-interactive-weaker: hsl(64, 74%, 95%);
+
+  --color-text: hsl(0, 1%, 39%);
+  --color-text-weak: hsl(0, 1%, 60%);
+  --color-text-weaker: hsl(0, 3%, 88%);
+  --color-text-strong: hsl(0, 5%, 12%);
+  --color-text-inverted: hsl(0, 20%, 99%);
+
+  --color-border: hsl(30, 2%, 81%);
+  --color-border-weak: hsl(0, 1%, 85%);
+  --color-icon: hsl(0, 1%, 55%);
+
+  /* Starlight overrides */
+  --sl-color-bg-surface: var(--sl-color-bg);
+  --sl-color-divider: var(--sl-color-gray-5);
+  --sl-color-border: var(--sl-color-gray-5);
+  --sl-color-text-secondary: hsl(224, 6%, 66%);
+  --sl-color-text-dimmed: hsl(224, 7%, 46%);
+
+  /* Layout variables used by OpenCode */
+  --sl-nav-pad-y: 2rem;
+  --sl-color-black: #000;
+  --sl-color-gray-2: hsl(0, 3%, 36%);
+  --sl-color-gray-3: hsl(0, 4%, 44%);
+}
+
+/* Responsive heading sizes */
+@media (min-width: 50rem) {
+  :root {
+    --sl-text-h1: 2.5rem;
+    --sl-text-h2: 2rem;
+    --sl-text-h3: 1.5625rem;
+    --sl-text-h4: 1.25rem;
+  }
+}
+
+/* Dark Mode - Exact HSL from OpenCode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sl-color-bg: hsl(0, 9%, 7%);
+    --sl-color-gray-5: hsl(0, 4%, 23%);
+    --sl-color-text: hsl(0, 4%, 71%);
+    --sl-border-color: hsl(0, 4%, 23%);
+    --sl-color-hairline-shade: hsl(0, 4%, 23%);
+
+    --color-background: hsl(0, 9%, 7%);
+    --color-background-weak: hsl(0, 6%, 10%);
+    --color-background-strong: hsl(0, 15%, 94%);
+    --color-background-strong-hover: hsl(0, 15%, 97%);
+    --color-background-interactive: hsl(62, 100%, 90%);
+    --color-background-interactive-weaker: hsl(60, 20%, 8%);
+
+    --color-text: hsl(0, 4%, 71%);
+    --color-text-weak: hsl(0, 2%, 49%);
+    --color-text-weaker: hsl(0, 3%, 28%);
+    --color-text-strong: hsl(0, 15%, 94%);
+    --color-text-inverted: hsl(0, 9%, 7%);
+
+    --color-border: hsl(0, 3%, 28%);
+    --color-border-weak: hsl(0, 4%, 23%);
+    --color-icon: hsl(10, 3%, 43%);
+
+    --sl-color-text-secondary: hsl(224, 6%, 66%);
+    --sl-color-text-dimmed: hsl(224, 7%, 46%);
+  }
+}
+
+[data-theme='light'] {
+  --sl-color-border: var(--sl-color-gray-5);
+  --sl-color-text-secondary: hsl(224, 7%, 46%);
+  --sl-color-text-dimmed: hsl(224, 6%, 63%);
+}
+
+/* ============================================
+   GLOBAL BASE STYLES - EXACT FROM OPENCODE
+   ============================================ */
+
+body {
+  color: var(--color-text) !important;
+  font-size: 14px !important;
+  font-family: var(--__sl-font) !important;
+  line-height: var(--sl-line-height);
+  text-underline-offset: 0.1875rem;
+}
+
+a {
+  color: var(--color-text-strong) !important;
+}
+
+a:hover {
+  color: var(--color-text-strong) !important;
+}
+
+/* ============================================
+   TYPOGRAPHY - EXACT FROM OPENCODE
+   ============================================ */
+
+h1 {
+  font-size: 26px !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  color: var(--color-text-strong) !important;
+  line-height: var(--sl-line-height-headings);
+}
+
+h2 {
+  font-size: 22px !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  color: var(--color-text-strong) !important;
+  line-height: var(--sl-line-height-headings);
+}
+
+h3 {
+  font-size: 18px !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  color: var(--color-text-strong) !important;
+  line-height: var(--sl-line-height-headings);
+}
+
+h4 {
+  font-size: 16px !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  color: var(--color-text-strong) !important;
+  line-height: var(--sl-line-height-headings);
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+  color: var(--color-text-strong) !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+h1 a:hover,
+h2 a:hover,
+h3 a:hover,
+h4 a:hover,
+h5 a:hover,
+h6 a:hover {
+  text-decoration: none;
+  color: var(--color-text-strong) !important;
+}
+
+strong {
+  font-weight: 500 !important;
+}
+
+.page-description {
+  color: var(--color-text) !important;
+}
+
+/* Paragraph spacing from OpenCode */
+.sl-markdown-content
+  :not(a, strong, em, del, span, input, code)
+  + :not(a, strong, em, del, span, input, code, :where(.not-content *)) {
+  margin-top: var(--paragraph-spacing);
+}
+
+/* ============================================
+   HEADER - EXACT FROM OPENCODE
+   ============================================ */
+
+/* Header container - flex container to center content */
+body > .page > header {
+  display: flex;
+  align-items: center;
+  background-color: var(--sl-color-black);
+  border-bottom: 1px solid var(--sl-color-hairline);
+  padding: var(--sl-nav-pad-y) var(--sl-nav-pad-x);
+}
+
+/* Header content wrapper */
+.header {
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+body > .page > header a.site-title img {
+  height: 2.625rem !important;
+  width: auto !important;
+}
+
+body > .page > header a.site-title {
+  gap: 0.75rem !important;
+}
+
+body > .page > header a.site-title span {
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+}
+
+@media (max-width: 30rem) {
+  body > .page > header a.site-title img {
+    height: 2rem !important;
+  }
+
+  body > .page > header a.site-title span {
+    font-size: 1rem !important;
+  }
+}
+
+/* Header padding */
+@media (min-width: 50rem) {
+  body > .page > header,
+  :root[data-has-sidebar] body > .page > header {
+    padding-inline-start: var(--sl-nav-pad-y);
+    padding-inline-end: var(--sl-nav-pad-y);
+  }
+}
+
+/* Search button styling */
+body > .page > header button[data-open-modal] {
+  border-radius: 0;
+  border: none;
+  height: 2.25rem;
+  padding: 0 0 0 0.5rem;
+  color: var(--sl-color-text-secondary);
+  gap: 0.4375rem;
+  background-color: transparent;
+  line-height: normal;
+  text-transform: uppercase;
+}
+
+body > .page > header button[data-open-modal] span {
+  text-decoration: underline;
+}
+
+body > .page > header button[data-open-modal] svg {
+  display: none;
+}
+
+body > .page > header button[data-open-modal] > kbd {
+  background-color: transparent;
+  padding-inline-start: 0;
+  padding-inline-end: 0;
+  letter-spacing: -1px;
+  position: relative;
+  display: flex;
+  gap: 4px;
+}
+
+body > .page > header button[data-open-modal] > kbd kbd {
+  line-height: 1;
+  color: var(--sl-color-text-dimmed);
+  color: var(--color-icon) !important;
+  font-size: 15px;
+}
+
+body > .page > header button[data-open-modal][aria-keyshortcuts='Meta+K'] > kbd > kbd:first-child {
+  font-size: 20px;
+  line-height: 0.73;
+}
+
+/* Header right group spacing */
+.right-group {
+  gap: 40px !important;
+  align-items: center;
+}
+
+.social-icons {
+  gap: 24px !important;
+  align-items: center;
+}
+
+.social-icons a svg {
+  height: 18px !important;
+  width: 18px !important;
+}
+
+/* ============================================
+   SIDEBAR - EXACT FROM OPENCODE
+   ============================================ */
+
+nav.sidebar .sidebar-pane {
+  border-color: var(--sl-color-border);
+  padding-top: 0;
+  background-color: var(--sl-color-bg);
+}
+
+.sidebar-pane {
+  border-inline-end: 1px solid var(--color-border-weak) !important;
+}
+
+.sidebar-content {
+  padding: 24px 0 !important;
+  scrollbar-width: thin;
+}
+
+nav.sidebar .sidebar-pane > .sidebar-content::-webkit-scrollbar {
+  display: none;
+}
+
+nav.sidebar ul > li {
+  border-inline-start: none;
+}
+
+nav.sidebar ul.top-level > li > a,
+nav.sidebar ul.top-level > li > details > summary,
+nav.sidebar ul.top-level > li > details > ul > li {
+  padding-inline-start: 0;
+  margin-inline-start: 0;
+}
+
+nav.sidebar ul > li + li {
+  margin-top: 0.25rem;
+}
+
+nav.sidebar ul.top-level > li + li:has(> details) {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+nav.sidebar summary {
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
+}
+
+nav.sidebar a {
+  font-size: var(--sl-text-sm);
+  font-weight: 400;
+  color: var(--sl-color-gray-2);
+}
+
+nav.sidebar a,
+nav.sidebar span.large {
+  font-size: var(--sl-text-sm);
+  font-weight: 400;
+  color: var(--sl-color-gray-2);
+}
+
+/* Sidebar group labels */
+nav.sidebar ul.top-level > li > details > summary .group-label > span {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-family: var(--__sl-font-mono);
+  font-size: var(--sl-text-code-sm);
+  letter-spacing: 0.5px;
+  color: var(--sl-color-gray-2);
+}
+
+nav.sidebar summary svg.caret {
+  color: var(--sl-color-text-dimmed);
+  color: var(--color-icon) !important;
+}
+
+nav.sidebar a:hover {
+  color: var(--sl-color-text);
+}
+
+/* Active page state - EXACT 2px border from OpenCode */
+nav.sidebar a[aria-current='page'],
+nav.sidebar a[aria-current='page']:hover,
+nav.sidebar a[aria-current='page']:focus {
+  font-weight: 600;
+  color: var(--sl-color-text);
+  background-color: transparent;
+}
+
+a[aria-current='page'] {
+  border-left: 2px solid var(--color-background-strong);
+  background: var(--color-background-weak) !important;
+  font-weight: 600 !important;
+}
+
+ul.top-level a[aria-current='page'] > span {
+  color: var(--color-text-strong) !important;
+}
+
+/* Sidebar link styling */
+.top-level li a {
+  border-radius: 0;
+  width: 100%;
+  padding: 4px 24px !important;
+}
+
+.top-level li a:hover {
+  background: var(--color-background-weak) !important;
+}
+
+/* Sidebar details/summary */
+#starlight__sidebar > div > sl-sidebar-state-persist > ul > li > details > summary {
+  padding: 0 24px !important;
+  margin-top: 20px !important;
+}
+
+#starlight__sidebar > div > sl-sidebar-state-persist > ul > li > details > summary:hover {
+  background: var(--color-background-weak);
+}
+
+#starlight__sidebar > div > sl-sidebar-state-persist > ul > li > details > summary span {
+  color: var(--color-text-strong) !important;
+  font-weight: 600 !important;
+}
+
+/* ============================================
+   RIGHT SIDEBAR (TABLE OF CONTENTS)
+   ============================================ */
+
+@media (min-width: 72rem) {
+  .right-sidebar {
+    border-color: var(--sl-color-border);
+    border-inline-start: none !important;
+  }
+}
+
+.right-sidebar-panel {
+  padding: 24px 0 !important;
+  color: var(--color-text-weaker);
+}
+
+.right-sidebar-panel h2,
+#starlight__on-this-page {
+  margin-top: 0.3125rem;
+  font-weight: 600;
+  color: var(--color-text-dimmed);
+  text-transform: uppercase;
+  font-size: var(--sl-text-xs);
+  line-height: 1.4;
+  letter-spacing: -0.5px;
+}
+
+.right-sidebar-panel a {
+  --pad-inline: 0px;
+  color: var(--sl-color-gray-2);
+}
+
+.right-sidebar-panel a:hover {
+  color: var(--sl-color-gray-3);
+}
+
+.right-sidebar-panel a[aria-current='true'],
+.right-sidebar-panel a[aria-current='true']:hover,
+.right-sidebar-panel a[aria-current='true']:focus {
+  font-weight: 500;
+  background-color: transparent;
+  color: var(--sl-color-text);
+}
+
+.right-sidebar-panel ul li > a {
+  padding-inline: calc(0.75rem * var(--depth) + var(--pad-inline)) var(--pad-inline);
+}
+
+/* ============================================
+   MOBILE TABLE OF CONTENTS
+   ============================================ */
+
+mobile-starlight-toc nav {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: none;
+  background-color: var(--sl-color-bg);
+}
+
+mobile-starlight-toc nav summary {
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--sl-color-border);
+}
+
+mobile-starlight-toc nav summary .toggle {
+  border-radius: var(--border-radius);
+  height: 2rem;
+  background-color: transparent;
+  color: var(--color-text);
+  border: none;
+  text-decoration: underline;
+  opacity: 60% !important;
+  text-decoration: none !important;
+}
+
+mobile-starlight-toc nav summary .toggle:hover {
+  color: var(--sl-color-text);
+}
+
+mobile-starlight-toc nav summary .toggle svg {
+  color: var(--sl-color-text-dimmed);
+}
+
+mobile-starlight-toc nav .dropdown {
+  border: none;
+  background-color: transparent;
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+mobile-starlight-toc nav .dropdown a {
+  border-color: var(--sl-color-hairline);
+}
+
+mobile-starlight-toc nav .dropdown a[aria-current='true'] {
+  font-weight: 500;
+}
+
+mobile-starlight-toc nav .dropdown a[aria-current='true']:after {
+  background-color: var(--sl-color-text-dimmed);
+}
+
+#starlight__on-this-page--mobile {
+  border-bottom: 1px solid var(--color-border-weak) !important;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+
+body > .page > .main-frame .main-pane > main > .content-panel + .content-panel {
+  border-top: none !important;
+  border-top: 1px solid var(--sl-color-border);
+}
+
+@media (min-width: 72rem) {
+  body > .page > .main-frame .main-pane > main > .content-panel .sl-container {
+    margin-inline: auto;
+  }
+}
+
+.sl-markdown-content hr {
+  border-bottom: 1px solid var(--color-border-weak) !important;
+}
+
+/* ============================================
+   LINKS
+   ============================================ */
+
+.sl-markdown-content a:not(:where(.not-content *)),
+.sl-markdown-content a:not(:where(.not-content *)) code {
+  color: var(--sl-color-text);
+  text-underline-offset: 0.25rem;
+  text-decoration: underline;
+}
+
+.sl-markdown-content a:hover:not(:where(.not-content *)) {
+  color: var(--sl-color-text);
+}
+
+/* ============================================
+   CODE BLOCKS - EXACT FROM OPENCODE
+   ============================================ */
+
+.sl-markdown-content code:not(:where(.not-content *)) {
+  padding: 0;
+  background: none;
+  font-weight: 600;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-text);
+}
+
+.sl-markdown-content strong code:not(:where(.not-content *)) {
+  font-weight: 700;
+}
+
+.sl-markdown-content code:not(:where(.not-content *)):before,
+.sl-markdown-content code:not(:where(.not-content *)):after {
+  content: '`';
+}
+
+/* Expressive Code frames */
+.sl-markdown-content .expressive-code .frame:not(.has-title):not(.is-terminal) pre {
+  border-color: var(--sl-color-border);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.sl-markdown-content .expressive-code .copy {
+  inset-block-start: calc(var(--ec-brdWd) + var(--button-spacing) + 0.1rem);
+}
+
+.sl-markdown-content .expressive-code .copy .feedback {
+  --tooltip-bg: var(--sl-color-gray-3);
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.375rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sl-markdown-content .expressive-code .copy button {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0;
+  background-color: var(--sl-color-bg);
+}
+
+.sl-markdown-content .expressive-code .copy button:before {
+  opacity: 1;
+  border-color: var(--sl-color-border);
+}
+
+.sl-markdown-content .expressive-code .copy button div {
+  background-color: transparent;
+}
+
+/* Terminal frames */
+.sl-markdown-content .expressive-code .frame.is-terminal .header {
+  font-size: var(--sl-text-sm);
+  font-weight: 400;
+  border-radius: 0;
+  background: transparent;
+  border-color: var(--sl-color-border);
+}
+
+.sl-markdown-content .expressive-code .frame.is-terminal .header:after {
+  border-color: var(--sl-color-border);
+}
+
+.sl-markdown-content .expressive-code .frame.is-terminal pre {
+  border-color: var(--sl-color-border);
+}
+
+/* ============================================
+   BLOCKQUOTES
+   ============================================ */
+
+.sl-markdown-content blockquote:not(:where(.not-content *)) {
+  border-inline-start: 2px solid var(--sl-color-hairline);
+  padding-inline-start: 1rem;
+  font-size: var(--sl-text-h5);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+.sl-markdown-content thead th:not(:where(.not-content *)) {
+  border-bottom: 1px solid var(--sl-color-border);
+}
+
+.sl-markdown-content :is(th):not(:where(.not-content *)) {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: var(--sl-text-code-sm);
+  text-align: left;
+  padding-block-start: 0;
+}
+
+.sl-markdown-content tbody > tr td:not(:where(.not-content *)) {
+  font-size: var(--sl-text-sm);
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.sl-markdown-content :is(td):not(:where(.not-content *)) {
+  padding-block: 0.5rem;
+  border: none;
+}
+
+.sl-markdown-content tr:nth-child(2n):not(:where(.not-content *)) {
+  background-color: transparent;
+}
+
+/* ============================================
+   TABS - EXACT FROM OPENCODE
+   ============================================ */
+
+.sl-markdown-content [role='tablist'] {
+  border-color: var(--sl-color-hairline);
+}
+
+.sl-markdown-content .tab > [role='tab'] {
+  font-weight: 600;
+  color: var(--sl-color-text-dimmed);
+  border-color: var(--sl-color-hairline);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: var(--sl-text-code-sm);
+  padding-block-end: 0.375rem;
+}
+
+.sl-markdown-content .tab > [role='tab'][aria-selected='true'] {
+  color: var(--sl-color-text);
+  border-color: var(--sl-color-border);
+}
+
+/* ============================================
+   ASIDES/CALLOUTS - EXACT FROM OPENCODE
+   ============================================ */
+
+.starlight-aside {
+  border: none;
+  border-radius: 0;
+  padding: 0.9375rem 1rem 0.875rem;
+  display: flex;
+  gap: 16px;
+  align-items: start;
+}
+
+.starlight-aside__title {
+  text-transform: uppercase;
+  font-size: var(--sl-text-code-sm);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+
+.starlight-aside__icon {
+  font-size: 0.875rem;
+  width: 0.8125rem;
+  height: 0.8125rem;
+  opacity: 0.9;
+}
+
+.starlight-aside__title + .starlight-aside__content {
+  margin-top: 0.75rem;
+  font-size: var(--sl-text-sm);
+}
+
+.starlight-aside .starlight-aside__content {
+  margin-top: 0;
+}
+
+.sl-markdown-content .starlight-aside__content code:not(:where(.not-content *)) {
+  background-color: transparent;
+  font-size: var(--sl-text-xs);
+}
+
+/* ============================================
+   LISTS - EXACT FROM OPENCODE
+   ============================================ */
+
+.sl-markdown-content li:not(:where(.not-content *)) > ol,
+.sl-markdown-content li:not(:where(.not-content *)) > ul,
+.sl-markdown-content li + li:not(:where(.not-content *)) {
+  margin-top: 0.625rem;
+}
+
+.sl-markdown-content
+  li
+  > :last-child:not(li, ul, ol):not(a, strong, em, del, span, input, :where(.not-content *)) {
+  margin-bottom: calc(var(--paragraph-spacing) + 0.5rem);
+}
+
+ul,
+ol {
+  list-style: none !important;
+}
+
+/* ============================================
+   SEARCH DIALOG
+   ============================================ */
+
+dialog[aria-label='Search'] {
+  border: none;
+  border-radius: 0;
+  border: 1px solid var(--sl-color-border);
+  background-color: var(--sl-color-bg);
+  box-shadow: var(--sl-shadow-md);
+}
+
+dialog[aria-label='Search'][open] {
+  animation: fadeInScaleUp 0.2s ease forwards;
+}
+
+dialog[aria-label='Search']::backdrop {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: fadeInBackdrop 0.2s ease forwards;
+}
+
+@keyframes fadeInScaleUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInBackdrop {
+  0% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   MENU BUTTON
+   ============================================ */
+
+body > .page > nav starlight-menu-button button {
+  background-color: transparent;
+  color: var(--color-text);
+  box-shadow: none;
+}
+
+[data-theme='light'] starlight-menu-button[aria-expanded='true'] button {
+  background-color: var(--sl-color-gray-6);
+}
+
+[data-theme='dark'] starlight-menu-button[aria-expanded='true'] button {
+  background-color: var(--sl-color-gray-6);
+}
+
+/* ============================================
+   THEME SELECT (HIDDEN IN OPENCODE)
+   ============================================ */
+
+starlight-theme-select {
+  display: none;
+}
+
+/* ============================================
+   DETAILS
+   ============================================ */
+
+.sl-markdown-content details:not(:where(.not-content *)) {
+  --sl-details-border-color--hover: var(--sl-details-border-color);
+}
+
+/* ============================================
+   SITE SEARCH BUTTON
+   ============================================ */
+
+site-search > button {
+  text-transform: none !important;
+  gap: 12px !important;
+  background: var(--color-background-weak);
+  border: 1px solid var(--color-border-weak) !important;
+  padding: 6px 12px !important;
+  border-radius: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  body > .page > header button[data-open-modal] {
+    background: var(--color-background-weak);
+  }
+}
+
+body > .page > header button[data-open-modal] {
+  background: var(--color-background-weaker);
+}
+
+site-search > button span {
+  text-decoration: none !important;
+}
+
+site-search > button > kbd {
+  font-size: 14px !important;
+}
+
+/* ============================================
+   RIGHT SIDEBAR (TABLE OF CONTENTS) BEHAVIOR
+   ============================================ */
+
+/* On mobile/tablet: Hide right sidebar, show mobile TOC dropdown */
+@media (max-width: 71.99rem) {
+  .right-sidebar-container {
+    display: none;
+  }
+
+  mobile-starlight-toc {
+    display: block;
+  }
+}
+
+/* On desktop: Show right sidebar, hide mobile TOC dropdown */
+@media (min-width: 72rem) {
+  .right-sidebar-container {
+    display: block;
+  }
+
+  .lg\:sl-hidden {
+    display: none !important;
+  }
+
+  mobile-starlight-toc {
+    display: none;
   }
 }

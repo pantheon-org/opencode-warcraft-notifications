@@ -21,6 +21,64 @@ This guide covers deployment, installation, configuration, and operational aspec
 - [Maintenance](#maintenance)
 - [Security](#security)
 
+## Installation
+
+The Warcraft II Notifications Plugin can be installed globally or per-project using OpenCode's plugin system.
+
+### Prerequisites
+
+- OpenCode (latest version)
+- Node.js >= 18.0.0 or Bun >= 1.0.0
+- Working audio output (speakers/headphones)
+- Platform-specific audio tools:
+  - **macOS**: `afplay` (built-in)
+  - **Linux**: `libcanberra-gtk` (install via package manager)
+
+### Installation Methods
+
+#### Global Installation
+
+Add the plugin to your global OpenCode configuration:
+
+```bash
+# Edit global config
+nano ~/.config/opencode/opencode.json
+```
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
+}
+```
+
+#### Project-Specific Installation
+
+Add the plugin to your project's OpenCode configuration:
+
+```bash
+# Create project config
+mkdir -p .opencode
+nano .opencode/opencode.json
+```
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@pantheon-ai/opencode-warcraft-notifications"]
+}
+```
+
+### Post-Installation
+
+After adding the plugin to your configuration:
+
+1. **Restart OpenCode**: The plugin will be automatically installed from npm
+2. **Sound Files**: On first run, sound files are automatically copied to your system
+3. **Verification**: Sound files should appear in your platform-specific data directory
+
+For configuration options, see the [Configuration](#configuration) section below.
+
 ## Configuration
 
 ### Configuration Hierarchy
@@ -843,7 +901,7 @@ This separation ensures:
 - Generated artifacts don't pollute main branch history
 - Documentation builds and deploys automatically via CI/CD
 
-For complete branch structure details, see [Docs Branch Structure](/docs-branch-structure/).
+For complete branch structure details, see [Docs Branch Structure](/docs-branch-structure).
 
 #### Automatic Deployment
 
@@ -1049,10 +1107,10 @@ Monitor documentation deployment health:
 
 #### Related Documentation
 
-- [Docs Branch Structure](/docs-branch-structure/) - Complete branch organization specification
-- [Docs Migration Plan](/docs-migration-plan/) - Migration guide from old workflow
-- [CI/CD Pipeline](/pipeline/) - Complete pipeline documentation
-- [Development Guide](/development/) - Local documentation development
+- [Docs Branch Structure](/docs-branch-structure) - Complete branch organization specification
+- [Docs Migration Plan](/docs-migration-plan) - Migration guide from old workflow
+- [CI/CD Pipeline](/pipeline) - Complete pipeline documentation
+- [Development Guide](/development) - Local documentation development
 
 ---
 
@@ -1060,10 +1118,10 @@ Monitor documentation deployment health:
 
 ### Documentation
 
-- [README](../README.md) - Quick start guide
-- [API Documentation](/api/) - API reference
-- [Architecture](/architecture/) - System design
-- [Development Guide](/development/) - Development workflows
+- [README](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/README.md) - Quick start guide
+- [API Documentation](/api) - API reference
+- [Architecture](/architecture) - System design
+- [Development Guide](/development) - Development workflows
 - [Live Documentation Site](https://pantheon-org.github.io/opencode-warcraft-notifications/) - GitHub Pages
 
 ### Community

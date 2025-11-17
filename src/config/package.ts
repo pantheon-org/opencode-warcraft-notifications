@@ -43,13 +43,20 @@ const getPluginRootDir = (): string => {
  */
 export const getPackageName = (): string | null => {
   // Strategy:
-  // 1. Try CWD first (for tests and development)
-  // 2. Fall back to plugin root (for production when running from OpenCode)
+  // 1. Try plugin root FIRST (for production when running from OpenCode)
+  // 2. Fall back to CWD (for tests and development only)
+  // This ensures we always get the plugin's own package.json, not the user's project
+
+  const DEBUG = Boolean(process.env.DEBUG_OPENCODE);
 
   const locations = [
-    join(process.cwd(), 'package.json'), // CWD (tests/development)
-    join(getPluginRootDir(), 'package.json'), // Plugin root (production)
+    join(getPluginRootDir(), 'package.json'), // Plugin root (production) - PRIORITY
+    join(process.cwd(), 'package.json'), // CWD (tests/development) - FALLBACK
   ];
+
+  if (DEBUG) {
+    console.log('[opencode-warcraft-notifications] Looking for package.json in:', locations);
+  }
 
   for (const pkgPath of locations) {
     try {
@@ -57,12 +64,29 @@ export const getPackageName = (): string | null => {
         name?: string;
       };
       if (pkg && typeof pkg.name === 'string') {
+        if (DEBUG) {
+          console.log(
+            '[opencode-warcraft-notifications] Found package name:',
+            pkg.name,
+            'from:',
+            pkgPath,
+          );
+        }
         return pkg.name;
       }
-    } catch {
+    } catch (err) {
+      if (DEBUG) {
+        console.log('[opencode-warcraft-notifications] Failed to read:', pkgPath, err);
+      }
       // Try next location
       continue;
     }
+  }
+
+  if (DEBUG) {
+    console.warn(
+      '[opencode-warcraft-notifications] Could not determine package name from any location',
+    );
   }
 
   return null;

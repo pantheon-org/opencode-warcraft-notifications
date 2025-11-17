@@ -21,6 +21,37 @@ This document provides comprehensive API documentation for the Warcraft II Notif
 - [Type Definitions](#type-definitions)
 - [Usage Examples](#usage-examples)
 
+## Plugin Entry Point
+
+The Warcraft II Notifications Plugin exports a single default function that serves as the plugin entry point for OpenCode.
+
+**File**: `index.ts`
+
+```typescript
+import { Plugin } from '@opencode-ai/plugin';
+export { Plugin } from '@opencode-ai/plugin';
+
+const WarcraftNotifications: Plugin = async (ctx) => {
+  // Plugin initialization
+  return {
+    event: async ({ event }) => {
+      // Handle OpenCode events
+    },
+  };
+};
+
+export default WarcraftNotifications;
+```
+
+The plugin follows the OpenCode plugin architecture and provides:
+
+- Event handlers for session idle events
+- Configuration loading and validation
+- Sound file management
+- Toast notification integration
+
+See [Notification Module](#notification-module) for implementation details.
+
 ## Notification Module
 
 ### `notification.ts`
@@ -287,7 +318,7 @@ export interface WarcraftNotificationConfig {
 - `faction?: Faction` - Which faction sounds to play (default: 'both')
 - `showDescriptionInToast?: boolean` - Whether to show toast notifications when idle (default: true)
 
-For schema validation and IDE autocomplete support, see the [Schema Validation Guide](/validate-schema/).
+For schema validation and IDE autocomplete support, see the [Schema Validation Guide](/validate-schema).
 
 #### Functions
 
@@ -1357,10 +1388,10 @@ export DEBUG_OPENCODE=1
 
 ## Related Documentation
 
-- [Architecture Documentation](/architecture/) - System design and components
-- [Development Guide](/development/) - Development setup and workflow
-- [User Guide](/user-guide/) - End-user documentation
-- [Schema Validation Guide](/validate-schema/) - Configuration validation
+- [Architecture Documentation](/architecture) - System design and components
+- [Development Guide](/development) - Development setup and workflow
+- [User Guide](/user-guide) - End-user documentation
+- [Schema Validation Guide](/validate-schema) - Configuration validation
 
 ---
 

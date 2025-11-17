@@ -237,13 +237,13 @@ ls ~/.cache/opencode/node_modules/@pantheon-ai/
 
 Read these documents in order:
 
-1. **[Architecture Documentation](/architecture/)**
+1. **[Architecture Documentation](/architecture)**
    - System architecture overview
    - Component architecture
    - Data flow diagrams
    - Platform integration
 
-2. **[API Documentation](/api/)**
+2. **[API Documentation](/api)**
    - Plugin entry point
    - Notification module
    - Configuration module
@@ -309,9 +309,9 @@ graph TB
 
 Read these documents:
 
-1. **[Pipeline Documentation](/pipeline/)** - Complete technical reference
+1. **[Pipeline Documentation](/pipeline)** - Complete technical reference
 2. **[GitHub Workflows](./github-workflows/README.md)** - Setup guides
-3. **[Deployment Guide](/deployment/)** - Operations
+3. **[Deployment Guide](/deployment)** - Operations
 
 #### Understand the Workflows
 
@@ -593,13 +593,13 @@ Choose an area to specialize in:
 
 ### Documentation
 
-- **[README](../README.md)** - Project overview
-- **[User Guide](/user-guide/)** - End-user documentation
-- **[Development Guide](/development/)** - Development workflow
-- **[API Documentation](/api/)** - Technical reference
-- **[Architecture](/architecture/)** - System design
-- **[Deployment Guide](/deployment/)** - Operations
-- **[Pipeline Documentation](/pipeline/)** - CI/CD reference
+- **[README](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/README.md)** - Project overview
+- **[User Guide](/user-guide)** - End-user documentation
+- **[Development Guide](/development)** - Development workflow
+- **[API Documentation](/api)** - Technical reference
+- **[Architecture](/architecture)** - System design
+- **[Deployment Guide](/deployment)** - Operations
+- **[Pipeline Documentation](/pipeline)** - CI/CD reference
 
 ### External Resources
 
@@ -795,7 +795,7 @@ bun test --coverage
 
 #### "How does the CI/CD pipeline work?"
 
-See the [Pipeline Documentation](/pipeline/) for complete details.
+See the [Pipeline Documentation](/pipeline) for complete details.
 
 ---
 

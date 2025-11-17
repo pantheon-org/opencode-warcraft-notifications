@@ -23,7 +23,7 @@ Schema validation ensures that your `plugin.json` configuration file:
 This guide covers **build-time and IDE validation** using the JSON schema file. The plugin also performs **runtime validation** when it loads:
 
 - **Build-time/IDE validation** (this guide): Validates syntax while editing with tools like VS Code
-- **Runtime validation**: Automatic validation when the plugin loads (see [Troubleshooting Guide](/troubleshooting/#configuration-validation-errors) for runtime errors)
+- **Runtime validation**: Automatic validation when the plugin loads (see [Troubleshooting Guide](/troubleshooting#configuration-validation-errors) for runtime errors)
 
 Both types use the same schema definition, ensuring consistency.
 
@@ -446,10 +446,10 @@ Look for log messages showing:
 
 ## Related Documentation
 
-- **[Configuration Guide](/user-guide/#configuration)** - Complete configuration reference
+- **[Configuration Guide](/user-guide#configuration)** - Complete configuration reference
 - **[Schema README](./schemas/README.md)** - Schema documentation overview
-- **[API Documentation](/api/#plugin-configuration-module)** - Configuration API details
-- **[Deployment Guide](/deployment/#configuration)** - Configuration deployment
+- **[API Documentation](/api#plugin-configuration-module)** - Configuration API details
+- **[Deployment Guide](/deployment#configuration)** - Configuration deployment
 
 ## Resources
 

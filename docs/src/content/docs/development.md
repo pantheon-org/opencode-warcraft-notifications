@@ -21,6 +21,86 @@ This guide provides comprehensive information for developers working on the Warc
 - [Contributing](#contributing)
 - [Release Process](#release-process)
 
+## Getting Started
+
+Welcome to the Warcraft II Notifications Plugin development guide! This section will help you set up your development environment and start contributing.
+
+### Prerequisites
+
+Before you begin, ensure you have:
+
+- **Bun** >= 1.0.0 (recommended) or **Node.js** >= 18.0.0
+- **Git** for version control
+- **Code editor** (VS Code recommended)
+- **OpenCode** installed for testing
+
+### Quick Setup
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/pantheon-org/opencode-warcraft-notifications.git
+   cd opencode-warcraft-notifications
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   bun install
+   ```
+
+3. **Run tests**:
+
+   ```bash
+   bun test
+   ```
+
+4. **Build the project**:
+
+   ```bash
+   bun run build
+   ```
+
+5. **Link for local development**:
+
+   ```bash
+   # Link the package locally
+   bun link
+
+   # In your OpenCode project
+   cd ~/your-opencode-project
+   bun link @pantheon-ai/opencode-warcraft-notifications
+   ```
+
+### First Contribution
+
+1. **Create a feature branch**:
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make your changes** and write tests
+
+3. **Verify your changes**:
+
+   ```bash
+   bun test           # Run tests
+   bun run lint       # Check linting
+   bun run type-check # Check types
+   ```
+
+4. **Commit and push**:
+
+   ```bash
+   git commit -m "feat: your feature description"
+   git push origin feature/your-feature-name
+   ```
+
+5. **Create a Pull Request** on GitHub
+
+For detailed information, see the sections below.
+
 ## Development Environment
 
 ### IDE Setup
@@ -893,10 +973,10 @@ export const getSoundPath = (
 
 ## Related Documentation
 
-- [API Documentation](/api/) - Complete technical API reference
-- [Architecture Documentation](/architecture/) - System design and components
-- [Deployment Guide](/deployment/) - Installation and operations
-- [CI/CD Pipeline](/pipeline/) - Pipeline technical reference
+- [API Documentation](/api) - Complete technical API reference
+- [Architecture Documentation](/architecture) - System design and components
+- [Deployment Guide](/deployment) - Installation and operations
+- [CI/CD Pipeline](/pipeline) - Pipeline technical reference
 
 ---
 
