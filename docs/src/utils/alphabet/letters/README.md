@@ -1,69 +1,57 @@
-# Glyph Letter Definitions
+# Letter Glyphs (A-Z)
 
-This directory contains the individual glyph definitions for all 26 letters (A-Z) used in the blocky text rendering system.
+This directory contains the individual glyph definitions for all 26 uppercase letters (A-Z) used in the blocky text rendering system.
+
+> **Note**: For general information about the glyph system, see [`../README.md`](../README.md). For symbol glyphs, see [`../symbols/README.md`](../symbols/README.md).
 
 ## Overview
 
-Each letter is defined as a `Glyph` object that represents the visual appearance of the character using a 7-row grid system. These glyphs are used by the text rendering utilities to generate blocky, pixel-art style text suitable for logos and headers.
+Each letter is defined as a `Glyph` object that represents the visual appearance of the character using a 7-row grid system. These glyphs are combined to render text in a blocky, pixel-art style.
 
-## What is a Glyph?
+## Letter Set
 
-A **Glyph** is a visual representation of a single character using a grid-based system:
+All 26 uppercase letters are available with varying widths for visual proportion:
 
-- **7 rows** (indexed 0-6) for consistent character height
-- **1-5 columns** per row (width varies by letter)
-- **Binary values** (0 or 1) for each cell:
-  - `0` = Empty/blank cell (no visual representation)
-  - `1` = Filled cell (rendered with PRIMARY or SECONDARY color)
+### Narrow Letters (1-2 columns)
 
-### Color Assignment
+- **I** (1 column): Vertical line with top serif and gap
+- **J** (3 columns): Hook shape with descender
 
-Filled cells (`1`) are automatically assigned colors based on their row position:
+### Regular Letters (3-4 columns)
 
-- **Rows 0-2 and 6**: PRIMARY color (main foreground color)
-- **Rows 3-5**: SECONDARY color (accent color for depth and shading)
+- **A, B, C, D, E, F, G, H, K, L, N, O, P, Q, R, S, T, U, V, X, Y, Z**
 
-This automatic assignment creates visual depth and character to the rendered text.
+### Wide Letters (5 columns)
 
-## Grid System
-
-The 7-row grid system is structured as follows:
-
-```
-Row 0: Top padding/ascender space (often empty)
-Row 1: Upper portion of character
-Row 2: Upper-middle portion
-Row 3: Middle portion (switches to secondary color)
-Row 4: Lower-middle portion
-Row 5: Bottom portion
-Row 6: Bottom padding/descender space (often empty)
-```
-
-### Width Variations
-
-Different letters have different widths to maintain visual proportion:
-
-| Width       | Letters                                                          | Columns |
-| ----------- | ---------------------------------------------------------------- | ------- |
-| **Narrow**  | I, J                                                             | 1-2     |
-| **Regular** | A, B, C, D, E, F, G, H, K, L, N, O, P, Q, R, S, T, U, V, X, Y, Z | 3-4     |
-| **Wide**    | M, W                                                             | 5       |
+- **M**: Wide M-shape with central peak
+- **W**: Wide W-shape with central valley
 
 ## File Structure
 
 Each letter file follows a consistent pattern:
 
 ```typescript
-import { type Glyph } from './types';
+import { type Glyph } from '../types';
 
 /**
- * Letter [X] representation
+ * Glyph definition for the letter '[X]'.
+ *
+ * [Detailed description]
+ *
+ * ## Visual Representation
+ * [ASCII grid showing the letter]
+ *
+ * ## Grid Details
+ * - Width: [N] columns
+ * - Height: 7 rows (standard)
+ * - Color zones: [description]
+ *
+ * ## Character Design
+ * [Design rationale]
+ *
  * @type {Glyph}
- *
- * [Visual ASCII representation of the letter]
- *
- * Example usage:
- * const blocks = textToBlocks('[X]');
+ * @example [usage examples]
+ * @see [related references]
  */
 export const letter[X]: Glyph = {
   rows: {
@@ -78,7 +66,7 @@ export const letter[X]: Glyph = {
 };
 ```
 
-## Example Glyph Definitions
+## Letter Examples
 
 ### Letter A (Regular Width - 4 columns)
 
@@ -102,15 +90,15 @@ Visual representation:
 +---+---+---+---+
 |   |   |   |   |  Row 0 (padding)
 +---+---+---+---+
-| █ | █ | █ | █ |  Row 1 (primary)
+| █ | █ | █ | █ |  Row 1 (PRIMARY)
 +---+---+---+---+
-|   |   |   | █ |  Row 2 (primary)
+|   |   |   | █ |  Row 2 (PRIMARY)
 +---+---+---+---+
-| █ | █ | █ | █ |  Row 3 (secondary)
+| █ | █ | █ | █ |  Row 3 (SECONDARY)
 +---+---+---+---+
-| █ |   |   | █ |  Row 4 (secondary)
+| █ |   |   | █ |  Row 4 (SECONDARY)
 +---+---+---+---+
-| █ | █ | █ | █ |  Row 5 (secondary)
+| █ | █ | █ | █ |  Row 5 (SECONDARY)
 +---+---+---+---+
 |   |   |   |   |  Row 6 (padding)
 +---+---+---+---+
@@ -121,8 +109,8 @@ Visual representation:
 ```typescript
 export const letterI: Glyph = {
   rows: {
-    0: [1], // Top (primary)
-    1: [0], // Gap
+    0: [1], // Top serif (primary)
+    1: [0], // Gap for spacing
     2: [1], // Upper stem (primary)
     3: [1], // Middle stem (secondary)
     4: [1], // Lower stem (secondary)
@@ -136,17 +124,17 @@ Visual representation:
 
 ```
 +---+
-| █ |  Row 0 (primary)
+| █ |  Row 0 (PRIMARY)
 +---+
 |   |  Row 1 (gap)
 +---+
-| █ |  Row 2 (primary)
+| █ |  Row 2 (PRIMARY)
 +---+
-| █ |  Row 3 (secondary)
+| █ |  Row 3 (SECONDARY)
 +---+
-| █ |  Row 4 (secondary)
+| █ |  Row 4 (SECONDARY)
 +---+
-| █ |  Row 5 (secondary)
+| █ |  Row 5 (SECONDARY)
 +---+
 |   |  Row 6 (padding)
 +---+
@@ -174,15 +162,15 @@ Visual representation:
 +---+---+---+---+---+
 |   |   |   |   |   |  Row 0 (padding)
 +---+---+---+---+---+
-| █ | █ | █ | █ | █ |  Row 1 (primary)
+| █ | █ | █ | █ | █ |  Row 1 (PRIMARY)
 +---+---+---+---+---+
-| █ |   | █ |   | █ |  Row 2 (primary)
+| █ |   | █ |   | █ |  Row 2 (PRIMARY)
 +---+---+---+---+---+
-| █ |   | █ |   | █ |  Row 3 (secondary)
+| █ |   | █ |   | █ |  Row 3 (SECONDARY)
 +---+---+---+---+---+
-| █ |   |   |   | █ |  Row 4 (secondary)
+| █ |   |   |   | █ |  Row 4 (SECONDARY)
 +---+---+---+---+---+
-| █ |   |   |   | █ |  Row 5 (secondary)
+| █ |   |   |   | █ |  Row 5 (SECONDARY)
 +---+---+---+---+---+
 |   |   |   |   |   |  Row 6 (padding)
 +---+---+---+---+---+
@@ -190,79 +178,140 @@ Visual representation:
 
 ## Usage
 
-These glyph definitions are used by the rendering system to convert text into visual blocks:
+### Accessing Letter Glyphs
+
+```typescript
+import { ALPHABET } from '../types';
+import { letterA } from './letter-a';
+
+// Access from ALPHABET constant
+const glyphA = ALPHABET.A;
+const glyphH = ALPHABET.H;
+const glyphZ = ALPHABET.Z;
+
+// Or import directly
+const glyph = letterA;
+```
+
+### Rendering Text
 
 ```typescript
 import { textToBlocks } from '../block';
-import { ALPHABET } from '../types';
 
 // Convert text to blocks
 const blocks = textToBlocks('HELLO');
 
-// Access individual letter glyphs
-const letterH = ALPHABET.H;
-const letterE = ALPHABET.E;
+// The function automatically:
+// 1. Converts to uppercase
+// 2. Looks up each letter in ALPHABET
+// 3. Converts grids to positioned blocks
+// 4. Applies colors based on row position
 ```
 
-The `textToBlocks` function:
+## Letter Characteristics
 
-1. Converts input text to uppercase
-2. Looks up each letter's glyph definition
-3. Converts the grid to positioned blocks with colors
-4. Returns an array of `Block` objects with `x`, `y`, and `color` properties
+### Design Patterns
 
-## Design Guidelines
+1. **Top Bar**: Many letters (A, E, F, H, etc.) start with a horizontal bar at row 1
+2. **Vertical Stems**: Letters like I, J, L use single-column stems
+3. **Curves**: Letters like O, C, Q use filled rectangles to approximate curves
+4. **Diagonals**: Letters like V, W, X, Z use stepped patterns for diagonal lines
+5. **Enclosed Spaces**: Letters like A, B, D, O, P, Q, R have internal empty spaces
 
-When creating or modifying glyph definitions:
+### Common Row Patterns
 
-1. **Use rows 0 and 6 sparingly**: These are typically empty for padding
-2. **Maintain consistent stroke width**: Use solid lines for better readability
-3. **Balance the character**: Ensure visual weight is distributed evenly
-4. **Test readability**: Characters should be recognizable at the intended size
-5. **Follow the grid**: Stay within the 7-row height constraint
-6. **Consider color transition**: Row 3 marks the transition to secondary color
+- **Row 0**: Usually empty for top padding
+- **Rows 1-2**: Upper portion of letter (PRIMARY color)
+- **Row 3**: Transition row (SECONDARY color) - often has crossbars
+- **Rows 4-5**: Lower portion of letter (SECONDARY color)
+- **Row 6**: Usually empty for bottom padding, except descenders (J, Q, Y)
+
+## Letter Reference
+
+All 26 letters with their widths:
+
+| Letter | Width | Notes                                   |
+| ------ | ----- | --------------------------------------- |
+| A      | 4     | Top bar with crossbar                   |
+| B      | 4     | Left stem with double bulges            |
+| C      | 4     | Open right side                         |
+| D      | 4     | Left stem with right bulge              |
+| E      | 4     | Left stem with three horizontal bars    |
+| F      | 4     | Left stem with two top horizontal bars  |
+| G      | 4     | C-shape with bottom-right extension     |
+| H      | 4     | Two stems with crossbar                 |
+| I      | 1     | Single vertical line with top serif     |
+| J      | 3     | Hook shape with descender               |
+| K      | 4     | Left stem with diagonal branches        |
+| L      | 3     | Left stem with bottom bar               |
+| M      | 5     | Wide M-shape with central peak          |
+| N      | 4     | Two stems with diagonal connector       |
+| O      | 4     | Enclosed rectangle                      |
+| P      | 4     | Left stem with top bulge, descends to 6 |
+| Q      | 4     | O with bottom-right extension, descends |
+| R      | 4     | P with diagonal leg                     |
+| S      | 4     | S-curve using stacked horizontal bars   |
+| T      | 4     | Top bar with center stem                |
+| U      | 4     | Two stems connected at bottom           |
+| V      | 5     | Wide V-shape converging downward        |
+| W      | 5     | Wide W-shape with central valley        |
+| X      | 5     | Crossed diagonals                       |
+| Y      | 4     | Y-shape with descender stem             |
+| Z      | 3     | Z-shape with diagonal                   |
+
+## Design Guidelines for Letters
+
+When creating or modifying letter glyphs:
+
+1. **Maintain proportions**: Keep visual weight balanced
+2. **Use consistent stroke width**: Typically 1 cell, occasionally 2 for emphasis
+3. **Respect color zones**: PRIMARY (rows 0-2, 6), SECONDARY (rows 3-5)
+4. **Top/bottom padding**: Use rows 0 and 6 for spacing, except special cases
+5. **Readability first**: Ensure letters are recognizable at small sizes
+6. **Width consistency**: Similar-shaped letters should have similar widths
+7. **Test in context**: Verify letters look good next to each other
 
 ## Related Files
 
-- **`types.ts`**: Type definitions for `Glyph`, `CellType`, and `LetterName`
-- **`../types.ts`**: The `ALPHABET` mapping of all letters to glyphs
-- **`../block.ts`**: Rendering utilities that use these glyphs
-- **`../theme.ts`**: Color theme definitions and mapping logic
-
-## Testing
-
-All glyph definitions are tested to ensure:
-
-- Each letter has exactly 7 rows (0-6)
-- Each cell contains valid values (0 or 1)
-- The glyph is properly exported and accessible in the ALPHABET
-
-See `../letters.test.ts` for the test implementation.
-
-## Visual References
-
-For visual examples of rendered text using these glyphs, see:
-
-- `/docs/samples/opencode.svg` - OPENCODE logo
-- `/docs/samples/warcraft.svg` - WARCRAFT text
-- `/docs/samples/a-z-test-.svg` - Full alphabet test
-- `/docs/samples/hello-world.svg` - HELLO WORLD example
+- **[`../README.md`](../README.md)**: Overall glyph system documentation
+- **[`../types.ts`](../types.ts)**: Type definitions and ALPHABET constant
+- **[`../symbols/README.md`](../symbols/README.md)**: Symbol glyph documentation
+- **[`../block.ts`](../block.ts)**: Rendering utilities
+- **[`../theme.ts`](../theme.ts)**: Color theme definitions
+- **[`../letters.test.ts`](../letters.test.ts)**: Letter tests
 
 ## Contributing
 
-When adding a new letter or modifying an existing one:
+When adding or modifying a letter:
 
-1. Follow the existing file naming pattern: `letter-[x].ts`
-2. Include the visual ASCII representation in the JSDoc comment
-3. Ensure the export name follows the pattern: `letter[X]`
-4. Test the visual appearance by generating an SVG sample
-5. Update tests if necessary
-6. Verify the letter renders correctly at different sizes
+1. **Follow naming**: `letter-[x].ts` with export `letter[X]`
+2. **Include full documentation**: JSDoc with visual representation
+3. **Update ALPHABET**: Add to the constant in `../types.ts`
+4. **Update LetterName type**: Add to the union type if new letter
+5. **Test thoroughly**: Verify appearance in SVG samples
+6. **Check consistency**: Compare with similar letters for proportions
 
-## Additional Documentation
+## Testing
 
-For more information about the blocky text system:
+Letter glyphs are validated in `../letters.test.ts` and `../types.test.ts`:
 
-- See `/docs/BLOCKY-TEXT-README.md` for the full system documentation
-- See `types.ts` for detailed type documentation
-- See `../block.ts` for rendering implementation details
+```bash
+bun test
+```
+
+Tests verify:
+
+- All 26 letters are present in ALPHABET
+- Each letter has 7 rows
+- Each row has 1-5 columns
+- Cells contain only 0 or 1 values
+- Glyphs are properly exported
+
+## Visual Examples
+
+See rendered examples in:
+
+- `/docs/samples/a-z-test-.svg` - Full alphabet display
+- `/docs/samples/hello-world.svg` - HELLO WORLD example
+- `/docs/samples/opencode.svg` - OPENCODE logo
+- `/docs/samples/warcraft.svg` - WARCRAFT text
