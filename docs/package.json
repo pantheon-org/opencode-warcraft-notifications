@@ -15,7 +15,7 @@
     "@types/figlet": "^1.7.0",
     "astro": "^5.15.0",
     "astro-diagram": "^0.7.0",
-    "astro-expressive-code": "^0.38.0",
+    "astro-expressive-code": "^0.41.3",
     "figlet": "^1.9.4",
     "mermaid": "^11.12.1",
     "playwright": "^1.56.1",
