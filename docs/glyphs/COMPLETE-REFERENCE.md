@@ -3,6 +3,7 @@
 This document shows all available glyphs in the blocky text system, including both letters (A-Z) and symbols (punctuation).
 
 Each glyph is shown with:
+
 - **ASCII Grid**: Text representation of the 7-row grid
 - **SVG Preview**: Visual rendering in dark theme
 

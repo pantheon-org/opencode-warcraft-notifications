@@ -35,9 +35,11 @@ This project includes a comprehensive glyph system inspired by retro pixel art a
 ## 🎨 What's Included
 
 ### 26 Letters (A-Z)
+
 All uppercase letters rendered in blocky pixel-art style using a 7-row grid system.
 
 ### 6 Symbols
+
 - `-` Hyphen (for compound words)
 - `|` Pipe (for separators)
 - `'` Apostrophe (for contractions)
@@ -58,27 +60,33 @@ const customSvg = blockyTextToSVG('WARCRAFT', {
   theme: 'dark',
   blockSize: 6,
   charSpacing: 1,
-  optimize: true
+  optimize: true,
 });
 ```
 
 ## 📖 Viewing Options
 
 ### 1. Markdown Files
+
 Perfect for reading in GitHub or any markdown viewer:
+
 - Complete technical documentation
 - ASCII grid representations
 - Inline SVG previews
 
 ### 2. HTML Gallery
+
 Open `docs/glyphs/index.html` in a browser:
+
 - Interactive visual interface
 - Real-time block size adjustment
 - Beautiful dark theme
 - Responsive layout
 
 ### 3. Quick Reference
+
 Use `docs/glyphs/QUICK-REFERENCE.md` for:
+
 - Fast character lookup
 - Common patterns
 - One-liner examples
@@ -86,33 +94,33 @@ Use `docs/glyphs/QUICK-REFERENCE.md` for:
 
 ## 🔗 Key Locations
 
-| Resource | Path |
-|----------|------|
-| Main Docs | [docs/glyphs/README.md](./glyphs/README.md) |
-| Full Reference | [docs/glyphs/COMPLETE-REFERENCE.md](./glyphs/COMPLETE-REFERENCE.md) |
-| Quick Reference | [docs/glyphs/QUICK-REFERENCE.md](./glyphs/QUICK-REFERENCE.md) |
-| Interactive Gallery | [docs/glyphs/index.html](./glyphs/index.html) |
-| Source Code | [pages/src/utils/alphabet/](../pages/src/utils/alphabet/) |
-| Sample SVGs | [pages/samples/](../pages/samples/) |
+| Resource            | Path                                                                |
+| ------------------- | ------------------------------------------------------------------- |
+| Main Docs           | [docs/glyphs/README.md](./glyphs/README.md)                         |
+| Full Reference      | [docs/glyphs/COMPLETE-REFERENCE.md](./glyphs/COMPLETE-REFERENCE.md) |
+| Quick Reference     | [docs/glyphs/QUICK-REFERENCE.md](./glyphs/QUICK-REFERENCE.md)       |
+| Interactive Gallery | [docs/glyphs/index.html](./glyphs/index.html)                       |
+| Source Code         | [pages/src/utils/alphabet/](../pages/src/utils/alphabet/)           |
+| Sample SVGs         | [pages/samples/](../pages/samples/)                                 |
 
 ## 🎯 Common Examples
 
 ```typescript
 // Logo generation
-blockyTextToSVG('OPENCODE')
+blockyTextToSVG('OPENCODE');
 
 // Warcraft theme
-blockyTextToSVG('WARCRAFT')
+blockyTextToSVG('WARCRAFT');
 
 // With punctuation
-blockyTextToSVG('READY?')
-blockyTextToSVG('YES!')
+blockyTextToSVG('READY?');
+blockyTextToSVG('YES!');
 
 // Compound words
-blockyTextToSVG('A-Z')
+blockyTextToSVG('A-Z');
 
 // Contractions
-blockyTextToSVG("DON'T")
+blockyTextToSVG("DON'T");
 ```
 
 ## 🛠️ Development
@@ -142,6 +150,7 @@ bun run generate-samples.mjs
 ## 🎨 Color Themes
 
 ### Dark Theme (Default)
+
 ```
 PRIMARY:   #F1ECEC (off-white)
 SECONDARY: #B7B1B1 (light gray)
@@ -149,6 +158,7 @@ TERTIARY:  #4B4646 (dark gray)
 ```
 
 ### Light Theme
+
 ```
 PRIMARY:   #2D2D2D (dark gray)
 SECONDARY: #4A4A4A (medium gray)
@@ -181,6 +191,7 @@ See [LICENSE](../LICENSE) for details.
 ---
 
 **Start Exploring:**
+
 1. Browse the [interactive gallery](./glyphs/index.html)
 2. Read the [complete reference](./glyphs/COMPLETE-REFERENCE.md)
 3. Check the [quick reference](./glyphs/QUICK-REFERENCE.md)

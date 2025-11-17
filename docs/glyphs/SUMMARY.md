@@ -30,38 +30,44 @@ pages/samples/
 
 ## 📊 Statistics
 
-| Metric | Value |
-|--------|-------|
-| Total documentation files | 5 |
-| Total lines of documentation | 2,010 |
-| Total size | ~52KB |
-| Letters documented | 26 (A-Z) |
-| Symbols documented | 6 (-, \|, ', ", ?, !) |
-| Sample SVGs generated | 6 |
-| Interactive features | Yes (HTML gallery) |
+| Metric                       | Value                 |
+| ---------------------------- | --------------------- |
+| Total documentation files    | 5                     |
+| Total lines of documentation | 2,010                 |
+| Total size                   | ~52KB                 |
+| Letters documented           | 26 (A-Z)              |
+| Symbols documented           | 6 (-, \|, ', ", ?, !) |
+| Sample SVGs generated        | 6                     |
+| Interactive features         | Yes (HTML gallery)    |
 
 ## 🎯 How to Use
 
 ### 1. Start Here
+
 **[docs/GLYPHS.md](../GLYPHS.md)** - Top-level overview with quick links
 
 ### 2. Choose Your Path
 
 #### For Developers
+
 → **[README.md](./README.md)** - Technical documentation with code examples
 
 #### For Quick Lookup
+
 → **[QUICK-REFERENCE.md](./QUICK-REFERENCE.md)** - Fast character lookup and patterns
 
 #### For Complete Details
+
 → **[COMPLETE-REFERENCE.md](./COMPLETE-REFERENCE.md)** - Every glyph with ASCII grids and SVGs
 
 #### For Visual Exploration
+
 → **[index.html](./index.html)** - Interactive gallery (open in browser)
 
 ## 📖 What Each File Contains
 
 ### README.md (Main Hub)
+
 - System overview
 - Quick start guide
 - API documentation
@@ -72,6 +78,7 @@ pages/samples/
 **Best for:** Getting started, understanding the system
 
 ### COMPLETE-REFERENCE.md (Full Details)
+
 - All 26 letters with:
   - ASCII grid representation
   - Width specification
@@ -86,6 +93,7 @@ pages/samples/
 **Best for:** Looking up specific glyphs, seeing visual representations
 
 ### QUICK-REFERENCE.md (Cheat Sheet)
+
 - Character lookup by width
 - Common patterns
 - One-liner examples
@@ -96,6 +104,7 @@ pages/samples/
 **Best for:** Fast lookup, copying code snippets
 
 ### index.html (Interactive Gallery)
+
 - Visual grid of all glyphs
 - Hoverable preview cards
 - Adjustable block size
@@ -110,28 +119,31 @@ pages/samples/
 ### All Available Characters
 
 **Letters (26):**
+
 ```
 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 ```
 
 **Symbols (6):**
+
 ```
 - | ' " ? !
 ```
 
 ### By Width
 
-| Width | Characters |
-|-------|------------|
-| 1 column | I, \|, ', ! |
-| 2 columns | " |
-| 3 columns | F, J, L, - |
+| Width     | Characters                                              |
+| --------- | ------------------------------------------------------- |
+| 1 column  | I, \|, ', !                                             |
+| 2 columns | "                                                       |
+| 3 columns | F, J, L, -                                              |
 | 4 columns | A, B, C, D, E, G, H, K, N, O, P, Q, R, S, T, U, Y, Z, ? |
-| 5 columns | M, V, W, X |
+| 5 columns | M, V, W, X                                              |
 
 ## 💻 Code Examples
 
 ### Basic Text
+
 ```typescript
 import { blockyTextToSVG } from './pages/src/utils/alphabet';
 
@@ -139,20 +151,22 @@ const svg = blockyTextToSVG('HELLO');
 ```
 
 ### With Symbols
+
 ```typescript
-blockyTextToSVG('READY?')    // Question mark
-blockyTextToSVG('YES!')      // Exclamation
-blockyTextToSVG('A-Z')       // Hyphen
-blockyTextToSVG("DON'T")     // Apostrophe
+blockyTextToSVG('READY?'); // Question mark
+blockyTextToSVG('YES!'); // Exclamation
+blockyTextToSVG('A-Z'); // Hyphen
+blockyTextToSVG("DON'T"); // Apostrophe
 ```
 
 ### Custom Options
+
 ```typescript
 blockyTextToSVG('WARCRAFT', {
   theme: 'dark',
   blockSize: 6,
   charSpacing: 1,
-  optimize: true
+  optimize: true,
 });
 ```
 
@@ -191,16 +205,19 @@ All sample SVGs are available in `pages/samples/`:
 ## 🛠️ Regenerating Documentation
 
 ### Update All Documentation
+
 ```bash
 cd pages
 bun run generate-glyph-docs.mjs
 ```
 
 This regenerates:
+
 - COMPLETE-REFERENCE.md (with all glyphs)
 - (HTML gallery is static)
 
 ### Generate Sample SVGs
+
 ```bash
 cd pages
 bun run generate-samples.mjs
@@ -211,22 +228,27 @@ This creates/updates SVG files in `pages/samples/`
 ## 📐 Technical Specifications
 
 ### Grid System
+
 - **Rows**: 7 (fixed)
 - **Columns**: 1-5 (variable)
 - **Block size**: 6px (default)
 - **Char spacing**: 1 block (default)
 
 ### Color Zones
+
 - **PRIMARY**: Rows 0-2, 6
 - **SECONDARY**: Rows 3-5
 
 ### Themes
+
 **Dark (default):**
+
 - PRIMARY: #F1ECEC
 - SECONDARY: #B7B1B1
 - TERTIARY: #4B4646
 
 **Light:**
+
 - PRIMARY: #2D2D2D
 - SECONDARY: #4A4A4A
 - TERTIARY: #B8B8B8
@@ -240,11 +262,12 @@ This creates/updates SVG files in `pages/samples/`
 ✅ **Code Examples** - Real usage patterns  
 ✅ **ASCII Grids** - Text representation of each glyph  
 ✅ **Technical Specs** - Full API documentation  
-✅ **Sample Files** - Pre-generated SVG examples  
+✅ **Sample Files** - Pre-generated SVG examples
 
 ## 📝 Documentation Quality
 
 ### Coverage
+
 - ✅ All 32 characters documented
 - ✅ ASCII grids for all glyphs
 - ✅ SVG previews for all letters
@@ -253,12 +276,14 @@ This creates/updates SVG files in `pages/samples/`
 - ✅ Code snippets tested
 
 ### Formats
+
 - ✅ Markdown (3 files)
 - ✅ HTML (1 interactive gallery)
 - ✅ SVG (6 sample files)
 - ✅ Quick reference (cheat sheet)
 
 ### Organization
+
 - ✅ Logical file structure
 - ✅ Cross-referenced links
 - ✅ Table of contents
@@ -267,16 +292,19 @@ This creates/updates SVG files in `pages/samples/`
 ## 🚀 Next Steps
 
 ### For Users
+
 1. Open [index.html](./index.html) to see the gallery
 2. Read [README.md](./README.md) to understand the system
 3. Try the code examples from [QUICK-REFERENCE.md](./QUICK-REFERENCE.md)
 
 ### For Developers
+
 1. Review the API in [README.md](./README.md)
 2. Check source code in `pages/src/utils/alphabet/`
 3. Generate your own SVGs using the examples
 
 ### For Maintainers
+
 1. Update glyphs in `pages/src/utils/alphabet/glyphs/`
 2. Regenerate docs with `bun run generate-glyph-docs.mjs`
 3. Test changes in the HTML gallery
@@ -284,16 +312,19 @@ This creates/updates SVG files in `pages/samples/`
 ## 📚 Related Documentation
 
 ### Source Code
+
 - `pages/src/utils/alphabet/` - Glyph definitions
 - `pages/src/utils/alphabet/glyphs/letters/` - Letter glyphs
 - `pages/src/utils/alphabet/glyphs/symbols/` - Symbol glyphs
 
 ### Original Documentation
+
 - `pages/src/utils/alphabet/README.md` - Technical README
 - `pages/src/utils/alphabet/LETTERS.md` - Letter reference
 - `pages/src/utils/alphabet/USAGE.md` - Usage guide
 
 ### Scripts
+
 - `pages/generate-glyph-docs.mjs` - Doc generator
 - `pages/generate-samples.mjs` - SVG generator
 
@@ -307,7 +338,7 @@ This documentation provides:
 🔍 **Fast Lookup** - Find characters quickly  
 🎯 **Multiple Views** - Choose your preferred format  
 📱 **Interactive** - Explore in the browser  
-📖 **Complete** - No glyph left undocumented  
+📖 **Complete** - No glyph left undocumented
 
 ## 🎉 Summary
 
