@@ -5,7 +5,7 @@ description: 'Automated release pipeline documentation'
 
 # CI/CD Pipeline Documentation
 
-> **📚 Note:** For the most current workflow documentation, see [GitHub Workflows Overview](/github-workflows/overview/). This document provides detailed technical reference for the CI/CD pipeline.
+> **📚 Note:** For the most current workflow documentation, see [GitHub Workflows Overview](/github-workflows/overview). This document provides detailed technical reference for the CI/CD pipeline.
 
 ## Overview
 
@@ -1415,10 +1415,10 @@ git log origin/docs --oneline -5
 
 #### Related Documentation
 
-- [Docs Branch Structure](/docs-branch-structure/) - Complete branch organization
-- [Docs Migration Plan](/docs-migration-plan/) - Migration from old workflow
-- [Deployment Guide](/deployment/#documentation-deployment) - User-facing deployment docs
-- [Development Guide](/development/) - Local documentation development
+- [Docs Branch Structure](/docs-branch-structure) - Complete branch organization
+- [Docs Migration Plan](/docs-migration-plan) - Migration from old workflow
+- [Deployment Guide](/deployment#documentation-deployment) - User-facing deployment docs
+- [Development Guide](/development) - Local documentation development
 
 ---
 
@@ -2712,8 +2712,8 @@ npm login
 - [Squash Merge Configuration](./github-workflows/squash-merge-configuration.md) - Repository setup guide
 - [Cleanup Old Releases](./github-workflows/cleanup-old-releases.md) - Release retention policy
 - [Cycle Prevention Fix](./github-workflows/cycle-prevention-fix.md) - Version bump cycle prevention
-- [DEPLOYMENT.md](/deployment/) - Deployment and installation guide
-- [DEVELOPMENT.md](/development/) - Development setup and guidelines
+- [DEPLOYMENT.md](/deployment) - Deployment and installation guide
+- [DEVELOPMENT.md](/development) - Development setup and guidelines
 
 ---
 

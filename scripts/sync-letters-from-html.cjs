@@ -9,7 +9,7 @@ if (!m) {
   process.exit(1);
 }
 const body = m[1];
-const entryRe = /['\"]([a-z])['\"]\s*:\s*createLetter\((\[\[[\s\S]*?\]\])\s*,\s*(\d+)\)/g;
+const entryRe = /['\"]([a-z])['\"]\s*:\s*createGlyph\((\[\[[\s\S]*?\]\])\s*,\s*(\d+)\)/g;
 let match;
 const letters = {};
 while ((match = entryRe.exec(body)) !== null) {

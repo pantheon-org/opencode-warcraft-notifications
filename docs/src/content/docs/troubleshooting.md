@@ -16,15 +16,15 @@ Comprehensive troubleshooting index for the Warcraft II Notifications Plugin.
 
 ## User Troubleshooting
 
-For common user issues, see [USER_GUIDE.md - Troubleshooting](/user-guide/#troubleshooting)
+For common user issues, see [USER_GUIDE.md - Troubleshooting](/user-guide#troubleshooting)
 
 ### Quick Links
 
-- [No sound playing](/user-guide/#no-sound-playing)
-- [Wrong faction sounds](/user-guide/#wrong-faction-sounds)
-- [Plugin not loading](/user-guide/#plugin-not-loading)
-- [Configuration not loading](/user-guide/#configuration-not-loading)
-- [Sound files missing](/user-guide/#sound-files-missing)
+- [No sound playing](/user-guide#no-sound-playing)
+- [Wrong faction sounds](/user-guide#wrong-faction-sounds)
+- [Plugin not loading](/user-guide#plugin-not-loading)
+- [Configuration not loading](/user-guide#configuration-not-loading)
+- [Sound files missing](/user-guide#sound-files-missing)
 
 ### Common User Issues
 
@@ -41,14 +41,14 @@ For common user issues, see [USER_GUIDE.md - Troubleshooting](/user-guide/#troub
 
 ## Development Troubleshooting
 
-For development issues, see [DEVELOPMENT.md - Debugging](/development/#debugging)
+For development issues, see [DEVELOPMENT.md - Debugging](/development#debugging)
 
 ### Quick Links
 
-- [Tests failing](/development/#tests-failing)
-- [Type errors](/development/#type-checking)
-- [Linting issues](/development/#linting)
-- [Sound not playing during development](/development/#sound-not-playing)
+- [Tests failing](/development#tests-failing)
+- [Type errors](/development#type-checking)
+- [Linting issues](/development#linting)
+- [Sound not playing during development](/development#sound-not-playing)
 
 ### Common Development Issues
 
@@ -72,14 +72,14 @@ For development issues, see [DEVELOPMENT.md - Debugging](/development/#debugging
 
 ## Deployment Troubleshooting
 
-For deployment issues, see [DEPLOYMENT.md - Troubleshooting](/deployment/#troubleshooting)
+For deployment issues, see [DEPLOYMENT.md - Troubleshooting](/deployment#troubleshooting)
 
 ### Quick Links
 
-- [Installation fails](/deployment/#installation-fails)
-- [Sound files missing](/deployment/#sound-files-missing)
-- [Configuration issues](/deployment/#configuration-not-loading)
-- [Platform-specific issues](/deployment/#platform-specific-troubleshooting)
+- [Installation fails](/deployment#installation-fails)
+- [Sound files missing](/deployment#sound-files-missing)
+- [Configuration issues](/deployment#configuration-not-loading)
+- [Platform-specific issues](/deployment#platform-specific-troubleshooting)
 
 ### Common Deployment Issues
 
@@ -218,14 +218,14 @@ Both fields are optional. If not specified, defaults will be used:
 
 ## CI/CD Troubleshooting
 
-For CI/CD pipeline issues, see [PIPELINE.md - Troubleshooting](/pipeline/#troubleshooting)
+For CI/CD pipeline issues, see [PIPELINE.md - Troubleshooting](/pipeline#troubleshooting)
 
 ### Quick Links
 
-- [Workflow failures](/pipeline/#workflow-failures)
-- [Version bump issues](/pipeline/#version-bump-issues)
-- [Deployment failures](/pipeline/#deployment-failures)
-- [Auto-merge issues](/pipeline/#auto-merge-troubleshooting)
+- [Workflow failures](/pipeline#workflow-failures)
+- [Version bump issues](/pipeline#version-bump-issues)
+- [Deployment failures](/pipeline#deployment-failures)
+- [Auto-merge issues](/pipeline#auto-merge-troubleshooting)
 
 ### Common CI/CD Issues
 
@@ -285,10 +285,10 @@ graph TD
 If you can't find a solution to your issue:
 
 1. **Check documentation**:
-   - [User Guide](/user-guide/)
-   - [Development Guide](/development/)
-   - [Deployment Guide](/deployment/)
-   - [CI/CD Pipeline](/pipeline/)
+   - [User Guide](/user-guide)
+   - [Development Guide](/development)
+   - [Deployment Guide](/deployment)
+   - [CI/CD Pipeline](/pipeline)
 
 2. **Search existing issues**:
    - [GitHub Issues](https://github.com/pantheon-org/opencode-warcraft-notifications/issues)
@@ -354,11 +354,11 @@ cat .opencode/plugin.json
 
 ## Related Documentation
 
-- [User Guide](/user-guide/) - End-user documentation
-- [Development Guide](/development/) - Development workflow
-- [Deployment Guide](/deployment/) - Installation and operations
-- [CI/CD Pipeline](/pipeline/) - Pipeline technical reference
-- [FAQ](/user-guide/#faq) - Frequently asked questions
+- [User Guide](/user-guide) - End-user documentation
+- [Development Guide](/development) - Development workflow
+- [Deployment Guide](/deployment) - Installation and operations
+- [CI/CD Pipeline](/pipeline) - Pipeline technical reference
+- [FAQ](/user-guide#faq) - Frequently asked questions
 
 ---
 

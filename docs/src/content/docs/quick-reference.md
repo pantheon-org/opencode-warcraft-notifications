@@ -412,12 +412,12 @@ gh run view <run-id>
 
 ### Documentation
 
-- [Home](/) - Project overview
-- [User Guide](/user-guide/) - Installation and usage
-- [Development Guide](/development/) - Development setup
-- [API Documentation](/api/) - API reference
-- [Architecture](/architecture/) - System design
-- [Troubleshooting](/troubleshooting/) - Common issues
+- [Home](/index) - Project overview
+- [User Guide](/user-guide) - Installation and usage
+- [Development Guide](/development) - Development setup
+- [API Documentation](/api) - API reference
+- [Architecture](/architecture) - System design
+- [Troubleshooting](/troubleshooting) - Common issues
 
 ### External Resources
 

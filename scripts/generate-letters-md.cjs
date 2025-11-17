@@ -6,7 +6,7 @@ const s = fs.readFileSync(htmlPath, 'utf8');
 const m = s.match(/const letters = \{([\s\S]*?)\};/m);
 if(!m){ console.error('letters object not found'); process.exit(1); }
 const body = m[1];
-const entryRe = /['\"]([a-z])['\"]\s*:\s*createLetter\((\[\[[\s\S]*?\]\])\s*,\s*(\d+)\)/g;
+const entryRe = /['\"]([a-z])['\"]\s*:\s*createGlyph\((\[\[[\s\S]*?\]\])\s*,\s*(\d+)\)/g;
 let match;
 const letters = {};
 while((match = entryRe.exec(body)) !== null){

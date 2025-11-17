@@ -282,9 +282,9 @@ The plugin automatically validates your configuration when it loads. If your con
 - `soundsDir`: Must be a string path (if provided)
 - `showDescriptionInToast`: Must be a boolean (`true` or `false`)
 
-If you encounter validation errors, see the [Troubleshooting Guide](/troubleshooting/#configuration-validation-errors) for solutions.
+If you encounter validation errors, see the [Troubleshooting Guide](/troubleshooting#configuration-validation-errors) for solutions.
 
-For IDE autocomplete support and schema details, see the [Schema Validation Guide](/validate-schema/).
+For IDE autocomplete support and schema details, see the [Schema Validation Guide](/validate-schema).
 
 ---
 
@@ -781,7 +781,7 @@ You can add your own WAV files:
 
 #### Q: How do I update the plugin?
 
-**A**: See the [Maintenance - Updates section in the Deployment Guide](/deployment/#maintenance) for update instructions.
+**A**: See the [Maintenance - Updates section in the Deployment Guide](/deployment#maintenance) for update instructions.
 
 ### Troubleshooting Questions
 
@@ -803,11 +803,11 @@ You can add your own WAV files:
 
 ### Documentation
 
-- **[README](../README.md)**: Quick start and overview
-- **[API Documentation](/api/)**: Technical API reference
-- **[Architecture](/architecture/)**: System design and components
-- **[Development Guide](/development/)**: For contributors
-- **[Deployment Guide](/deployment/)**: Installation and operations
+- **[README](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/README.md)**: Quick start and overview
+- **[API Documentation](/api)**: Technical API reference
+- **[Architecture](/architecture)**: System design and components
+- **[Development Guide](/development)**: For contributors
+- **[Deployment Guide](/deployment)**: Installation and operations
 
 ### Community
 

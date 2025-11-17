@@ -22,9 +22,9 @@ export const lightTheme: Theme = {
 
 export const darkTheme: Theme = {
   backgroundColor: '#000000',
-  primaryColor: '#FFFFFF',
-  secondaryColor: '#626262',
-  tertiaryColor: '#626262',
+  primaryColor: '#F1ECEC', // Light (OpenCode.ai dark mode logo)
+  secondaryColor: '#B7B1B1', // Medium (OpenCode.ai dark mode logo)
+  tertiaryColor: '#4B4646', // Dark (OpenCode.ai dark mode logo)
 };
 
 export const getColorFromLetter = (_glyph: Glyph, theme: ThemeType, cell: CellType): string => {

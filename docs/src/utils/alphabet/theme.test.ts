@@ -41,10 +41,10 @@ describe('getColorFromLetter function', () => {
     expect(getColorFromLetter(mockGlyph, themeType.LIGHT, cellType.TERTIARY)).toBe('#4B4646');
     expect(getColorFromLetter(mockGlyph, themeType.LIGHT, cellType.BLANK)).toBe('#FFFFFF');
 
-    // Test DARK theme
-    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.PRIMARY)).toBe('#FFFFFF');
-    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.SECONDARY)).toBe('#626262');
-    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.TERTIARY)).toBe('#626262');
+    // Test DARK theme (uses OpenCode.ai colors)
+    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.PRIMARY)).toBe('#F1ECEC');
+    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.SECONDARY)).toBe('#B7B1B1');
+    expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.TERTIARY)).toBe('#4B4646');
     expect(getColorFromLetter(mockGlyph, themeType.DARK, cellType.BLANK)).toBe('#000000');
   });
 });

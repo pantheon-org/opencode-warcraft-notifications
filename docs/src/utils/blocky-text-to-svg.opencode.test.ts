@@ -43,7 +43,7 @@ describe('OpenCode Logo Comparison', () => {
     // New alphabet uses simplified 2-color palette (PRIMARY/SECONDARY)
     // This differs from the original OpenCode logo which uses 3 colors
     expect(svg).toContain('fill="#F1ECEC"'); // PRIMARY (light)
-//     expect(svg).toContain('fill="#B7B1B1"'); // SECONDARY (medium)
+    //     expect(svg).toContain('fill="#B7B1B1"'); // SECONDARY (medium)
 
     // Note: The new alphabet system uses automatic row-based coloring:
   });
@@ -72,17 +72,15 @@ describe('OpenCode Logo Comparison', () => {
   it('should generate rectangular block paths like OpenCode', () => {
     const svg = blockyTextToSVG('O');
 
-    // OpenCode uses paths like: M18 30H6V18H18V30Z
-    // Our format: M0 0H6V6H0V0Z
+    // With optimization, paths are merged compound paths
+    // Format: M x y H x V y H x V y Z (can repeat for multiple rectangles)
 
-    const pathRegex = /<path d="M\d+ \d+H\d+V\d+H\d+V\d+Z" fill="#[0-9A-F]{6}"\/>/;
-    const paths = svg.split('\n\t\t').filter((line) => line.includes('<path'));
+    // Should contain path elements with compound data
+    expect(svg).toMatch(/<path d="[^"]+" fill="#[0-9A-F]{6}"\/>/);
 
-    expect(paths.length).toBeGreaterThan(0);
-
-    paths.forEach((path) => {
-      expect(path.trim()).toMatch(pathRegex);
-    });
+    // Should have at least one path element
+    const pathCount = (svg.match(/<path/g) || []).length;
+    expect(pathCount).toBeGreaterThan(0);
   });
 
   it('should support all letters in OPENCODE', () => {
@@ -98,9 +96,9 @@ describe('OpenCode Logo Comparison', () => {
     expect(svg).toContain('<svg');
     expect(svg).toContain('</svg>');
 
-    // Should have many paths (one per block)
+    // With optimization, paths are merged (typically 2-3 per letter depending on colors)
     const pathCount = (svg.match(/<path/g) || []).length;
-    expect(pathCount).toBeGreaterThan(50); // OPENCODE should have many blocks
+    expect(pathCount).toBeGreaterThan(0); // Should have at least one path
   });
 
   it('should use same SVG structure as OpenCode', () => {

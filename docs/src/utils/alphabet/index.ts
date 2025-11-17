@@ -31,6 +31,8 @@ export { textToBlocks, blockyTextToSVG, calculateWidth, blocksToSVGPaths } from 
 
 export type { Block, BlockyTextOptions } from './block';
 
+export { optimizeBlocksToSVGPaths } from './svg-optimizer';
+
 // ============================================================================
 // Type System
 // ============================================================================

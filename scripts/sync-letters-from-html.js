@@ -9,8 +9,8 @@ if (!m) {
   process.exit(1);
 }
 const body = m[1];
-// Match entries like 'a': createLetter([[...]], 4),
-const entryRe = /['"]([a-z])['"]\s*:\s*createLetter\((\[\[[\s\S]*?\]\])\s*,\s*(\d+)\)/g;
+// Match entries like 'a': createGlyph([[...]], 4),
+const entryRe = /['"]([a-z])['"]\s*:\s*createGlyph\((\[\[[\s\S]*?\]\])\s*,\s*(\d+)\)/g;
 let match;
 const letters = {};
 while ((match = entryRe.exec(body)) !== null) {

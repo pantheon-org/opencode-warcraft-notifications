@@ -1,6 +1,7 @@
 import { cellType } from './types';
 import { getColorFromLetter, themeType, type ThemeType } from './theme';
 import { ALPHABET } from './types';
+import { optimizeBlocksToSVGPaths } from './svg-optimizer';
 
 export interface BlockyTextOptions {
   theme?: ThemeType;
@@ -8,6 +9,8 @@ export interface BlockyTextOptions {
   blockSize?: number;
   /** Spacing between characters */
   charSpacing?: number;
+  /** Enable SVG path optimization (merges adjacent blocks) */
+  optimize?: boolean;
 }
 
 export type Block = {
@@ -20,6 +23,7 @@ const DEFAULT_BLOCKY_TEXT_OPTIONS: Required<BlockyTextOptions> = {
   theme: themeType.LIGHT,
   blockSize: 6, // OpenCode.ai uses 6px blocks
   charSpacing: 1, // 1 block spacing = 6px with blockSize=6
+  optimize: true, // Enable optimization by default for smaller file sizes
 };
 
 export const textToBlocks = (
@@ -143,7 +147,12 @@ export const blockyTextToSVG = (text: string, options: BlockyTextOptions = {}): 
   const width = calculateWidth(text, opts);
   const height = 7 * opts.blockSize; // 7 rows to match OpenCode logo
 
+  // Use optimized or unoptimized path generation
+  const paths = opts.optimize
+    ? optimizeBlocksToSVGPaths(blocks, opts.blockSize).join('\n')
+    : blocksToSVGPaths(blocks, opts.blockSize);
+
   return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
-    ${blocksToSVGPaths(blocks, opts.blockSize)}
-  </svg>`;
+${paths}
+</svg>`;
 };
