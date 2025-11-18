@@ -49,6 +49,7 @@ STYLE_ANALYSIS.md
 
 # Temporary directories
 tmp_*/
+.tmp*/
 
 # Phase 1, 2, & 3 test files
 test-phase1.cjs
