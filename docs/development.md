@@ -124,6 +124,107 @@ Documentation files:
 
 ---
 
+## Pages and Documentation Site
+
+### Documentation Structure
+
+The project includes a comprehensive documentation site built with Astro and Starlight, located in the `pages/` directory. The documentation is automatically deployed to GitHub Pages on every push to the `main` branch.
+
+### Building the Documentation Site
+
+The documentation site requires several generation steps before the Astro build:
+
+```bash
+# Full build process (from pages directory)
+cd pages
+bun run build
+
+# Development mode with hot reload
+bun run dev
+```
+
+#### Build Pipeline
+
+The build process follows this sequence:
+
+1. **Generate Favicon** (`bun run generate-favicon`)
+   - Dynamically generates `pages/public/favicon.svg`
+   - Uses the blocky text utility with "W" character
+   - Matches the Warcraft-themed aesthetic of the logos
+   - Generated file is gitignored and created on each build
+
+2. **Transform Documentation** (`bun run transform`)
+   - Copies files from `docs/` to `pages/src/content/docs/`
+   - Converts markdown to Astro-compatible format
+
+3. **Build Astro Site** (`astro build`)
+   - Builds the static site to `pages/dist/`
+
+4. **Fix Links** (`bun run fix-links`)
+   - Updates internal links for GitHub Pages deployment
+
+### Regenerating the Favicon
+
+The favicon is automatically generated during the build process, but you can regenerate it manually:
+
+```bash
+cd pages
+bun run generate-favicon
+```
+
+The favicon generation script (`pages/generate-favicon.mjs`):
+
+- Creates a blocky "W" character using the same style as the project logos
+- Outputs to `pages/public/favicon.svg`
+- Uses dark theme with 8px block size for optimal rendering
+- The generated file is gitignored and must be regenerated for each build
+
+**Configuration**:
+
+The favicon can be customized by modifying `pages/generate-favicon.mjs`:
+
+```javascript
+const faviconSVG = blockyTextToSVG('W', {
+  theme: 'dark', // 'light' or 'dark'
+  blockSize: 8, // Size of each pixel block
+  charSpacing: 0, // Spacing between characters
+  optimize: true, // Enable path optimization
+});
+```
+
+### Documentation Development Workflow
+
+1. **Edit source documentation** in the `docs/` directory
+2. **Run development server**:
+   ```bash
+   cd pages
+   bun run dev
+   ```
+3. **View changes** at `http://localhost:4321`
+4. **Build for production**:
+   ```bash
+   bun run build
+   ```
+
+### Documentation Scripts
+
+All documentation scripts are run from the `pages/` directory:
+
+```json
+{
+  "generate-favicon": "bun generate-favicon.mjs",
+  "transform": "node transform-docs.js",
+  "fix-links": "node fix-links.js",
+  "test-links": "node test-links.js",
+  "dev": "bun run generate-favicon && bun run transform && astro dev",
+  "build": "bun run generate-favicon && bun run transform && astro build && bun run fix-links",
+  "preview": "astro preview",
+  "verify": "bun run test-links"
+}
+```
+
+---
+
 ## Configuration Validation
 
 The plugin implements runtime validation of `plugin.json` configuration using Zod schemas. Configuration is validated automatically when the plugin loads, ensuring that any configuration errors are caught early with clear, actionable error messages.
