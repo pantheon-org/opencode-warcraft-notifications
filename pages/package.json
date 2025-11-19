@@ -7,8 +7,9 @@
     "transform": "node transform-docs.js",
     "fix-links": "node fix-links.js",
     "test-links": "node test-links.js",
-    "dev": "bun run transform && astro dev",
-    "build": "bun run transform && astro build && bun run fix-links",
+    "generate-favicon": "bun generate-favicon.mjs",
+    "dev": "bun run generate-favicon && bun run transform && astro dev",
+    "build": "bun run generate-favicon && bun run transform && astro build && bun run fix-links",
     "preview": "astro preview",
     "verify": "bun run test-links"
   },

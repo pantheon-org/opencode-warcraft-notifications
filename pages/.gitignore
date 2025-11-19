@@ -5,6 +5,9 @@ dist/
 # Generated content (from transformation)
 src/content/docs/
 
+# Generated assets
+public/favicon.svg
+
 # Dependencies
 node_modules/
 
