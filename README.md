@@ -16,7 +16,7 @@ This plugin plays authentic Warcraft II unit audio clips from both Alliance and 
 
 ## Features
 
-- 🎵 **100+ Authentic Sounds**: Complete collection of Warcraft II Alliance and Horde unit voices
+- 🎵 **110+ Authentic Sounds**: Complete collection of Warcraft II Alliance and Horde unit voices
 - 📦 **Bundled Sounds**: Includes pre-bundled WAV assets copied into a per-user data directory on first use (no runtime network dependency by default)
 - 🎲 **Random Selection**: Plays a different sound each time for variety
 - ⚔️ **Faction Choice**: Choose Alliance, Horde, or both factions
@@ -36,27 +36,27 @@ This project includes comprehensive documentation for all users:
 ### Quick Access
 
 - **[📚 Documentation Site](https://pantheon-org.github.io/opencode-warcraft-notifications/)** - Complete documentation (recommended)
-- **[🗺️ Documentation Map](https://pantheon-org.github.io/opencode-warcraft-notifications/documentation-map/)** - Navigation guide
-- **[⚡ Quick Reference](https://pantheon-org.github.io/opencode-warcraft-notifications/quick-reference/)** - Common tasks and commands
+- **[🗺️ Documentation Map](https://pantheon-org.github.io/opencode-warcraft-notifications/documentation-map/** - Navigation guide
+- **[⚡ Quick Reference](https://pantheon-org.github.io/opencode-warcraft-notifications/quick-reference/** - Common tasks and commands
 
 ### For Users
 
-- **[User Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/user-guide/)** - Installation, configuration, and usage
+- **[User Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/user-guide/** - Installation, configuration, and usage
 - **[FAQ](https://pantheon-org.github.io/opencode-warcraft-notifications/user-guide/#faq)** - Common questions and answers
-- **[Troubleshooting](https://pantheon-org.github.io/opencode-warcraft-notifications/troubleshooting/)** - Problem resolution
+- **[Troubleshooting](https://pantheon-org.github.io/opencode-warcraft-notifications/troubleshooting/** - Problem resolution
 
 ### For Developers
 
-- **[Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/)** - Setup, workflow, and contributing
-- **[API Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/api/)** - Complete technical reference
-- **[Architecture](https://pantheon-org.github.io/opencode-warcraft-notifications/architecture/)** - System design and components
-- **[Onboarding](https://pantheon-org.github.io/opencode-warcraft-notifications/onboarding/)** - New contributor guide
+- **[Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/** - Setup, workflow, and contributing
+- **[API Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/api/** - Complete technical reference
+- **[Architecture](https://pantheon-org.github.io/opencode-warcraft-notifications/architecture/** - System design and components
+- **[Onboarding](https://pantheon-org.github.io/opencode-warcraft-notifications/onboarding/** - New contributor guide
 
 ### For Operations
 
-- **[Deployment Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/deployment/)** - Installation and operations
-- **[CI/CD Pipeline](https://pantheon-org.github.io/opencode-warcraft-notifications/pipeline/)** - Complete pipeline technical reference
-- **[GitHub Workflows](https://pantheon-org.github.io/opencode-warcraft-notifications/github-workflows/)** - CI/CD setup guides
+- **[Deployment Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/deployment/** - Installation and operations
+- **[CI/CD Pipeline](https://pantheon-org.github.io/opencode-warcraft-notifications/pipeline/** - Complete pipeline technical reference
+- **[GitHub Workflows](https://pantheon-org.github.io/opencode-warcraft-notifications/github-workflows/** - CI/CD setup guides
 
 ### Additional Resources
 
@@ -93,7 +93,7 @@ On first run, the plugin automatically copies bundled WAV files to your local pl
 
 - **Configure factions**: See [Configuration](#configuration) below
 - **Customize sounds**: See [User Guide - Customization](https://pantheon-org.github.io/opencode-warcraft-notifications/user-guide/#customization)
-- **Troubleshoot**: See [Troubleshooting Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/troubleshooting/)
+- **Troubleshoot**: See [Troubleshooting Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/troubleshooting/
 
 ## Configuration
 
@@ -172,7 +172,7 @@ For complete configuration options and examples, see:
 
 - **[User Guide - Configuration](https://pantheon-org.github.io/opencode-warcraft-notifications/user-guide/#configuration)**
 - **[API Documentation - Configuration](https://pantheon-org.github.io/opencode-warcraft-notifications/api/#configuration-module)**
-- **[Schemas Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/schemas/)**
+- **[Schemas Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/schemas/**
 
 ## How It Works
 
@@ -181,7 +181,7 @@ For complete configuration options and examples, see:
 3. **Sound Playback**: Plays the sound using platform-specific audio tools
 4. **Toast Notification**: Shows an in-app toast with the voice line as the title (e.g., "Yes, milord?") and your session summary
 
-The plugin includes 100+ authentic sounds from both factions, including:
+The plugin includes 110+ authentic sounds from both factions, including:
 
 - Unit selection sounds ("Yes, my lord?" / "Zug zug!")
 - Acknowledgment sounds ("For the Alliance!" / "Lok tar!")
@@ -213,7 +213,7 @@ For detailed platform-specific setup and troubleshooting, see:
 
 All sound files are bundled with the plugin from Warcraft II archives. The plugin:
 
-- Includes 100+ pre-bundled WAV files in the `data/` directory
+- Includes 110+ pre-bundled WAV files in the `data/` directory
 - Copies files to local storage on first use
 - No network downloads required during runtime
 - Ensures authentic game audio quality
@@ -244,7 +244,7 @@ For more details, see the [User Guide - Updating](https://pantheon-org.github.io
 
 ## Development
 
-For development instructions, see the [Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/).
+For development instructions, see the [Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/.
 
 Quick start:
 
@@ -311,7 +311,7 @@ The debug mode will log:
 - Toast notification attempts and results
 - Sound file selection and playback
 
-See the [Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/) for complete development workflow, testing strategies, and contributing guidelines.
+See the [Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/ for complete development workflow, testing strategies, and contributing guidelines.
 
 ---
 
@@ -319,7 +319,7 @@ See the [Development Guide](https://pantheon-org.github.io/opencode-warcraft-not
 
 Having issues? Check these resources:
 
-- **[Troubleshooting Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/troubleshooting/)** - Common issues and solutions
+- **[Troubleshooting Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/troubleshooting/** - Common issues and solutions
 - **[User Guide - FAQ](https://pantheon-org.github.io/opencode-warcraft-notifications/user-guide/#faq)** - Frequently asked questions
 - **[Deployment Guide - Troubleshooting](https://pantheon-org.github.io/opencode-warcraft-notifications/deployment/#troubleshooting)** - Deployment and configuration issues
 
@@ -328,10 +328,10 @@ Having issues? Check these resources:
 We welcome contributions! Please see:
 
 - **[Contributing Guide](CONTRIBUTING.md)** - How to contribute
-- **[Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/)** - Development setup and workflow
-- **[Onboarding Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/onboarding/)** - New contributor onboarding
-- **[Architecture Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/architecture/)** - System design
-- **[API Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/api/)** - Technical reference
+- **[Development Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/development/** - Development setup and workflow
+- **[Onboarding Guide](https://pantheon-org.github.io/opencode-warcraft-notifications/onboarding/** - New contributor onboarding
+- **[Architecture Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/architecture/** - System design
+- **[API Documentation](https://pantheon-org.github.io/opencode-warcraft-notifications/api/** - Technical reference
 
 ## License
 

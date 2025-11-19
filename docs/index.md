@@ -15,7 +15,7 @@ This plugin plays authentic Warcraft II unit audio clips from both Alliance and 
 
 ## Features
 
-- 🎵 **100+ Authentic Sounds**: Complete collection of Warcraft II Alliance and Horde unit voices
+- 🎵 **110+ Authentic Sounds**: Complete collection of Warcraft II Alliance and Horde unit voices
 - 📦 **Bundled Sounds**: Includes pre-bundled WAV assets copied into a per-user data directory on first use (no runtime network dependency by default)
 - 🎲 **Random Selection**: Plays a different sound each time for variety
 - ⚔️ **Faction Choice**: Choose Alliance, Horde, or both factions
@@ -34,20 +34,20 @@ This project includes comprehensive documentation for all users:
 
 ### For Users
 
-- **[User Guide](/user-guide/)** - Installation, configuration, and usage
+- **[User Guide](./user-guide.md)** - Installation, configuration, and usage
 - **[FAQ](/user-guide/#faq)** - Common questions and answers
 
 ### For Developers
 
-- **[Development Guide](/development/)** - Setup, workflow, and contributing
-- **[API Documentation](/api/)** - Complete technical reference
-- **[Architecture](/architecture/)** - System design and components
+- **[Development Guide](./development.md)** - Setup, workflow, and contributing
+- **[API Documentation](./api.md)** - Complete technical reference
+- **[Architecture](./architecture.md)** - System design and components
 
 ### For Operations
 
-- **[Deployment Guide](/deployment/)** - Installation and operations
-- **[CI/CD Pipeline](/pipeline/)** - Complete pipeline technical reference
-- **[GitHub Workflows](/github-workflows/)** - CI/CD setup guides
+- **[Deployment Guide](./deployment.md)** - Installation and operations
+- **[CI/CD Pipeline](./pipeline.md)** - Complete pipeline technical reference
+- **[GitHub Workflows](./github-workflows.md)** - CI/CD setup guides
 
 ### Complete Documentation
 
@@ -137,7 +137,7 @@ For complete configuration options and examples, see:
 
 - **[User Guide - Configuration](/user-guide/#configuration)**
 - **[API Documentation - Configuration](/api/#plugin-configuration-module)**
-- **[Schemas Documentation](/schemas/)**
+- **[Schemas Documentation](./schemas.md)**
 
 ## How It Works
 
@@ -146,7 +146,7 @@ For complete configuration options and examples, see:
 3. **Sound Playback**: Plays the sound using platform-specific audio tools
 4. **Toast Notification**: Shows an in-app toast with the voice line as the title (e.g., "Yes, milord?") and your session summary
 
-The plugin includes 100+ authentic sounds from both factions, including:
+The plugin includes 110+ authentic sounds from both factions, including:
 
 - Unit selection sounds ("Yes, my lord?" / "Zug zug!")
 - Acknowledgment sounds ("For the Alliance!" / "Lok tar!")
@@ -178,7 +178,7 @@ For detailed platform-specific setup and troubleshooting, see:
 
 All sound files are bundled with the plugin from Warcraft II archives. The plugin:
 
-- Includes 100+ pre-bundled WAV files in the `data/` directory
+- Includes 110+ pre-bundled WAV files in the `data/` directory
 - Copies files to local storage on first use
 - No network downloads required during runtime
 - Ensures authentic game audio quality
@@ -209,7 +209,7 @@ For more details, see the [User Guide - Updating](/user-guide/#updating-the-plug
 
 ## Development
 
-For development instructions, see the [Development Guide](/development/).
+For development instructions, see the [Development Guide](./development.md).
 
 Quick start:
 
@@ -224,7 +224,7 @@ bun run type-check
 bun run lint
 ```
 
-See the [Development Guide](/development/) for complete development workflow, testing strategies, and contributing guidelines.
+See the [Development Guide](./development.md) for complete development workflow, testing strategies, and contributing guidelines.
 
 ---
 
@@ -241,10 +241,10 @@ Having issues? Check these resources:
 We welcome contributions! Please see:
 
 - **[Contributing Guide](https://github.com/pantheon-org/opencode-warcraft-notifications/blob/main/CONTRIBUTING.md)** - How to contribute
-- **[Development Guide](/development/)** - Development setup and workflow
-- **[Onboarding Guide](/onboarding/)** - New contributor onboarding
-- **[Architecture Documentation](/architecture/)** - System design
-- **[API Documentation](/api/)** - Technical reference
+- **[Development Guide](./development.md)** - Development setup and workflow
+- **[Onboarding Guide](./onboarding.md)** - New contributor onboarding
+- **[Architecture Documentation](./architecture.md)** - System design
+- **[API Documentation](./api.md)** - Technical reference
 
 ## License
 
@@ -263,4 +263,4 @@ MIT License - see [LICENSE](../LICENSE) file for details.
 _"Work complete!"_ - Warcraft II Peasant  
 _"Zug zug!"_ - Warcraft II Orc
 
-> **Note:** This plugin uses an advanced AI-powered workflow system for automated versioning, publishing, and auto-merging. See [GitHub Workflows Documentation](/github-workflows/) for details.
+> **Note:** This plugin uses an advanced AI-powered workflow system for automated versioning, publishing, and auto-merging. See [GitHub Workflows Documentation](./github-workflows.md) for details.
