@@ -9,7 +9,6 @@ This document provides comprehensive API documentation for the Warcraft II Notif
 
 ## Table of Contents
 
-- [Plugin Entry Point](#plugin-entry-point)
 - [Notification Module](#notification-module)
 - [Schema Validator Module](#schema-validator-module)
 - [Plugin Configuration Module](#plugin-configuration-module)
@@ -285,7 +284,7 @@ export interface WarcraftNotificationConfig {
 - `faction?: Faction` - Which faction sounds to play (default: 'both')
 - `showDescriptionInToast?: boolean` - Whether to show toast notifications when idle (default: true)
 
-For schema validation and IDE autocomplete support, see the [Schema Validation Guide](/validate-schema/).
+For schema validation and IDE autocomplete support, see the [Schema Validation Guide](validate-schema.md).
 
 #### Functions
 
@@ -1355,10 +1354,10 @@ export DEBUG_OPENCODE=1
 
 ## Related Documentation
 
-- [Architecture Documentation](/architecture/) - System design and components
-- [Development Guide](/development/) - Development setup and workflow
-- [User Guide](/user-guide/) - End-user documentation
-- [Schema Validation Guide](/validate-schema/) - Configuration validation
+- [Architecture Documentation](architecture.md) - System design and components
+- [Development Guide](development.md) - Development setup and workflow
+- [User Guide](user-guide.md) - End-user documentation
+- [Schema Validation Guide](validate-schema.md) - Configuration validation
 
 ---
 

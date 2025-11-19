@@ -282,7 +282,7 @@ The plugin automatically validates your configuration when it loads. If your con
 
 If you encounter validation errors, see the [Troubleshooting Guide](/troubleshooting/#configuration-validation-errors) for solutions.
 
-For IDE autocomplete support and schema details, see the [Schema Validation Guide](/validate-schema/).
+For IDE autocomplete support and schema details, see the [Schema Validation Guide](./validate-schema.md).
 
 ---
 
@@ -802,10 +802,10 @@ You can add your own WAV files:
 ### Documentation
 
 - **[README](../README.md)**: Quick start and overview
-- **[API Documentation](/api/)**: Technical API reference
-- **[Architecture](/architecture/)**: System design and components
-- **[Development Guide](/development/)**: For contributors
-- **[Deployment Guide](/deployment/)**: Installation and operations
+- **[API Documentation](./api.md)**: Technical API reference
+- **[Architecture](./architecture.md)**: System design and components
+- **[Development Guide](./development.md)**: For contributors
+- **[Deployment Guide](./deployment.md)**: Installation and operations
 
 ### Community
 
