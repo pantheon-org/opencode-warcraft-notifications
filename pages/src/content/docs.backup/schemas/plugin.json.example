@@ -1,7 +1,0 @@
-{
-  "@pantheon-ai/opencode-warcraft-notifications": {
-    "soundsDir": "/home/user/.cache/opencode-warcraft-sounds",
-    "faction": "both",
-    "showDescriptionInToast": true
-  }
-}

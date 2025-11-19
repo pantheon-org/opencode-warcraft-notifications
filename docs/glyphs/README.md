@@ -1,3 +1,7 @@
+---
+title: Glyph Documentation
+---
+
 # Glyph Documentation
 
 Complete reference documentation for the Blocky Alphabet glyph system used in the opencode-warcraft-notifications project.

@@ -1,3 +1,7 @@
+---
+title: Documentation Summary
+---
+
 # Glyph Documentation Summary
 
 ## 📦 What's Been Created

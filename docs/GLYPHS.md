@@ -1,3 +1,7 @@
+---
+title: Blocky Alphabet Glyph System
+---
+
 # Blocky Alphabet Glyph System
 
 Complete documentation for the pixel-art blocky alphabet used in this project.

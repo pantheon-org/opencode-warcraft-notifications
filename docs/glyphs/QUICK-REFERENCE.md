@@ -1,3 +1,7 @@
+---
+title: Quick Reference
+---
+
 # Quick Reference — Blocky Alphabet
 
 Fast lookup guide for all available glyphs.
