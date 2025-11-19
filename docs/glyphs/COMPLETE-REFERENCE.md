@@ -1,3 +1,7 @@
+---
+title: Complete Glyph Reference
+---
+
 # Blocky Alphabet — Complete Glyph Reference
 
 This document shows all available glyphs in the blocky text system, including both letters (A-Z) and symbols (punctuation).

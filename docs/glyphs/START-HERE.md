@@ -1,3 +1,7 @@
+---
+title: Start Here
+---
+
 # 🎨 Start Here: Glyph Documentation Guide
 
 Welcome! This guide will help you navigate the glyph documentation.
