@@ -81,7 +81,7 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@f268e62a13468170ab6417f4075bbff92cb826f9 # v3.28.6
+        uses: github/codeql-action/upload-sarif@c3d42c5d08633d8b33635fbd94b000a0e2585b3c # v3.31.4
         if: always()
         continue-on-error: true
         with:
