@@ -47,7 +47,8 @@ This project includes comprehensive documentation for all users:
 
 - **[Deployment Guide](./deployment.md)** - Installation and operations
 - **[CI/CD Pipeline](./pipeline.md)** - Complete pipeline technical reference
-- **[GitHub Workflows](./github-workflows.md)** - CI/CD setup guides
+- **[GitHub Workflows](./github-workflows/)** - CI/CD setup guides
+- **[npm Publishing](./npmjs/)** - npm authentication and token management
 
 ### Complete Documentation
 

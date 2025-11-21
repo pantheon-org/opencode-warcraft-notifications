@@ -1,0 +1,24 @@
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      run: 'npx prettier --write "{staged_files}"'
+      glob: '**/*.{ts,tsx,js,jsx,json,md,css,scss,html}'
+    eslint:
+      run: 'npx eslint --fix "{staged_files}"'
+      glob: 'src/**/*.{ts,tsx,js,jsx}'
+    typecheck:
+      run: 'npm run type-check'
+      glob: '**/*.{ts,tsx}'
+    test:
+      run: 'bun test "{staged_files}"'
+      glob: '**/*.{spec.ts,spec.tsx,spec.js,spec.jsx,test.ts,test.tsx,test.js,test.jsx}'
+
+pre-push:
+  parallel: false
+  commands:
+    typecheck:
+      run: 'npm run type-check'
+    # Unit tests only - E2E tests run in CI/CD via GitHub Actions
+    test:
+      run: 'bun test src/'
