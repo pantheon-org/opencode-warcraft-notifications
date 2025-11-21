@@ -1,0 +1,56 @@
+name: Clean Old Releases
+
+on:
+  schedule:
+    # Run monthly on the 1st at midnight UTC
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (show what would be deleted without deleting)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Delete Old Releases
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete old releases
+        uses: sgpublic/delete-release-action@v1.2
+        with:
+          # Stable releases: keep last 10, preserve tags for version history
+          release-drop: true
+          release-keep-count: 10
+          release-drop-tag: false
+
+          # Pre-releases: keep only 2 most recent, delete tags
+          pre-release-drop: true
+          pre-release-keep-count: 2
+          pre-release-drop-tag: true
+
+          # Drafts: delete all
+          draft-drop: true
+          draft-drop-count: -1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🧹 Release Cleanup Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Retention Policy" >> $GITHUB_STEP_SUMMARY
+          echo "- **Stable Releases**: Keep last 10 (tags preserved)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Pre-releases**: Keep last 2 (tags deleted)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Draft Releases**: Delete all" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Run completed at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
