@@ -1,8 +1,8 @@
-name: 6. Cleanup (Releases & Branches)
+name: 3. Cleanup (Releases & Branches)
 
 on:
   workflow_run:
-    workflows: ['5. Publish Release (npm + Docs)']
+    workflows: ['2. Publish Release (npm + Docs)']
     types: [completed]
   schedule:
     # Run weekly on Sundays at 2 AM UTC

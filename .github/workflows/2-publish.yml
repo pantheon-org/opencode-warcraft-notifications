@@ -1,4 +1,4 @@
-name: 5. Publish Release (npm + Docs)
+name: 2. Publish Release (npm + Docs)
 
 on:
   push:
