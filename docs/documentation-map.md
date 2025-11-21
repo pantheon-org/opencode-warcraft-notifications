@@ -28,6 +28,7 @@ This document provides a comprehensive map of all documentation available for th
 - **[Deployment Guide](/deployment/)** - Installation and operations
 - **[CI/CD Pipeline](/pipeline/)** - Pipeline technical reference
 - **[GitHub Workflows](/github-workflows/)** - Workflow documentation
+- **[npm Publishing](/npmjs/)** - npm authentication and token management
 - **[Docs Branch Structure](/docs-branch-structure/)** - Documentation deployment
 
 ### ⚙️ Configuration
@@ -116,6 +117,7 @@ This document provides a comprehensive map of all documentation available for th
 
 - **[Pipeline Overview](/pipeline/)** - Complete pipeline reference
 - **[GitHub Workflows](/github-workflows/)** - Workflow documentation
+- **[npm Publishing](/npmjs/)** - npm authentication and publishing
 - **[Smart Version Bump](/github-workflows/overview/#smart-version-bump)** - Automated versioning
 - **[Release & Publish](/github-workflows/overview/#release-publish)** - Release automation
 - **[Auto-Merge Bot](/github-workflows/overview/#auto-merge-bot)** - PR automation
@@ -173,6 +175,8 @@ This document provides a comprehensive map of all documentation available for th
 | [Pipeline Documentation](/pipeline/)   | [Overview](/pipeline/#overview)                    | Pipeline architecture |
 | [GitHub Workflows](/github-workflows/) | [Workflows](/github-workflows/overview/)           | Workflow details      |
 | [GitHub Workflows](/github-workflows/) | [Setup Guide](/github-workflows/setup-guide/)      | Workflow setup        |
+| [npm Publishing](/npmjs/)              | [Authentication](/npmjs/authentication/)           | npm token management  |
+| [npm Publishing](/npmjs/)              | [Token Renewal](/npmjs/token-renewal/)             | Quick token renewal   |
 | [Deployment Guide](/deployment/)       | [CI/CD Integration](/deployment/#cicd-integration) | Deployment automation |
 
 ### Troubleshooting

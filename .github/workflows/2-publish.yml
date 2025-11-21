@@ -38,7 +38,6 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-          always-auth: true
 
       - name: Get version from tag
         id: version
@@ -133,7 +132,10 @@ jobs:
 
           if [ -z "$NODE_AUTH_TOKEN" ]; then
             echo "❌ Error: NPM_TOKEN secret is not set!"
-            echo "Please add NPM_TOKEN to repository secrets"
+            echo "Please configure npm authentication:"
+            echo "  Option 1 (Recommended): Set up npm provenance with OIDC"
+            echo "  Option 2: Add NPM_TOKEN secret with granular access token"
+            echo "See: https://docs.npmjs.com/generating-provenance-statements"
             exit 1
           fi
 
@@ -143,14 +145,19 @@ jobs:
           else
             NPM_EXIT_CODE=$?
             echo "❌ npm publish failed with exit code: $NPM_EXIT_CODE"
-            echo "Check npm token permissions and package configuration"
+            echo ""
+            echo "Common causes:"
+            echo "  - Expired or invalid NPM_TOKEN"
+            echo "  - Token lacks publish permissions for @pantheon-ai organization"
+            echo "  - Package name already published with this version"
+            echo ""
+            echo "To fix: Update NPM_TOKEN with a granular access token that has"
+            echo "        'Read and write' permissions for this package"
             exit $NPM_EXIT_CODE
           fi
 
       - name: Verify npm publication
         if: steps.check-npm.outputs.published == 'false'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION="${{ steps.version.outputs.version }}"
