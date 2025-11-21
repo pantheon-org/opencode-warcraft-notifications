@@ -5,13 +5,14 @@
  *
  * This script:
  * 1. Reads markdown files from ../docs/
- * 2. Copies them to ./src/content/docs/
- * 3. Preserves directory structure
- * 4. Maintains frontmatter and markdown formatting
+ * 2. Adds frontmatter if missing (title is required by Astro)
+ * 3. Copies them to ./src/content/docs/
+ * 4. Preserves directory structure
+ * 5. Maintains existing frontmatter and markdown formatting
  */
 
-import { readdir, mkdir, copyFile } from 'fs/promises';
-import { join, dirname, relative } from 'path';
+import { readdir, mkdir, copyFile, readFile, writeFile } from 'fs/promises';
+import { join, dirname, relative, basename } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +20,43 @@ const __dirname = dirname(__filename);
 
 const SOURCE_DIR = join(__dirname, '../docs');
 const TARGET_DIR = join(__dirname, 'src/content/docs');
+
+/**
+ * Extract title from first heading in markdown content
+ */
+function extractTitle(content) {
+  const match = content.match(/^#\s+(.+)$/m);
+  return match ? match[1] : 'Untitled';
+}
+
+/**
+ * Check if content has frontmatter
+ */
+function hasFrontmatter(content) {
+  return content.trimStart().startsWith('---');
+}
+
+/**
+ * Add frontmatter to markdown content if missing
+ */
+function addFrontmatter(content, filename) {
+  if (hasFrontmatter(content)) {
+    return content;
+  }
+
+  const title = extractTitle(content);
+  const frontmatter = `---\ntitle: '${title}'\n---\n\n`;
+  return frontmatter + content;
+}
+
+/**
+ * Process markdown file: add frontmatter if needed, then copy
+ */
+async function processMarkdownFile(sourcePath, targetPath) {
+  const content = await readFile(sourcePath, 'utf-8');
+  const processedContent = addFrontmatter(content, basename(sourcePath));
+  await writeFile(targetPath, processedContent, 'utf-8');
+}
 
 /**
  * Recursively copy all markdown files from source to target
@@ -46,14 +84,17 @@ async function copyMarkdownFiles(sourceDir, targetDir, relativePath = '') {
       await mkdir(targetPath, { recursive: true });
       // Recursively copy contents
       await copyMarkdownFiles(sourcePath, targetPath, currentRelativePath);
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      // Process markdown files (add frontmatter if needed)
+      await processMarkdownFile(sourcePath, targetPath);
+      console.log(`  ✓ ${currentRelativePath}`);
     } else if (
       entry.isFile() &&
-      (entry.name.endsWith('.md') ||
-        entry.name.endsWith('.json') ||
+      (entry.name.endsWith('.json') ||
         entry.name.endsWith('.example') ||
         entry.name.endsWith('.schema'))
     ) {
-      // Copy markdown and schema files
+      // Copy non-markdown files as-is
       await copyFile(sourcePath, targetPath);
       console.log(`  ✓ ${currentRelativePath}`);
     }
