@@ -16,7 +16,7 @@ This plugin plays authentic Warcraft II unit audio clips from both Alliance and 
 
 ## Features
 
-- 🎵 **110+ Authentic Sounds**: Complete collection of Warcraft II Alliance and Horde unit voices
+- 🎵 **110 Authentic Sounds**: Complete collection of Warcraft II Alliance and Horde unit voices (56 Alliance, 54 Horde)
 - 📦 **Bundled Sounds**: Includes pre-bundled WAV assets copied into a per-user data directory on first use (no runtime network dependency by default)
 - 🎲 **Random Selection**: Plays a different sound each time for variety
 - ⚔️ **Faction Choice**: Choose Alliance, Horde, or both factions
@@ -200,9 +200,21 @@ For the complete list of sounds and examples, see:
 
 ## Platform Support
 
-- **macOS**: Uses `afplay` for audio playback
-- **Linux**: Uses `canberra-gtk-play` for audio playback
-- **Toast Notifications**: Cross-platform using OpenCode's built-in toast system
+- **macOS**: ✅ Full support - Uses `afplay` for audio playback
+- **Linux**: ✅ Full support - Uses `canberra-gtk-play` for audio playback
+- **Windows**: ⚠️ Partial support - Toast notifications work, sound playback planned for future release
+- **Toast Notifications**: ✅ Cross-platform using OpenCode's built-in toast system
+
+### Windows Support Status
+
+**Current**: Partial support
+
+- Plugin loads and initializes on Windows
+- Configuration and sound file management work
+- Toast notifications work via OpenCode TUI
+- Sound playback not yet implemented (logs warning)
+
+**Planned**: Full sound playback support in future release
 
 For detailed platform-specific setup and troubleshooting, see:
 

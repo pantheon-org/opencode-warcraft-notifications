@@ -251,7 +251,9 @@ For CI/CD pipeline issues, see [PIPELINE.md - Troubleshooting](/pipeline/#troubl
 - **Merge conflicts**: Resolve conflicts manually, rebase branch, update base branch
 - **Checks not passing**: Fix failing tests, resolve linting issues, update documentation
 
-## Diagnostic Flowchart
+## Diagnostic Flowcharts
+
+### Main Troubleshooting Decision Tree
 
 ```mermaid
 graph TD
@@ -276,6 +278,178 @@ graph TD
     F --> P[Check workflow logs]
     P --> Q[Verify secrets]
     Q --> R[Check permissions]
+```
+
+### Sound Playback Troubleshooting
+
+```mermaid
+graph TD
+    A[No Sound Playing] --> B{Can you hear<br/>system sounds?}
+    B -->|No| C[Fix system audio]
+    B -->|Yes| D{Is plugin loaded?}
+
+    D -->|No| E[Check OpenCode config]
+    D -->|Yes| F{Session goes idle?}
+
+    F -->|No| G[Wait for idle state]
+    F -->|Yes| H{Sound files exist?}
+
+    H -->|No| I[Run: ls ~/.local/share/opencode/<br/>storage/plugin/...sounds/]
+    I --> J{Files present?}
+    J -->|No| K[Reinstall plugin]
+    J -->|Yes| L{Check file permissions}
+
+    H -->|Yes| M{Test sound manually}
+    M --> N[macOS: afplay sound.wav<br/>Linux: paplay sound.wav]
+    N --> O{Sound plays?}
+
+    O -->|No| P[Check audio tool<br/>installation]
+    O -->|Yes| Q[Check plugin config]
+
+    C --> R[Restart audio service]
+    E --> S[Add plugin to opencode.json]
+    K --> T[Remove & reinstall plugin]
+    P --> U[Install: libcanberra, pulseaudio]
+    Q --> V[Verify faction setting]
+```
+
+### Configuration Validation Troubleshooting
+
+```mermaid
+graph TD
+    A[Config Validation Error] --> B{What error type?}
+
+    B -->|Invalid faction| C[Check faction value]
+    C --> D{Using valid value?}
+    D -->|No| E[Change to: alliance,<br/>horde, or both]
+    D -->|Yes| F[Check quotes & syntax]
+
+    B -->|Wrong type| G[Check data types]
+    G --> H{soundsDir a string?}
+    H -->|No| I[Change to string path]
+    H -->|Yes| J[Check JSON syntax]
+
+    B -->|Unrecognized key| K[Check allowed keys]
+    K --> L{Only soundsDir,<br/>faction, showDescriptionInToast?}
+    L -->|No| M[Remove invalid keys]
+    L -->|Yes| N[Check for typos]
+
+    E --> O[Save & restart OpenCode]
+    F --> O
+    I --> O
+    J --> O
+    M --> O
+    N --> O
+
+    O --> P{Error resolved?}
+    P -->|Yes| Q[Success!]
+    P -->|No| R[Validate with: bun run<br/>validate:schema]
+```
+
+### Plugin Installation Troubleshooting
+
+```mermaid
+graph TD
+    A[Plugin Not Loading] --> B{Plugin in<br/>opencode.json?}
+    B -->|No| C[Add plugin to config]
+    B -->|Yes| D{Restart OpenCode?}
+
+    D -->|No| E[Restart OpenCode]
+    D -->|Yes| F{Check console<br/>for errors}
+
+    F --> G{What error?}
+    G -->|Cannot find module| H[Plugin not installed]
+    G -->|Config validation| I[Fix configuration]
+    G -->|Permission denied| J[Check permissions]
+    G -->|Other error| K[Enable DEBUG_OPENCODE=1]
+
+    H --> L[Clear cache:<br/>rm -rf ~/.cache/opencode/]
+    L --> M[Restart OpenCode]
+
+    I --> N[See Config Validation<br/>Flowchart]
+
+    J --> O[Check directory permissions:<br/>~/.cache/opencode/]
+    O --> P[chmod -R u+rwX]
+
+    K --> Q[Review debug output]
+    Q --> R[Report issue on GitHub]
+
+    C --> S{Config syntax valid?}
+    S -->|No| T[Fix JSON syntax]
+    S -->|Yes| E
+
+    T --> E
+    M --> U{Plugin loaded?}
+    U -->|Yes| V[Success!]
+    U -->|No| R
+```
+
+### Platform-Specific Audio Troubleshooting
+
+```mermaid
+graph TD
+    A[Platform Audio Issue] --> B{What platform?}
+
+    B -->|macOS| C{afplay installed?}
+    C -->|No| D[Install Xcode tools:<br/>xcode-select --install]
+    C -->|Yes| E{Test: afplay<br/>/System/Library/<br/>Sounds/Glass.aiff}
+    E -->|Works| F[Check sound file paths]
+    E -->|Fails| G[Check audio output<br/>in System Preferences]
+
+    B -->|Linux| H{Which player?}
+    H -->|paplay| I{paplay installed?}
+    I -->|No| J[Install pulseaudio:<br/>apt install pulseaudio-utils]
+    I -->|Yes| K{Test: paplay<br/>/usr/share/sounds/<br/>sample.wav}
+
+    H -->|canberra| L{canberra installed?}
+    L -->|No| M[Install libcanberra:<br/>apt install libcanberra-gtk3]
+    L -->|Yes| N{Test: canberra-gtk-play<br/>--id=message}
+
+    B -->|Windows| O[Windows support<br/>partial - sound<br/>playback pending]
+    O --> P[Use toast notifications]
+
+    K -->|Works| F
+    K -->|Fails| Q[Check PulseAudio:<br/>systemctl --user<br/>status pulseaudio]
+
+    N -->|Works| F
+    N -->|Fails| R[Check ALSA/PulseAudio<br/>configuration]
+
+    D --> E
+    J --> K
+    M --> N
+    G --> S[Select correct output]
+    Q --> T[Restart PulseAudio]
+    R --> T
+```
+
+### Performance Issue Troubleshooting
+
+```mermaid
+graph TD
+    A[Performance Issue] --> B{What's slow?}
+
+    B -->|Plugin loading| C{First time loading?}
+    C -->|Yes| D[Sound installation<br/>2-3 seconds normal]
+    C -->|No| E{Using network<br/>directory?}
+    E -->|Yes| F[Move to local storage]
+    E -->|No| G[Check disk performance]
+
+    B -->|Sound playback| H{Latency > 100ms?}
+    H -->|Yes| I{On network<br/>storage?}
+    I -->|Yes| F
+    I -->|No| J[Check audio system<br/>initialization]
+    H -->|No| K[Within normal range]
+
+    B -->|Event handling| L{Enable DEBUG_OPENCODE=1}
+    L --> M[Check timing logs]
+    M --> N{Timing > 50ms?}
+    N -->|Yes| O[Report performance<br/>issue on GitHub]
+    N -->|No| K
+
+    D --> P[Subsequent loads<br/>should be fast]
+    F --> Q[Use ~/.local/share]
+    G --> R[Check disk health]
+    J --> S[First playback may<br/>have extra latency]
 ```
 
 ## Getting Help
