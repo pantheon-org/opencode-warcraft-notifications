@@ -49,7 +49,11 @@ jobs:
             TAG=${GITHUB_REF#refs/tags/}
           fi
 
+          # Strip 'v' prefix (v2.0.0 -> 2.0.0)
           VERSION=${TAG#v}
+          # Also handle Release Please format (opencode-warcraft-notifications-v2.0.0 -> 2.0.0)
+          VERSION=${VERSION##*-v}
+
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "📦 Publishing version: $VERSION from tag: $TAG"
