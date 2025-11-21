@@ -53,8 +53,8 @@ jobs:
         run: |
           echo "## 📝 Release PR Updated" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Release Please has updated the release PR:" >> $GITHUB_STEP_SUMMARY
-          echo "- **PR**: ${{ steps.release.outputs.pr }}" >> $GITHUB_STEP_SUMMARY
+          echo "Release Please has updated the release PR" >> $GITHUB_STEP_SUMMARY
+          echo "- **PR Number**: ${{ steps.release.outputs.prs_created }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Summary - No Changes
         if: steps.release.outputs.release_created != 'true' && steps.release.outputs.pr == ''
