@@ -11,71 +11,62 @@ This directory contains the CI/CD pipeline for the project.
    - Actions: Lint, type-check, test, build
    - Purpose: Ensure code quality before merge
 
-2. **[2-version-update.yml](2-version-update.yml)** - Version Management
-   - Runs on: Push to main (excluding docs/workflow changes)
-   - Actions: Analyze commits → Calculate version → Create version PR
-   - Purpose: Automated semantic versioning
-
-3. **[3-auto-merge.yml](3-auto-merge.yml)** - Auto-merge Version PRs
-   - Runs on: Version PR creation
-   - Actions: Auto-approve and merge version bump PRs
-   - Purpose: Streamline version updates
-
-4. **[4-create-tag.yml](4-create-tag.yml)** - Tag Creation
-   - Runs on: Version bump commit merged to main
-   - Actions: Create git tag from package.json version
-   - Purpose: Trigger release pipeline
-
-5. **[5-publish.yml](5-publish.yml)** - Release & Publish
+2. **[2-publish.yml](2-publish.yml)** - Release & Publish
    - Runs on: Tag push (v\*) or manual trigger
    - Actions: Publish to npm → Deploy docs → Create GitHub release
    - Purpose: Complete release process
 
-6. **[6-cleanup.yml](6-cleanup.yml)** - Cleanup
+3. **[3-cleanup.yml](3-cleanup.yml)** - Cleanup
    - Runs on: After publish workflow
    - Actions: Delete old branches, cleanup artifacts
    - Purpose: Repository maintenance
 
+4. **[release-please.yml](release-please.yml)** - Release Please (Version Management)
+   - Runs on: Push to main
+   - Actions: Analyze commits → Create/update release PR → Create tag on merge
+   - Purpose: Automated semantic versioning using Google's Release Please
+   - Note: Replaces workflows 2-4 from previous architecture
+
 ### Independent Workflows
 
-7. **[deploy-docs.yml](deploy-docs.yml)** - Documentation Deployment
+5. **[deploy-docs.yml](deploy-docs.yml)** - Documentation Deployment
    - Runs on: Push to main with docs/\*\* changes
    - Actions: Build docs → Deploy to docs branch
    - Purpose: Independent docs deployment (no version required)
-   - Note: Docs also deploy as part of release pipeline (workflow 5)
+   - Note: Docs also deploy as part of release pipeline (workflow 2)
 
-8. **[chores-docs-regenerate.yml](chores-docs-regenerate.yml)** - Documentation Regeneration
+6. **[chores-docs-regenerate.yml](chores-docs-regenerate.yml)** - Documentation Regeneration
    - Runs on: Push to main (`.github/**`, `src/**`) or manual trigger
    - Actions: AI analysis → Update docs → Create PR
    - Purpose: Automated documentation maintenance using OpenCode
    - Note: Keeps docs in sync when code or workflows change
    - See: [Documentation Regeneration Guide](../../docs/src/content/docs/github-workflows/docs-regeneration.md)
 
-9. **[chores-pages.yml](chores-pages.yml)** - GitHub Pages Check
+7. **[chores-pages.yml](chores-pages.yml)** - GitHub Pages Check
    - Runs on: Schedule (daily) or manual trigger
    - Actions: Verify Pages configuration
    - Purpose: Ensure Pages uses correct branch
 
-10. **[chores-repo-config.yml](chores-repo-config.yml)** - Repository Config Check
-    - Runs on: Schedule (weekly) or manual trigger
-    - Actions: Verify repository settings
-    - Purpose: Ensure squash merge strategy
+8. **[chores-repo-config.yml](chores-repo-config.yml)** - Repository Config Check
+   - Runs on: Schedule (weekly) or manual trigger
+   - Actions: Verify repository settings
+   - Purpose: Ensure squash merge strategy
 
-11. **[chores-dependabot.yml](chores-dependabot.yml)** - Dependabot PR Management
-    - Runs on: Schedule (daily at 2:00 AM UTC) or manual trigger
-    - Actions: Recreate failing PRs, rebase all PRs, close stale PRs
-    - Purpose: Automated maintenance of Dependabot pull requests
+9. **[chores-dependabot.yml](chores-dependabot.yml)** - Dependabot PR Management
+   - Runs on: Schedule (daily at 2:00 AM UTC) or manual trigger
+   - Actions: Recreate failing PRs, rebase all PRs, close stale PRs
+   - Purpose: Automated maintenance of Dependabot pull requests
 
 ## Workflow Triggers
 
-### Code Changes → Full Release Pipeline + Doc Regeneration
+### Code Changes → Full Release Pipeline
 
 ```
-Feature PR → [1] Validate → Merge to main → [2] Version Update + [8] Doc Regeneration →
-[3] Auto-merge → [4] Create Tag → [5] Publish (npm + docs + release) → [6] Cleanup
+Feature PR → [1] Validate → Merge to main → [release-please] Create/Update Release PR →
+Manual Merge → [2] Publish (npm + docs + release) → [3] Cleanup
 ```
 
-**Note**: Code changes in `.github/**` or `src/**` trigger doc regeneration in parallel with versioning.
+**Note**: Release Please automatically creates/updates a release PR with changelog based on conventional commits.
 
 ### Documentation Changes → Immediate Deployment
 
@@ -93,13 +84,10 @@ Workflow PR → [1] Validate → Merge to main → [8] Doc Regeneration (analyze
 
 ```bash
 # Manually publish a release
-gh workflow run 5-publish.yml -f tag=v1.2.3
+gh workflow run 2-publish.yml -f tag=v1.2.3
 
 # Manually deploy docs
 gh workflow run deploy-docs.yml
-
-# Force version bump
-gh workflow run 2-version-update.yml -f version_type=minor
 
 # Regenerate documentation with AI
 gh workflow run chores-docs-regenerate.yml -f ai_provider=anthropic -f create_pr=true
@@ -116,11 +104,11 @@ gh workflow run chores-dependabot.yml -f action=close-stale -f max_age_days=90  
 
 ## Path Filters
 
-### Workflow 2 (Version Update) - Ignores:
+### Release Please Workflow:
 
-- `.github/**` - Workflow changes don't trigger versions
-- `docs/**` - Documentation changes don't trigger versions
-- `*.md` - README/markdown changes don't trigger versions
+- Analyzes all commits to main branch
+- Creates release PRs based on conventional commits
+- No path filters - evaluates all changes
 
 ### Deploy Docs Workflow - Triggers on:
 
@@ -184,39 +172,41 @@ gh run view <run-id>
 gh workflow run deploy-docs.yml
 ```
 
-### Version Not Bumping
+### Release PR Not Created
 
-**Symptom**: PR merged but no version PR created
+**Symptom**: PR merged but no release PR created
 
 **Cause**: Could be one of:
 
-1. Changes in ignored paths (docs/workflows/markdown)
-2. Workflow-generated commit (has `[skip ci]`)
-3. No conventional commit pattern
+1. No conventional commit patterns detected
+2. Release Please workflow failed
 
 **Solution**:
 
 ```bash
 # Check workflow runs
-gh run list --workflow=2-version-update.yml --limit 5
+gh run list --workflow=release-please.yml --limit 5
 
-# Manually trigger version bump
-gh workflow run 2-version-update.yml -f version_type=patch
+# View specific run
+gh run view <run-id>
+
+# Manually trigger Release Please
+gh workflow run release-please.yml
 ```
 
 ### Tag Not Created
 
-**Symptom**: Version PR merged but no tag created
+**Symptom**: Release PR merged but no tag created
 
-**Cause**: Commit message doesn't match pattern `chore: bump version to X.Y.Z`
+**Cause**: Release Please workflow handles tag creation automatically on PR merge
 
-**Solution**: The version PR should have the correct message format automatically. If not, check workflow 2 logs.
+**Solution**: Check Release Please workflow logs for any errors
 
 ### Publish Not Triggered
 
 **Symptom**: Tag exists but publish didn't run
 
-**Cause**: Workflow 5 only triggers on tags matching `v*`
+**Cause**: Workflow 2 only triggers on tags matching `v*`
 
 **Solution**:
 
@@ -225,7 +215,7 @@ gh workflow run 2-version-update.yml -f version_type=patch
 git tag -l "v*"
 
 # Manually trigger publish
-gh workflow run 5-publish.yml -f tag=v1.2.3
+gh workflow run 2-publish.yml -f tag=v1.2.3
 ```
 
 ### Dependabot PRs Failing
