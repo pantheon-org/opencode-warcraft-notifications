@@ -57,6 +57,12 @@ This directory contains the CI/CD pipeline for the project.
    - Actions: Recreate failing PRs, rebase all PRs, close stale PRs
    - Purpose: Automated maintenance of Dependabot pull requests
 
+10. **[chores-cleanup-releases.yml](chores-cleanup-releases.yml)** - Release Cleanup
+    - Runs on: Schedule (monthly on 1st) or manual trigger
+    - Actions: Delete old releases based on retention policy
+    - Purpose: Keep releases page manageable while preserving version history
+    - Retention: 10 stable releases, 2 pre-releases, 0 drafts
+
 ## Workflow Triggers
 
 ### Code Changes → Full Release Pipeline
@@ -100,6 +106,9 @@ gh workflow run chores-docs-regenerate.yml -f ai_provider=anthropic -f create_pr
 gh workflow run chores-dependabot.yml -f action=recreate-failing  # Default: recreate failing PRs
 gh workflow run chores-dependabot.yml -f action=rebase-all        # Rebase all Dependabot PRs
 gh workflow run chores-dependabot.yml -f action=close-stale -f max_age_days=90  # Close PRs older than 90 days
+
+# Clean up old releases
+gh workflow run chores-cleanup-releases.yml  # Runs automatically monthly
 ```
 
 ## Path Filters
@@ -266,6 +275,31 @@ gh workflow run chores-dependabot.yml -f action=close-stale -f max_age_days=60
 gh pr close <PR#> --comment "Closing stale PR"
 ```
 
+### Too Many Old Releases
+
+**Symptom**: Releases page cluttered with old versions
+
+**Cause**: Automated releases accumulating over time
+
+**Solution**:
+
+```bash
+# Manually trigger cleanup (runs automatically monthly)
+gh workflow run chores-cleanup-releases.yml
+
+# Check recent cleanup runs
+gh run list --workflow=chores-cleanup-releases.yml --limit 5
+
+# View specific run details
+gh run view <run-id>
+```
+
+**Retention Policy**:
+
+- Stable releases: Last 10 kept (tags preserved for version history)
+- Pre-releases: Last 2 kept (tags deleted)
+- Draft releases: All deleted
+
 ## Testing Workflows Locally
 
 Use [act](https://github.com/nektos/act) for local testing:
@@ -298,5 +332,5 @@ act push -W .github/workflows/deploy-docs.yml
 
 ---
 
-**Last Updated:** 2025-11-12  
+**Last Updated:** 2025-11-21  
 **Maintained By:** Pantheon AI Team
