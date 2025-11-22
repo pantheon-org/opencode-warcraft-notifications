@@ -1,6 +1,6 @@
 {
   "name": "@pantheon-ai/opencode-warcraft-notifications",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Warcraft II notifications plugin for OpenCode with Alliance and Horde faction sounds",
   "keywords": [
     "opencode",
