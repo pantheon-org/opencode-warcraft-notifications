@@ -188,16 +188,16 @@ jobs:
         if: steps.check_provider.outputs.provider_available == 'true'
         run: |
           cat > .github/scripts/regenerate-docs-prompt.txt << 'PROMPT_EOF'
-          Please regenerate the documentation under docs/src/content/docs/ by analyzing the current codebase.
+          Please regenerate the documentation under docs/ by analyzing the current codebase.
 
           Focus on these key documentation files:
-          1. docs/src/content/docs/index.md - Main landing page and overview
-          2. docs/src/content/docs/user-guide.md - User-facing documentation
-          3. docs/src/content/docs/api.md - Complete API reference
-          4. docs/src/content/docs/architecture.md - System architecture
-          5. docs/src/content/docs/development.md - Development guide
-          6. docs/src/content/docs/deployment.md - Deployment guide
-          7. docs/src/content/docs/pipeline.md - CI/CD pipeline documentation
+          1. docs/index.md - Main landing page and overview
+          2. docs/user-guide.md - User-facing documentation
+          3. docs/api.md - Complete API reference
+          4. docs/architecture.md - System architecture
+          5. docs/development.md - Development guide
+          6. docs/deployment.md - Deployment guide
+          7. docs/pipeline.md - CI/CD pipeline documentation
 
           Requirements:
           - Analyze the source code to ensure documentation is accurate and up-to-date
@@ -245,7 +245,7 @@ jobs:
           }
 
           # Check if any docs were changed
-          if git diff --quiet docs/src/content/docs/; then
+          if git diff --quiet docs/; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
             echo "⚠️  No documentation changes detected"
           else
@@ -255,7 +255,7 @@ jobs:
             # Output diff stats for visibility
             echo ""
             echo "📊 Documentation Change Statistics:"
-            git diff --stat docs/src/content/docs/
+            git diff --stat docs/
           fi
 
       - name: Validate documentation changes
@@ -265,11 +265,11 @@ jobs:
 
           # Check that key files still exist
           required_files=(
-            "docs/src/content/docs/index.md"
-            "docs/src/content/docs/user-guide.md"
-            "docs/src/content/docs/api.md"
-            "docs/src/content/docs/architecture.md"
-            "docs/src/content/docs/development.md"
+            "docs/index.md"
+            "docs/user-guide.md"
+            "docs/api.md"
+            "docs/architecture.md"
+            "docs/development.md"
           )
 
           for file in "${required_files[@]}"; do
@@ -284,7 +284,7 @@ jobs:
       - name: Test documentation build
         if: steps.check_provider.outputs.provider_available == 'true' && steps.regenerate.outputs.has_changes == 'true'
         run: |
-          cd docs
+          cd pages
           bun install --frozen-lockfile
           bun run build
           echo "✅ Documentation builds successfully"
@@ -305,7 +305,7 @@ jobs:
 
             ### Changes Made
 
-            - Documentation files under `docs/src/content/docs/` have been regenerated
+            - Documentation files under `docs/` have been regenerated
             - Code examples and API references have been updated to match current implementation
             - All documentation has been validated and tested to build successfully
 
@@ -364,7 +364,7 @@ jobs:
             echo "✅ **Status**: Documentation changes detected and PR created" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### Changed Files" >> $GITHUB_STEP_SUMMARY
-            git diff --name-only docs/src/content/docs/ 2>/dev/null | while read file; do
+            git diff --name-only docs/ 2>/dev/null | while read file; do
               echo "- \`$file\`" >> $GITHUB_STEP_SUMMARY
             done || echo "- Changes available in PR" >> $GITHUB_STEP_SUMMARY
           else
