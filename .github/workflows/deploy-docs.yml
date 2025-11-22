@@ -26,56 +26,42 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # v2.0.2
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 'latest'
 
-      - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-pages-${{ hashFiles('**/pages/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-pages-
-
       - name: Install dependencies
-        run: |
-          cd pages
-          bun install --frozen-lockfile
+        working-directory: ./pages
+        run: bun install --frozen-lockfile
 
       - name: Install Playwright browsers
+        working-directory: ./pages
         run: |
-          cd pages
           bunx playwright install --with-deps chromium
           echo "✅ Playwright browsers installed"
 
       - name: Transform documentation
+        working-directory: ./pages
         run: |
-          cd pages
           node transform-docs.js
           echo "✅ Documentation transformed from ./docs/ to ./pages/src/content/docs/"
 
-      - name: Build documentation
-        run: |
-          cd pages
-          bun run build
-          echo "✅ Documentation built successfully"
+      - name: Build and upload with Astro action
+        uses: withastro/action@v3
+        with:
+          path: ./pages
+          package-manager: bun@latest
 
       - name: Verify internal links
+        working-directory: ./pages
         run: |
-          cd pages
           bun run verify
           echo "✅ All internal links verified"
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
-        with:
-          path: ./pages/dist
 
   deploy:
     name: Deploy to GitHub Pages

@@ -242,11 +242,12 @@ graph TD
 
 ### Deploy Documentation (`deploy-docs.yml`)
 
-**Purpose:** Deploy documentation immediately when docs change (no version required)
+**Purpose**: Deploy documentation immediately when docs change (no version required)
 
 **Triggers:**
 
-- Push to main branch with `docs/**` changes
+- Push to main branch with `docs/**` or `pages/**` changes
+- Release published
 - Manual workflow dispatch
 
 **Jobs:**
@@ -255,16 +256,23 @@ graph TD
    - Checkout repository
    - Setup Bun
    - Install dependencies
-   - Build documentation with Astro
+   - Install Playwright browsers
+   - Transform documentation
+   - Build and upload with Astro action (`withastro/action@v3`)
+   - Verify internal links
 
-2. **Deploy to docs branch**
-   - Deploy `docs/dist` to `docs` branch
-   - Uses `peaceiris/actions-gh-pages@v4`
+2. **Deploy to GitHub Pages**
+   - Deploy artifact to GitHub Pages
+   - Uses `actions/deploy-pages@v4`
+   - Generate deployment summary
 
 **Key Features:**
 
+- **Official Astro Action** - Uses `withastro/action@v3` for optimized builds
 - **Independent of releases** - Docs deploy without version bumps
-- **Fast deployment** - ~30 seconds from merge to live
+- **Fast deployment** - ~2-5 minutes from merge to live
+- **Link verification** - Validates all internal links before deployment
+- **Artifact-based** - No separate branch needed
 - **Caching** - Uses Bun cache for faster builds
 
 **Comparison with Workflow 5:**
