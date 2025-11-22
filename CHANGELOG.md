@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2](https://github.com/pantheon-org/opencode-warcraft-notifications/compare/v1.1.1...v1.1.2) (2025-11-22)
+
+
+### Bug Fixes
+
+* remove broken documentation links to non-existent files ([3da48ff](https://github.com/pantheon-org/opencode-warcraft-notifications/commit/3da48ffc45c1575c80df4332038917df7ff51b74))
+* remove broken sidebar links in astro config ([e21a0fd](https://github.com/pantheon-org/opencode-warcraft-notifications/commit/e21a0fd7a4fcb1ce4ee05075436ac3493971a034))
+
 ## [1.1.1](https://github.com/pantheon-org/opencode-warcraft-notifications/compare/v1.1.0...v1.1.1) (2025-11-21)
 
 ### Bug Fixes
