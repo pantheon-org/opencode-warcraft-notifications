@@ -40,6 +40,8 @@
     "check:docs": "node ./scripts/check-docs.cjs",
     "type-check": "bun tsc --noEmit --project tsconfig.test.json",
     "lint": "eslint src/",
+    "lint:md": "markdownlint-cli2",
+    "lint:md:fix": "markdownlint-cli2 --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,cjs,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,cjs,css}\"",
     "clean": "rm -rf dist/ .bun-cache/ coverage/",
@@ -78,6 +80,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-sonarjs": "^0.16.0",
     "eslint-plugin-tsdoc": "^0.4.0",
+    "markdownlint-cli2": "^0.19.0",
     "prettier": "^3.6.2",
     "typescript": "^5.0.0"
   },
