@@ -4,6 +4,7 @@ dist
 .bun-cache
 data
 *.wav
+.context
 
 tmp_docs_remote/
 docs/dist/

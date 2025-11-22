@@ -1,0 +1,59 @@
+{
+  // Configuration for markdownlint-cli2
+  // See https://github.com/DavidAnson/markdownlint-cli2#configuration
+  "config": {
+    // Default state for all rules
+    "default": true,
+
+    // MD010/no-hard-tabs - Hard tabs
+    "MD010": false,
+
+    // MD013/line-length - Line length (relaxed for docs)
+    "MD013": false,
+
+    // MD033/no-inline-html - Inline HTML (allow all HTML for now)
+    "MD033": false,
+
+    // MD034/no-bare-urls - Bare URLs (disable as many docs use them)
+    "MD034": false,
+
+    // MD041/first-line-heading - First line in file should be a top level heading
+    "MD041": false,
+
+    // MD024/no-duplicate-heading - Multiple headings with the same content
+    "MD024": {
+      "siblings_only": true,
+    },
+
+    // MD045/no-alt-text - Images should have alt text
+    "MD045": false,
+
+    // MD040/fenced-code-language - Fenced code blocks should have a language
+    "MD040": false,
+
+    // MD025/single-title - Multiple top-level headings
+    "MD025": false,
+
+    // MD026/no-trailing-punctuation - Trailing punctuation in heading
+    "MD026": false,
+
+    // MD029/ol-prefix - Ordered list item prefix
+    "MD029": false,
+
+    // MD031/blanks-around-fences - Fenced code blocks should be surrounded by blank lines
+    "MD031": false,
+
+    // MD036/no-emphasis-as-heading - Emphasis used instead of a heading
+    "MD036": false,
+
+    // MD051/link-fragments - Link fragments should be valid
+    "MD051": false,
+
+    // MD060/table-column-style - Table column style
+    "MD060": false,
+  },
+  // Only lint specific directories - focus on core documentation
+  "globs": ["docs/**/*.md", "README.md", "CONTRIBUTING.md", "SECURITY.md"],
+  // Fix mode disabled by default
+  "fix": false,
+}
