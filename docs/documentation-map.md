@@ -29,7 +29,7 @@ This document provides a comprehensive map of all documentation available for th
 - **[CI/CD Pipeline](/pipeline/)** - Pipeline technical reference
 - **[GitHub Workflows](/github-workflows/)** - Workflow documentation
 - **[npm Publishing](/npmjs/)** - npm authentication and token management
-- **[Docs Branch Structure](/docs-branch-structure/)** - Documentation deployment
+- **[Documentation Deployment](/deployment/#documentation-deployment)** - How docs are deployed
 
 ### ⚙️ Configuration
 

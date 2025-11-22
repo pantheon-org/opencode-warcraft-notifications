@@ -485,10 +485,10 @@ Potential improvements:
 
 ## Related Documentation
 
-- [CI/CD Pipeline Documentation](./pipeline.md)
-- [Documentation Branch Structure](./docs-branch-structure.md)
-- [Deploy Documentation Workflow](./deploy-docs.md)
-- [Development Guide](./development.md)
+- [CI/CD Pipeline Documentation](../pipeline.md)
+- [Documentation Deployment](../deployment.md#documentation-deployment)
+- [GitHub Workflows Overview](./overview.md)
+- [Development Guide](../development.md)
 
 ## Support
 
