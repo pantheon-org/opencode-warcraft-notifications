@@ -810,12 +810,12 @@ The project documentation is automatically deployed to GitHub Pages at:
 
 #### Deployment Architecture
 
-The documentation uses **GitHub Actions native deployment**:
+The documentation uses **GitHub Actions with Astro's official action**:
 
 ```mermaid
 graph TB
     A[Trigger Event] --> B{Event Type?}
-    B -->|Push to main| C[docs/** changed?]
+    B -->|Push to main| C[docs/** or pages/** changed?]
     B -->|Release published| D[Build Documentation]
     B -->|Manual dispatch| D
     C -->|Yes| D
@@ -823,23 +823,27 @@ graph TB
     D --> F[Checkout main branch]
     F --> G[Setup Bun runtime]
     G --> H[Install dependencies]
-    H --> I[Transform docs]
-    I --> J[Build with Astro]
-    J --> K[Upload Pages artifact]
-    K --> L[Deploy to GitHub Pages]
-    L --> M[Site live at pages URL]
+    H --> I[Install Playwright browsers]
+    I --> J[Transform docs]
+    J --> K[Build & Upload with Astro Action]
+    K --> L[Verify internal links]
+    L --> M[Deploy to GitHub Pages]
+    M --> N[Site live at pages URL]
 
     style D fill:#4caf50
-    style L fill:#2196f3
-    style M fill:#ff9800
+    style K fill:#ff9800
+    style M fill:#2196f3
+    style N fill:#4caf50
 ```
 
 **Key Benefits**:
 
+- **Official Astro Action**: Uses `withastro/action@v3` for optimized builds
 - **No branch management**: No need to maintain a separate `docs` or `gh-pages` branch
 - **Automatic on releases**: Documentation updates with every release
 - **Artifact-based**: Uses GitHub's native Pages deployment
 - **Concurrent safe**: Built-in concurrency control prevents conflicts
+- **Link verification**: Validates all internal links before deployment
 
 **Deployment Sources**:
 
@@ -861,7 +865,8 @@ Documentation is automatically deployed when:
 
 - **Static Site Generator**: Astro with Starlight theme
 - **Build Tool**: Bun (fast package management and builds)
-- **Deployment Method**: GitHub Actions native Pages deployment
+- **Deployment Method**: Astro GitHub Action (`withastro/action@v3`) with native Pages deployment
+- **Link Verification**: Validates all internal links before deployment
 - **Concurrency Control**: Single `pages` group prevents overlapping deployments
 - **Permissions**: Minimal required permissions (contents: read, pages: write, id-token: write)
 
@@ -890,6 +895,7 @@ To manually trigger documentation deployment:
 - No branch selection is needed - deployment uses Actions artifacts
 - First deployment creates the `github-pages` environment automatically
 - The workflow requires `pages: write` and `id-token: write` permissions
+- The Astro action handles build, upload, and artifact management automatically
 
 #### Verification
 
@@ -923,17 +929,22 @@ The documentation build process consists of two jobs:
 
 **Job 1: Build**
 
-1. **Transform**: `pages/transform-docs.js` syncs `./docs/` → `./pages/src/content/docs/`
-2. **Build**: Astro compiles markdown to HTML with Starlight theme
-3. **Output**: Static site generated in `./pages/dist/`
-4. **Upload**: Build artifacts uploaded as Pages artifact
+1. **Setup**: Checkout repository and setup Bun runtime
+2. **Dependencies**: Install dependencies with frozen lockfile
+3. **Playwright**: Install Playwright browsers for testing
+4. **Transform**: `pages/transform-docs.js` syncs `./docs/` → `./pages/src/content/docs/`
+5. **Build & Upload**: Astro action (`withastro/action@v3`) handles:
+   - Compiling markdown to HTML with Starlight theme
+   - Generating static site in `./pages/dist/`
+   - Uploading build artifacts as Pages artifact
+6. **Verification**: Validate all internal links in the built site
 
 **Job 2: Deploy**
 
 1. **Download**: Retrieve Pages artifact from build job
-2. **Deploy**: GitHub Actions deploys to Pages service
+2. **Deploy**: GitHub Actions deploys to Pages service using `actions/deploy-pages@v4`
 3. **Environment**: Creates/updates `github-pages` environment
-4. **Serve**: GitHub Pages serves the deployed artifact
+4. **Summary**: Generates deployment summary with URL and build details
 
 **Build Configuration**: `pages/astro.config.mjs`
 
@@ -986,6 +997,22 @@ export default defineConfig({
    - Pages deployment permissions are explicitly granted
 3. Manually trigger workflow to retry
 
+**Link verification failures**:
+
+If internal link verification fails:
+
+```bash
+# Run link verification locally
+cd pages
+bun run verify
+
+# Check for broken links in the output
+# Fix any broken links in the source markdown files in ./docs/
+
+# Test the build locally
+bun run build
+```
+
 **Build artifacts in main branch**:
 
 Build artifacts should never appear in the main branch. If you see `dist/` or `.astro/`:
@@ -1029,21 +1056,30 @@ gh run list --workflow=deploy-docs.yml --limit 5
 gh api repos/:owner/:repo/environments/github-pages/deployments --jq '.[]| {created_at, environment, state}'
 ```
 
-#### Migrating from Branch-Based Deployment
+#### Migration History
 
-If you previously used the `docs` branch deployment method:
+**Previous Deployment Method** (deprecated):
 
-1. **Keep existing docs branch** (optional) - It won't interfere with Actions deployment
-2. **Update Pages source**: Settings → Pages → Source → **GitHub Actions**
-3. **First Actions deployment**: Manually trigger the workflow
-4. **Delete docs branch** (optional): `git push origin --delete docs` after verifying new deployment works
+The project previously used `peaceiris/actions-gh-pages@v4` to deploy to a `docs` branch. This has been replaced with the official Astro GitHub Action.
 
-**Benefits of Migration**:
+**Current Deployment Method**:
+
+Uses `withastro/action@v3` which provides:
+
+- Optimized Astro builds
+- Automatic artifact upload
+- Better caching
+- Native GitHub Pages integration
+- Built-in link verification
+
+**Benefits of Current Approach**:
 
 - No branch to maintain or track
 - Better concurrency control
 - Cleaner git history
-- Native GitHub Pages integration
+- Official Astro support
+- Faster builds with caching
+- Automatic link verification
 
 #### Related Documentation
 

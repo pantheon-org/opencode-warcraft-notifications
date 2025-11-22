@@ -1150,16 +1150,17 @@ for (const item of uniqueToDelete) {
 ### Deploy Documentation Workflow
 
 **File**: `.github/workflows/deploy-docs.yml`  
-**Purpose**: Build and deploy documentation to GitHub Pages via docs branch
+**Purpose**: Build and deploy documentation to GitHub Pages using Astro's official action
 
 #### Overview
 
-The documentation deployment workflow uses a **two-branch strategy**:
+The documentation deployment workflow uses **GitHub Actions with the official Astro action**:
 
 - **`main` branch**: Contains source markdown files and build configuration
-- **`docs` branch**: Contains generated static site (auto-created and managed by workflow)
+- **Artifact-based deployment**: No separate branch needed - uses GitHub Pages artifacts
+- **Astro action**: Uses `withastro/action@v3` for optimized builds and deployment
 
-This separation ensures clean version control history and automated documentation deployment.
+This approach ensures clean version control history, faster builds, and automated documentation deployment.
 
 #### Triggers
 
@@ -1169,24 +1170,28 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
-      - '.github/workflows/deploy-docs.yml'
+      - 'pages/**'
+  release:
+    types: [published]
   workflow_dispatch:
 ```
 
 **Trigger Conditions**:
 
-- Pushes to `main` branch that modify `docs/**` directory
-- Changes to the workflow file itself
+- Pushes to `main` branch that modify `docs/**` or `pages/**` directories
+- New releases are published
 - Manual workflow dispatch
 
 #### Permissions
 
 ```yaml
 permissions:
-  contents: write # Required for pushing to docs branch
+  contents: read
+  pages: write
+  id-token: write
 ```
 
-**Critical**: The workflow needs `contents: write` permission to push generated artifacts to the `docs` branch.
+**Critical**: The workflow needs `pages: write` and `id-token: write` permissions for GitHub Pages deployment.
 
 #### Concurrency Control
 
@@ -1198,18 +1203,18 @@ concurrency:
 
 **Behavior**: Only one documentation deployment runs at a time. New deployments wait for current deployment to complete (no cancellation).
 
-#### Job: Build and Deploy
+#### Job 1: Build Documentation
 
-**Purpose**: Build static site and deploy to docs branch  
+**Purpose**: Build static site and upload as artifact  
 **Runner**: `ubuntu-latest`  
 **Duration**: 2-5 minutes
 
 ##### Workflow Steps
 
-1. **Checkout Source Branch**
+1. **Checkout Repository**
 
    ```yaml
-   - name: Checkout source branch
+   - name: Checkout repository
      uses: actions/checkout@v4
      with:
        fetch-depth: 0 # Full history for accurate build
@@ -1230,47 +1235,80 @@ concurrency:
 3. **Install Dependencies**
 
    ```bash
-   cd docs
-   bun install
+   cd pages
+   bun install --frozen-lockfile
    ```
 
    - Installs Astro, Starlight, and all documentation dependencies
-   - Uses `bun.lockb` for reproducible builds
+   - Uses `bun.lock` for reproducible builds
 
-4. **Transform and Build with Astro**
+4. **Install Playwright Browsers**
 
    ```bash
-   cd docs
-   bun run build
+   cd pages
+   bunx playwright install --with-deps chromium
    ```
 
-   - Runs `transform-docs.js` to process markdown files
-   - Astro compiles markdown to HTML with Starlight theme
-   - Generates static site in `docs/dist/`
-   - Creates search index with Pagefind
+   - Required for link verification and testing
 
-5. **Deploy to Docs Branch**
+5. **Transform Documentation**
+
+   ```bash
+   cd pages
+   node transform-docs.js
+   ```
+
+   - Syncs markdown files from `./docs/` to `./pages/src/content/docs/`
+
+6. **Build and Upload with Astro Action**
 
    ```yaml
-   - name: Deploy to docs branch
-     uses: peaceiris/actions-gh-pages@v4
+   - name: Build and upload with Astro action
+     uses: withastro/action@v3
      with:
-       github_token: ${{ secrets.GITHUB_TOKEN }}
-       publish_branch: docs
-       publish_dir: ./docs/dist
-       force_orphan: false
-       enable_jekyll: false
-       commit_message: 'docs: Deploy documentation from commit ${{ github.sha }}'
-       user_name: 'github-actions[bot]'
-       user_email: 'github-actions[bot]@users.noreply.github.com'
+       path: ./pages
+       package-manager: bun@latest
    ```
 
-   **Action Configuration**:
-   - `publish_branch: docs` - Target branch for deployment
-   - `publish_dir: ./docs/dist` - Source directory containing built site
-   - `force_orphan: false` - Maintain deployment history
-   - `enable_jekyll: false` - Disable Jekyll processing (using Astro)
-   - Meaningful commit messages with source commit SHA
+   **Action Benefits**:
+   - Optimized Astro builds with caching
+   - Automatic artifact upload to GitHub Pages
+   - Built-in error handling
+   - Official Astro support
+
+7. **Verify Internal Links**
+
+   ```bash
+   cd pages
+   bun run verify
+   ```
+
+   - Validates all internal links in the built site
+   - Prevents broken links from being deployed
+
+#### Job 2: Deploy to GitHub Pages
+
+**Purpose**: Deploy built artifacts to GitHub Pages  
+**Runner**: `ubuntu-latest`  
+**Duration**: 30 seconds
+
+##### Workflow Steps
+
+1. **Deploy to GitHub Pages**
+
+   ```yaml
+   - name: Deploy to GitHub Pages
+     id: deployment
+     uses: actions/deploy-pages@v4
+   ```
+
+   - Deploys the artifact uploaded by the build job
+   - Creates/updates the `github-pages` environment
+   - Returns the deployment URL
+
+2. **Generate Summary**
+   - Creates a deployment summary with URL, commit SHA, and build details
+   - Visible in the GitHub Actions workflow run
 
 #### Build Process Details
 
@@ -1279,32 +1317,35 @@ sequenceDiagram
     participant GH as GitHub
     participant WF as Workflow
     participant Bun as Bun Runtime
-    participant Astro as Astro Build
-    participant Docs as Docs Branch
+    participant Astro as Astro Action
+    participant Pages as GitHub Pages
 
-    GH->>WF: Push to main (docs/** changed)
+    GH->>WF: Push to main (docs/** or pages/** changed)
     WF->>WF: Checkout main branch
     WF->>Bun: Setup Bun runtime
     Bun->>WF: Runtime ready
     WF->>Bun: Install dependencies
     Bun->>WF: Dependencies installed
-    WF->>Astro: Run transform-docs.js
-    Astro->>Astro: Process markdown files
-    WF->>Astro: Run bun run build
-    Astro->>Astro: Compile to HTML
+    WF->>Bun: Install Playwright browsers
+    Bun->>WF: Browsers ready
+    WF->>WF: Run transform-docs.js
+    WF->>Astro: Build with Astro action
+    Astro->>Astro: Compile markdown to HTML
     Astro->>Astro: Generate search index
-    Astro->>WF: Build complete (docs/dist/)
-    WF->>Docs: Push to docs branch
-    Docs->>GH: Deployment complete
-    GH->>GH: GitHub Pages serves docs branch
+    Astro->>Astro: Upload Pages artifact
+    Astro->>WF: Build complete
+    WF->>WF: Verify internal links
+    WF->>Pages: Deploy artifact
+    Pages->>GH: Deployment complete
+    GH->>GH: GitHub Pages serves site
 ```
 
 #### Generated Artifacts
 
-The `docs` branch contains:
+The GitHub Pages artifact contains:
 
 ```
-docs branch/
+pages artifact/
 ├── _astro/                     # JavaScript/CSS bundles
 │   ├── *.js
 │   └── *.css
@@ -1320,14 +1361,15 @@ docs branch/
 └── content-modules.mjs         # Module mappings
 ```
 
+**Note**: No separate branch is created - artifacts are stored in GitHub Pages service.
+
 #### GitHub Pages Configuration
 
 After first workflow run, configure GitHub Pages:
 
 1. Go to: **Settings → Pages**
-2. Set **Source**: **Deploy from a branch**
-3. Set **Branch**: **docs** (root directory)
-4. Click **Save**
+2. Set **Source**: **GitHub Actions**
+3. Click **Save** (if required)
 
 **URL**: https://pantheon-org.github.io/opencode-warcraft-notifications/
 
@@ -1349,29 +1391,29 @@ gh run watch
 **Deployment Verification**:
 
 ```bash
-# Check docs branch exists
-git fetch --all
-git branch -a | grep docs
-
 # Verify site is accessible
 curl -I https://pantheon-org.github.io/opencode-warcraft-notifications/
 
-# Check docs branch commits
-git log origin/docs --oneline -5
+# Check deployment status
+gh api repos/:owner/:repo/pages/deployments --jq '.[0]'
+
+# View environment deployments
+gh api repos/:owner/:repo/environments/github-pages/deployments --jq '.[]| {created_at, environment, state}'
 ```
 
 #### Troubleshooting
 
-**Issue 1: Docs branch not created**
+**Issue 1: Deployment not triggered**
 
-**Symptoms**: Workflow completes but no `docs` branch appears
+**Symptoms**: Workflow completes but no deployment occurs
 
 **Solution**:
 
 1. Check workflow logs for errors
-2. Verify `contents: write` permission in workflow
+2. Verify `pages: write` and `id-token: write` permissions in workflow
 3. Check repository Actions permissions (Settings → Actions → General)
-4. Manually trigger workflow: Actions → Deploy Documentation → Run workflow
+4. Verify GitHub Pages source is set to "GitHub Actions" (Settings → Pages)
+5. Manually trigger workflow: Actions → Deploy Documentation → Run workflow
 
 **Issue 2: GitHub Pages not updating**
 
@@ -1379,10 +1421,11 @@ git log origin/docs --oneline -5
 
 **Solution**:
 
-1. Verify GitHub Pages is configured to use `docs` branch
-2. Check deployment status: Repository → Deployments
+1. Verify GitHub Pages source is set to "GitHub Actions" (not a branch)
+2. Check deployment status: Repository → Environments → github-pages
 3. Hard refresh browser: Ctrl+Shift+R (Windows/Linux) or Cmd+Shift+R (Mac)
 4. Wait 1-2 minutes for GitHub Pages propagation
+5. Check workflow summary for deployment URL
 
 **Issue 3: Build failures**
 
@@ -1392,17 +1435,28 @@ git log origin/docs --oneline -5
 
 1. Check workflow logs for specific error
 2. Verify all markdown files have valid frontmatter
-3. Check for broken internal links
-4. Test build locally: `cd docs && bun install && bun run build`
-5. Verify dependencies are up to date
+3. Check for broken internal links (link verification step)
+4. Test build locally: `cd pages && bun install && bun run build`
+5. Verify dependencies are up to date in `pages/bun.lock`
 
-**Issue 4: Permission denied errors**
+**Issue 4: Link verification failures**
+
+**Symptoms**: Workflow fails at "Verify internal links" step
+
+**Solution**:
+
+1. Run link verification locally: `cd pages && bun run verify`
+2. Fix any broken internal links in source markdown files
+3. Ensure all referenced files exist in `./docs/`
+4. Re-run the workflow after fixing links
+
+**Issue 5: Permission denied errors**
 
 **Symptoms**: "Permission denied" or "Resource not accessible"
 
 **Solution**:
 
-1. Verify workflow has `contents: write` permission
+1. Verify workflow has `pages: write` and `id-token: write` permissions
 2. Check repository Actions permissions:
    - Settings → Actions → General
    - Workflow permissions → "Read and write permissions"
@@ -1417,10 +1471,9 @@ git log origin/docs --oneline -5
 
 #### Related Documentation
 
-- [Docs Branch Structure](/docs-branch-structure/) - Complete branch organization
-- [Docs Migration Plan](/docs-migration-plan/) - Migration from old workflow
 - [Deployment Guide](/deployment/#documentation-deployment) - User-facing deployment docs
 - [Development Guide](/development/) - Local documentation development
+- [GitHub Workflows Overview](/github-workflows/overview/) - Complete workflow documentation
 
 ---
 
