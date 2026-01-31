@@ -177,7 +177,7 @@ const getPluginRootDir = (): string => {
  * Find the bundled data directory, trying multiple locations
  * @returns Path to data/ directory or null if not found
  */
-const findBundledDataDir = (): string | null => {
+const findBundledDataDir = async (): Promise<string | null> => {
   // Strategy:
   // 1. Try CWD first (for tests and development)
   // 2. Fall back to plugin root (for production when running from OpenCode)
@@ -188,11 +188,8 @@ const findBundledDataDir = (): string | null => {
   ];
 
   for (const dataPath of locations) {
-    try {
-      // Simple existence check - readdir will be done later
+    if (await fileExists(dataPath)) {
       return dataPath;
-    } catch {
-      continue;
     }
   }
 
@@ -254,7 +251,7 @@ const processEntry = async (
  */
 export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<number> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
-  const bundledDataDir = findBundledDataDir() ?? join(process.cwd(), 'data');
+  const bundledDataDir = await findBundledDataDir() ?? join(process.cwd(), 'data');
 
   let entries: { name: string; isDirectory: () => boolean; isFile: () => boolean }[];
   try {
