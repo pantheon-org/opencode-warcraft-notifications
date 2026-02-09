@@ -86,8 +86,10 @@ describe('bundled-sounds module', () => {
       await mkdir(emptyDir, { recursive: true });
       process.chdir(emptyDir);
 
+      // After fix in #175, findBundledDataDir() correctly finds bundled sounds
+      // in plugin root even when CWD is changed
       const count = await installBundledSoundsIfMissing(temp);
-      expect(count).toBe(0);
+      expect(count).toBe(110);
     } finally {
       process.chdir(origCwd);
       removeTempDir(temp);
@@ -104,8 +106,10 @@ describe('bundled-sounds module', () => {
         await mkdir(emptyDir, { recursive: true });
         process.chdir(emptyDir);
 
+        // After fix in #175, findBundledDataDir() correctly finds bundled sounds
+        // in plugin root even when CWD is changed
         const count = await installBundledSoundsIfMissing(temp);
-        expect(count).toBe(0);
+        expect(count).toBe(110);
       } finally {
         process.chdir(origCwd);
         removeTempDir(temp);
