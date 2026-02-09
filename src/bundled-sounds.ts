@@ -251,7 +251,7 @@ const processEntry = async (
  */
 export const installBundledSoundsIfMissing = async (dataDir?: string): Promise<number> => {
   const effectiveDataDir = dataDir ?? DEFAULT_DATA_DIR;
-  const bundledDataDir = await findBundledDataDir() ?? join(process.cwd(), 'data');
+  const bundledDataDir = (await findBundledDataDir()) ?? join(process.cwd(), 'data');
 
   let entries: { name: string; isDirectory: () => boolean; isFile: () => boolean }[];
   try {
