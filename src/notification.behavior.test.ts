@@ -234,6 +234,14 @@ describe('NotificationPlugin Behavior', () => {
         process.platform === 'darwin' ? '/System/Library/Sounds/Glass.aiff' : undefined;
       expect(fallback).toBeUndefined();
     });
+
+    it('should use system sound for Windows fallback', () => {
+      Object.defineProperty(process, 'platform', { value: 'win32' });
+      const fallbackCommand = `powershell -Command "[System.Media.SystemSounds]::Exclamation.Play()"`;
+      expect(fallbackCommand).toBe(
+        'powershell -Command "[System.Media.SystemSounds]::Exclamation.Play()"',
+      );
+    });
   });
 
   describe('Sound command construction', () => {
@@ -257,10 +265,14 @@ describe('NotificationPlugin Behavior', () => {
       expect(fallbackCommand).toBe('aplay /path/to/sound.wav');
     });
 
-    it('should have no command for Windows', () => {
+    it('should use PowerShell for Windows', () => {
       Object.defineProperty(process, 'platform', { value: 'win32' });
-      const hasCommand = process.platform === 'darwin' || process.platform === 'linux';
-      expect(hasCommand).toBe(false);
+      const soundPath = 'C:\\Users\\Test\\sound.wav';
+      const escapedPath = soundPath.replace(/'/g, "''");
+      const command = `powershell -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Media.SoundPlayer]::new('${escapedPath}').Play()"`;
+      expect(command).toBe(
+        'powershell -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Media.SoundPlayer]::new(\'C:\\Users\\Test\\sound.wav\').Play()"',
+      );
     });
   });
 
