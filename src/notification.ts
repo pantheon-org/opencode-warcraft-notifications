@@ -158,7 +158,10 @@ export const NotificationPlugin: Plugin = async (ctx) => {
             await $`aplay ${soundPath}`;
           }
         } else if (process.platform === 'win32') {
-          log.warn('Windows sound playback not yet supported', { soundPath });
+          // Use PowerShell with SoundPlayer - works on all Windows versions
+          // Escape single quotes in path for PowerShell
+          const escapedPath = soundPath.replace(/'/g, "''");
+          await $`powershell -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Media.SoundPlayer]::new('${escapedPath}').Play()"`;
         }
       } else {
         // Play fallback sound if primary sound is missing
@@ -170,7 +173,8 @@ export const NotificationPlugin: Plugin = async (ctx) => {
           log.warn('Primary sound not found, using system sound', { soundPath });
           await $`canberra-gtk-play --id=message`;
         } else if (process.platform === 'win32') {
-          log.warn('Windows sound playback not yet supported', { soundPath });
+          log.warn('Primary sound not found, using system sound', { soundPath });
+          await $`powershell -Command "[System.Media.SystemSounds]::Exclamation.Play()"`;
         }
         await showMissingSoundToast(filename);
       }
