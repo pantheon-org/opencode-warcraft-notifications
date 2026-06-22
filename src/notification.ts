@@ -172,7 +172,10 @@ export const NotificationPlugin: Plugin = async (ctx) => {
           log.warn('Primary sound not found, using system sound', { soundPath });
           await $`canberra-gtk-play --id=message`;
         } else if (process.platform === 'win32') {
-          log.warn('Windows sound playback not yet supported', { soundPath });
+          log.warn('Primary sound not found, using system sound', { soundPath });
+          const psScript = `$ProgressPreference = 'SilentlyContinue'; [System.Media.SystemSounds]::Asterisk.Play()`;
+          const encoded = Buffer.from(psScript, 'utf16le').toString('base64');
+          await $`powershell.exe -NoProfile -EncodedCommand ${encoded}`.quiet();
         }
         await showMissingSoundToast(filename);
       }

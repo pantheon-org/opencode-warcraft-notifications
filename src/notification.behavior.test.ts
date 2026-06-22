@@ -234,6 +234,19 @@ describe('NotificationPlugin Behavior', () => {
         process.platform === 'darwin' ? '/System/Library/Sounds/Glass.aiff' : undefined;
       expect(fallback).toBeUndefined();
     });
+
+    it('should use SystemSounds.Asterisk for Windows fallback', () => {
+      Object.defineProperty(process, 'platform', { value: 'win32' });
+      const psScript = `$ProgressPreference = 'SilentlyContinue'; [System.Media.SystemSounds]::Asterisk.Play()`;
+      const encoded = Buffer.from(psScript, 'utf16le').toString('base64');
+      const command =
+        process.platform === 'win32'
+          ? `powershell.exe -NoProfile -EncodedCommand ${encoded}`
+          : null;
+      expect(command).toBe(`powershell.exe -NoProfile -EncodedCommand ${encoded}`);
+      const decoded = Buffer.from(encoded, 'base64').toString('utf16le');
+      expect(decoded).toBe(psScript);
+    });
   });
 
   describe('Sound command construction', () => {
