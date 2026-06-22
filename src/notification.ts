@@ -158,9 +158,9 @@ export const NotificationPlugin: Plugin = async (ctx) => {
             await $`aplay ${soundPath}`;
           }
         } else if (process.platform === 'win32') {
-          const psScript = `(New-Object Media.SoundPlayer '${soundPath}').PlaySync()`;
+          const psScript = `$ProgressPreference = 'SilentlyContinue'; (New-Object Media.SoundPlayer '${soundPath}').PlaySync()`;
           const encoded = Buffer.from(psScript, 'utf16le').toString('base64');
-          await $`powershell.exe -NoProfile -EncodedCommand ${encoded}`;
+          await $`powershell.exe -NoProfile -EncodedCommand ${encoded}`.quiet();
         }
       } else {
         // Play fallback sound if primary sound is missing

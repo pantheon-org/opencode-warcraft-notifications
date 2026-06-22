@@ -260,7 +260,7 @@ describe('NotificationPlugin Behavior', () => {
     it('should use powershell.exe with EncodedCommand for Windows', () => {
       Object.defineProperty(process, 'platform', { value: 'win32' });
       const soundPath = 'C:\\path\\to\\sound.wav';
-      const psScript = `(New-Object Media.SoundPlayer '${soundPath}').PlaySync()`;
+      const psScript = `$ProgressPreference = 'SilentlyContinue'; (New-Object Media.SoundPlayer '${soundPath}').PlaySync()`;
       const encoded = Buffer.from(psScript, 'utf16le').toString('base64');
       const command =
         process.platform === 'win32'
