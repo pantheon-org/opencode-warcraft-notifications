@@ -20,7 +20,7 @@ This plugin plays authentic Warcraft II unit audio clips from both Alliance and 
 - 📦 **Bundled Sounds**: Includes pre-bundled WAV assets copied into a per-user data directory on first use (no runtime network dependency by default)
 - 🎲 **Random Selection**: Plays a different sound each time for variety
 - ⚔️ **Faction Choice**: Choose Alliance, Horde, or both factions
-- 💻 **Cross-Platform**: Works on macOS and Linux
+- 💻 **Cross-Platform**: Works on macOS, Linux, and Windows
 - 🎨 **Toast Notifications**: In-app toast notifications with authentic voice lines (e.g., "Yes, milord?" / "Work, work.")
 - 🚀 **Automated Releases**: Fully automated CI/CD pipeline with AI-powered version management
 - 📚 **Comprehensive Documentation**: Complete documentation suite for users, developers, and operators
@@ -178,7 +178,7 @@ For complete configuration options and examples, see:
 
 1. **Idle Detection**: When your OpenCode session goes idle, the plugin triggers
 2. **Sound Selection**: Randomly selects a Warcraft II unit sound from your configured faction(s)
-3. **Sound Playback**: Plays the sound using platform-specific audio tools
+3. **Sound Playback**: Plays the sound using platform-specific audio tools (`afplay` on macOS, `canberra-gtk-play` on Linux, `powershell.exe` + `SoundPlayer` on Windows)
 4. **Toast Notification**: Shows an in-app toast with the voice line as the title (e.g., "Yes, milord?") and your session summary
 
 The plugin includes 110+ authentic sounds from both factions, including:
@@ -202,19 +202,18 @@ For the complete list of sounds and examples, see:
 
 - **macOS**: ✅ Full support - Uses `afplay` for audio playback
 - **Linux**: ✅ Full support - Uses `canberra-gtk-play` for audio playback
-- **Windows**: ⚠️ Partial support - Toast notifications work, sound playback planned for future release
+- **Windows**: ✅ Full support - Uses `powershell.exe` + `System.Media.SoundPlayer` for audio playback
 - **Toast Notifications**: ✅ Cross-platform using OpenCode's built-in toast system
 
 ### Windows Support Status
 
-**Current**: Partial support
+**Current**: Full support
 
 - Plugin loads and initializes on Windows
 - Configuration and sound file management work
 - Toast notifications work via OpenCode TUI
-- Sound playback not yet implemented (logs warning)
-
-**Planned**: Full sound playback support in future release
+- Sound playback via `powershell.exe` + `System.Media.SoundPlayer` (uses `-EncodedCommand` for safe path passing)
+- Fallback to `SystemSounds.Asterisk` when a sound file is missing
 
 For detailed platform-specific setup and troubleshooting, see:
 
