@@ -158,7 +158,15 @@ export const NotificationPlugin: Plugin = async (ctx) => {
             await $`aplay ${soundPath}`;
           }
         } else if (process.platform === 'win32') {
-          log.warn('Windows sound playback not yet supported', { soundPath });
+          const psScript = `$ProgressPreference = 'SilentlyContinue'; (New-Object Media.SoundPlayer '${soundPath}').PlaySync()`;
+          const encoded = Buffer.from(psScript, 'utf16le').toString('base64');
+          try {
+            await $`powershell.exe -NoProfile -EncodedCommand ${encoded}`.quiet();
+          } catch {
+            const fallbackScript = `$ProgressPreference = 'SilentlyContinue'; [System.Media.SystemSounds]::Asterisk.Play()`;
+            const fallbackEncoded = Buffer.from(fallbackScript, 'utf16le').toString('base64');
+            await $`powershell.exe -NoProfile -EncodedCommand ${fallbackEncoded}`.quiet();
+          }
         }
       } else {
         // Play fallback sound if primary sound is missing
@@ -170,7 +178,10 @@ export const NotificationPlugin: Plugin = async (ctx) => {
           log.warn('Primary sound not found, using system sound', { soundPath });
           await $`canberra-gtk-play --id=message`;
         } else if (process.platform === 'win32') {
-          log.warn('Windows sound playback not yet supported', { soundPath });
+          log.warn('Primary sound not found, using system sound', { soundPath });
+          const psScript = `$ProgressPreference = 'SilentlyContinue'; [System.Media.SystemSounds]::Asterisk.Play()`;
+          const encoded = Buffer.from(psScript, 'utf16le').toString('base64');
+          await $`powershell.exe -NoProfile -EncodedCommand ${encoded}`.quiet();
         }
         await showMissingSoundToast(filename);
       }

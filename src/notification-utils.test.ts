@@ -26,10 +26,9 @@ describe('extractFilename', () => {
     expect(extractFilename(path)).toBe('');
   });
 
-  it('should handle Windows-style paths', () => {
+  it('should handle Windows-style paths with backslashes', () => {
     const path = 'C:\\Users\\John\\sounds\\elf_selected1.wav';
-    // Note: This tests current behavior, may want to support both / and \ in future
-    expect(extractFilename(path)).toBe('C:\\Users\\John\\sounds\\elf_selected1.wav');
+    expect(extractFilename(path)).toBe('elf_selected1.wav');
   });
 });
 

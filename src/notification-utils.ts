@@ -3,19 +3,22 @@
  */
 
 /**
- * Extract filename from a full file path
+ * Extract filename from a full file path, handling both Unix (/) and Windows (\) separators
  *
- * @param path - Full file path (e.g., "/path/to/file.wav")
+ * @param path - Full file path using either forward or backslash separators
  * @returns The filename (e.g., "file.wav")
  *
  * @example
  * ```typescript
  * extractFilename("/Users/john/sounds/orc_selected1.wav")
  * // Returns: "orc_selected1.wav"
+ *
+ * extractFilename("C:\\Users\\John\\sounds\\elf_selected1.wav")
+ * // Returns: "elf_selected1.wav"
  * ```
  */
 export const extractFilename = (path: string): string => {
-  const parts = path.split('/');
+  const parts = path.split(/[/\\]/);
   return parts[parts.length - 1] || '';
 };
 
