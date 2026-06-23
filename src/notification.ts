@@ -160,7 +160,13 @@ export const NotificationPlugin: Plugin = async (ctx) => {
         } else if (process.platform === 'win32') {
           const psScript = `$ProgressPreference = 'SilentlyContinue'; (New-Object Media.SoundPlayer '${soundPath}').PlaySync()`;
           const encoded = Buffer.from(psScript, 'utf16le').toString('base64');
-          await $`powershell.exe -NoProfile -EncodedCommand ${encoded}`.quiet();
+          try {
+            await $`powershell.exe -NoProfile -EncodedCommand ${encoded}`.quiet();
+          } catch {
+            const fallbackScript = `$ProgressPreference = 'SilentlyContinue'; [System.Media.SystemSounds]::Asterisk.Play()`;
+            const fallbackEncoded = Buffer.from(fallbackScript, 'utf16le').toString('base64');
+            await $`powershell.exe -NoProfile -EncodedCommand ${fallbackEncoded}`.quiet();
+          }
         }
       } else {
         // Play fallback sound if primary sound is missing
