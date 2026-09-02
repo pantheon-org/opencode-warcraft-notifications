@@ -43,6 +43,11 @@ export const NotificationPlugin: Plugin = async (ctx) => {
   const pluginName = '@pantheon-ai/opencode-warcraft-notifications';
   const pluginConfig = await loadPluginConfig(pluginName);
 
+  // Track running subtasks to suppress idle sound while subagents execute.
+  let subtasksRunning = 0;
+  let subtaskTimer: ReturnType<typeof setTimeout> | null = null;
+  const SUBTASK_TIMEOUT_MS = pluginConfig.subagentSilenceTimeoutMs ?? 30_000;
+
   // Install bundled sounds into the user's config on first run
   try {
     const installedCount = await installBundledSoundsIfMissing(pluginConfig.soundsDir);
@@ -244,7 +249,45 @@ export const NotificationPlugin: Plugin = async (ctx) => {
         }
       }
 
+      // Track subtask starts (subagent dispatched)
+      if (
+        pluginConfig.suppressDuringSubagent &&
+        event.type === 'message.part.updated' &&
+        event.properties.part.type === 'subtask'
+      ) {
+        subtasksRunning++;
+        if (subtaskTimer) clearTimeout(subtaskTimer);
+        subtaskTimer = setTimeout(() => {
+          subtasksRunning = 0;
+          subtaskTimer = null;
+        }, SUBTASK_TIMEOUT_MS);
+        if (process.env.DEBUG_OPENCODE) {
+          log.debug('Subtask started, suppressing idle sound', { subtasksRunning });
+        }
+      }
+
+      // Detect subtask completion via session idle status
+      if (
+        pluginConfig.suppressDuringSubagent &&
+        event.type === 'session.status' &&
+        event.properties.status.type === 'idle' &&
+        subtasksRunning > 0
+      ) {
+        subtasksRunning = Math.max(0, subtasksRunning - 1);
+        if (process.env.DEBUG_OPENCODE) {
+          log.debug('Session idle, decremented subtask counter', { subtasksRunning });
+        }
+        return; // Don't play sound — subtask just finished
+      }
+
+      // Play sound on session idle (unless a subagent is running)
       if (event.type === 'session.idle') {
+        if (pluginConfig.suppressDuringSubagent && subtasksRunning > 0) {
+          if (process.env.DEBUG_OPENCODE) {
+            log.debug('Suppressing idle sound during subagent execution', { subtasksRunning });
+          }
+          return;
+        }
         const summary = getIdleSummary(lastMessage?.text) ?? 'Idle';
         await handleSessionIdle(summary);
       }

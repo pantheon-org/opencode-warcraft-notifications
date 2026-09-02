@@ -36,6 +36,17 @@ const warcraftConfigSchema = z
       .boolean()
       .optional()
       .describe('Whether to show toast notifications with voice lines when idle (default: true)'),
+    suppressDuringSubagent: z
+      .boolean()
+      .optional()
+      .describe('Suppress idle sound when a subagent is running (default: false)'),
+    subagentSilenceTimeoutMs: z
+      .number()
+      .int()
+      .min(1000)
+      .max(300000)
+      .optional()
+      .describe('Timeout in ms to clear subagent state (default: 30000, range: 1000-300000)'),
   })
   .strict(); // Reject unknown properties
 
@@ -86,7 +97,7 @@ const formatInvalidValueError = (path: string, issue: ZodIssueData): string => {
 const formatUnrecognizedKeysError = (issue: ZodIssueData): string => {
   const keys = issue.keys as string[];
   if (keys && Array.isArray(keys)) {
-    return `Unrecognized configuration key(s): ${keys.join(', ')}. Only 'soundsDir', 'faction', and 'showDescriptionInToast' are allowed.`;
+    return `Unrecognized configuration key(s): ${keys.join(', ')}. Only 'soundsDir', 'faction', 'showDescriptionInToast', 'suppressDuringSubagent', and 'subagentSilenceTimeoutMs' are allowed.`;
   }
   return `Unrecognized configuration keys`;
 };

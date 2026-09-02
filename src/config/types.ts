@@ -13,6 +13,10 @@ export interface WarcraftNotificationConfig {
   faction?: Faction;
   /** Whether to show toast notifications when idle (default: true). When enabled, displays voice lines as toast title */
   showDescriptionInToast?: boolean;
+  /** Suppress idle sound when a subagent/subtask is running (default: false) */
+  suppressDuringSubagent?: boolean;
+  /** Timeout in ms to clear subagent state if no completion signal received (default: 30000, range: 1000-300000) */
+  subagentSilenceTimeoutMs?: number;
 }
 
 /**
